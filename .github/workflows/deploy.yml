@@ -1,0 +1,22 @@
+name: Deploy Akademik
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Deploy to Local Server
+        run: |
+          cd /var/www/akademik
+          git pull origin main
+          composer install --no-dev --optimize-autoloader
+          php artisan config:clear
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+
