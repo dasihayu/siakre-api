@@ -40,6 +40,28 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
+     * Get default permissions based on role.
+     *
+     * @return array<string>
+     */
+    public function getPermissionsAttribute(): array
+    {
+        return match ($this->role) {
+            UserRole::KAPRODI => [
+                'read_dosen',
+                'create_penelitian',
+                'update_penelitian',
+            ],
+            UserRole::DOSEN => [
+                'read_dosen',
+                'update_penelitian',
+            ],
+            UserRole::ADMINISTRATOR => ['*'],
+            default => [],
+        };
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
