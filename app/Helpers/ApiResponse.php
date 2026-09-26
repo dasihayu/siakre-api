@@ -22,7 +22,18 @@ class ApiResponse
                 : ($user->role ?? null),
         ];
 
-        $userPermissions = $permissions ?? ($user->permissions ?? []);
+        $userPermissions = $permissions;
+        if ($userPermissions === null) {
+            if (is_object($user) && method_exists($user, 'getAllPermissions')) {
+                $userPermissions = $user->getAllPermissions()->pluck('name')->toArray();
+            }
+
+            if (empty($userPermissions) && is_object($user) && isset($user->permissions_array)) {
+                $userPermissions = $user->permissions_array;
+            }
+
+            $userPermissions = $userPermissions ?? [];
+        }
 
         return new JsonResponse([
             'success' => true,
