@@ -27,6 +27,8 @@ class RoleAndPermissionSeeder extends Seeder
             'led',
             'lkps',
             'user',
+            'role',
+            'permission',
         ];
 
         // Actions CRUD
