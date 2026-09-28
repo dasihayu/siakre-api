@@ -38,40 +38,40 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (UnauthorizedException $e, Request $request) {
             if ($request->is('api/*') || $request->expectsJson()) {
-                return ApiResponse::error($e->getMessage() ?: 'Access denied', 403);
+                return ApiResponse::error($e->getMessage() ?: 'Akses ditolak', 403);
             }
         });
 
         $exceptions->render(function (ValidationException $e, Request $request) {
             if ($request->is('api/*') || $request->expectsJson()) {
-                return ApiResponse::validationError($e->errors(), 'Input validation failed');
+                return ApiResponse::validationError($e->errors(), 'Validasi input gagal');
             }
         });
 
         $exceptions->render(function (AuthenticationException $e, Request $request) {
             if ($request->is('api/*') || $request->expectsJson()) {
-                return ApiResponse::error($e->getMessage() ?: 'Unauthenticated.', 401);
+                return ApiResponse::error($e->getMessage() ?: 'Belum terautentikasi.', 401);
             }
         });
 
         $exceptions->render(function (AccessDeniedHttpException $e, Request $request) {
             if ($request->is('api/*') || $request->expectsJson()) {
-                return ApiResponse::error($e->getMessage() ?: 'Access denied', 403);
+                return ApiResponse::error($e->getMessage() ?: 'Akses ditolak', 403);
             }
         });
 
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
             if ($request->is('api/*') || $request->expectsJson()) {
-                return ApiResponse::error('Resource not found', 404);
+                return ApiResponse::error('Data tidak ditemukan', 404);
             }
         });
 
         $exceptions->render(function (Throwable $e, Request $request) {
             if ($request->is('api/*') || $request->expectsJson()) {
                 $code = $e instanceof HttpExceptionInterface ? $e->getStatusCode() : 500;
-                $message = config('app.debug') || $code !== 500 ? $e->getMessage() : 'Server error occurred';
+                $message = config('app.debug') || $code !== 500 ? $e->getMessage() : 'Terjadi kesalahan server';
 
-                return ApiResponse::error($message ?: 'Server error occurred', $code);
+                return ApiResponse::error($message ?: 'Terjadi kesalahan server', $code);
             }
         });
     })->create();
