@@ -5,6 +5,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PerguruanTinggiController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -35,3 +36,5 @@ Route::middleware(['auth:api', 'role:ADMINISTRATOR'])->group(function () {
     Route::put('/permissions/{permission}', [PermissionController::class, 'update'])->middleware('permission:permission.update');
     Route::delete('/permissions/{permission}', [PermissionController::class, 'destroy'])->middleware('permission:permission.delete');
 });
+
+Route::apiResource('perguruan-tinggi', PerguruanTinggiController::class);
