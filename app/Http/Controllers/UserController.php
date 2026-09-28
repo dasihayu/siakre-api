@@ -21,7 +21,7 @@ class UserController extends Controller
 
         return ApiResponse::success(
             UserResource::collection($users),
-            'User list retrieved successfully'
+            'Daftar pengguna berhasil diambil'
         );
     }
 
@@ -44,7 +44,7 @@ class UserController extends Controller
 
         return ApiResponse::success(
             new UserResource($user),
-            'User created successfully',
+            'Pengguna berhasil dibuat',
             201
         );
     }
@@ -56,7 +56,7 @@ class UserController extends Controller
     {
         return ApiResponse::success(
             new UserResource($user),
-            'User detail retrieved successfully'
+            'Detail pengguna berhasil diambil'
         );
     }
 
@@ -89,7 +89,7 @@ class UserController extends Controller
 
         return ApiResponse::success(
             new UserResource($user),
-            'User updated successfully'
+            'Pengguna berhasil diperbarui'
         );
     }
 
@@ -102,7 +102,7 @@ class UserController extends Controller
 
         return ApiResponse::success(
             null,
-            'User deleted successfully'
+            'Pengguna berhasil dihapus'
         );
     }
 }

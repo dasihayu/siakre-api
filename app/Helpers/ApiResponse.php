@@ -9,9 +9,9 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 class ApiResponse
 {
     /**
-     * Return auth response format (Login Successful - 200 OK)
+     * Format respons autentikasi (Login Berhasil - 200 OK)
      */
-    public static function auth(mixed $user, string $token, ?array $permissions = null, string $message = 'Login successful', int $code = 200): JsonResponse
+    public static function auth(mixed $user, string $token, ?array $permissions = null, string $message = 'Login berhasil', int $code = 200): JsonResponse
     {
         $userArray = [
             'id' => $user->id ?? null,
@@ -52,9 +52,9 @@ class ApiResponse
     }
 
     /**
-     * Return single data or list success response format (200 OK / 201 Created)
+     * Format respons sukses data tunggal atau daftar (200 OK / 201 Created)
      */
-    public static function success(mixed $data = null, string $message = 'Success', int $code = 200): JsonResponse
+    public static function success(mixed $data = null, string $message = 'Berhasil', int $code = 200): JsonResponse
     {
         if ($data instanceof LengthAwarePaginator) {
             return self::paginated($data, $message, $code);
@@ -73,9 +73,9 @@ class ApiResponse
     }
 
     /**
-     * Return paginated success response format (200 OK)
+     * Format respons sukses dengan paginasi (200 OK)
      */
-    public static function paginated(LengthAwarePaginator $paginator, string $message = 'Success', int $code = 200): JsonResponse
+    public static function paginated(LengthAwarePaginator $paginator, string $message = 'Berhasil', int $code = 200): JsonResponse
     {
         return new JsonResponse([
             'success' => true,
@@ -94,9 +94,9 @@ class ApiResponse
     }
 
     /**
-     * Return paginated collection success response format (200 OK)
+     * Format respons sukses koleksi dengan paginasi (200 OK)
      */
-    public static function paginatedCollection(ResourceCollection $collection, string $message = 'Success', int $code = 200): JsonResponse
+    public static function paginatedCollection(ResourceCollection $collection, string $message = 'Berhasil', int $code = 200): JsonResponse
     {
         /** @var LengthAwarePaginator $paginator */
         $paginator = $collection->resource;
@@ -118,9 +118,9 @@ class ApiResponse
     }
 
     /**
-     * Return validation error response format (422 Unprocessable Entity)
+     * Format respons error validasi (422 Unprocessable Entity)
      */
-    public static function validationError(mixed $errors, string $message = 'Validation failed', int $code = 422): JsonResponse
+    public static function validationError(mixed $errors, string $message = 'Validasi gagal', int $code = 422): JsonResponse
     {
         return new JsonResponse([
             'success' => false,
@@ -132,9 +132,9 @@ class ApiResponse
     }
 
     /**
-     * Return general error response format (401 / 403 / 404 / 500)
+     * Format respons error umum (401 / 403 / 404 / 500)
      */
-    public static function error(string $message = 'An error occurred', int $code = 400, mixed $errors = null): JsonResponse
+    public static function error(string $message = 'Terjadi kesalahan', int $code = 400, mixed $errors = null): JsonResponse
     {
         return new JsonResponse([
             'success' => false,

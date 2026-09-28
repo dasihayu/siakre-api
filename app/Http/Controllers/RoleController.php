@@ -20,7 +20,7 @@ class RoleController extends Controller
 
         return ApiResponse::success(
             RoleResource::collection($roles),
-            'Role list retrieved successfully'
+            'Daftar role berhasil diambil'
         );
     }
 
@@ -44,7 +44,7 @@ class RoleController extends Controller
 
         return ApiResponse::success(
             new RoleResource($role),
-            'Role created successfully',
+            'Role berhasil dibuat',
             201
         );
     }
@@ -58,7 +58,7 @@ class RoleController extends Controller
 
         return ApiResponse::success(
             new RoleResource($role),
-            'Role detail retrieved successfully'
+            'Detail role berhasil diambil'
         );
     }
 
@@ -87,7 +87,7 @@ class RoleController extends Controller
 
         return ApiResponse::success(
             new RoleResource($role),
-            'Role updated successfully'
+            'Role berhasil diperbarui'
         );
     }
 
@@ -100,7 +100,7 @@ class RoleController extends Controller
 
         return ApiResponse::success(
             null,
-            'Role deleted successfully'
+            'Role berhasil dihapus'
         );
     }
 }

@@ -18,13 +18,13 @@ class AuthController extends Controller
         $credentials = $request->validated();
 
         if (! $token = Auth::guard('api')->attempt($credentials)) {
-            return ApiResponse::error('Invalid email or password.', 401);
+            return ApiResponse::error('Email atau password salah.', 401);
         }
 
         /** @var User $user */
         $user = Auth::guard('api')->user();
 
-        return ApiResponse::auth($user, $token, message: 'Login successful');
+        return ApiResponse::auth($user, $token, message: 'Login berhasil');
     }
 
     /**
@@ -42,7 +42,7 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'role' => is_object($user->role) ? $user->role->value : $user->role,
             ],
-        ], 'User profile retrieved successfully');
+        ], 'Profil pengguna berhasil diambil');
     }
 
     /**
@@ -52,7 +52,7 @@ class AuthController extends Controller
     {
         Auth::guard('api')->logout();
 
-        return ApiResponse::success(null, 'Successfully logged out');
+        return ApiResponse::success(null, 'Berhasil logout');
     }
 
     /**
@@ -66,6 +66,6 @@ class AuthController extends Controller
         /** @var User $user */
         $user = Auth::guard('api')->user();
 
-        return ApiResponse::auth($user, $token, message: 'Token refreshed successfully');
+        return ApiResponse::auth($user, $token, message: 'Token berhasil diperbarui');
     }
 }

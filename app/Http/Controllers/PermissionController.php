@@ -20,7 +20,7 @@ class PermissionController extends Controller
 
         return ApiResponse::success(
             PermissionResource::collection($permissions),
-            'Permission list retrieved successfully'
+            'Daftar permission berhasil diambil'
         );
     }
 
@@ -38,7 +38,7 @@ class PermissionController extends Controller
 
         return ApiResponse::success(
             new PermissionResource($permission),
-            'Permission created successfully',
+            'Permission berhasil dibuat',
             201
         );
     }
@@ -50,7 +50,7 @@ class PermissionController extends Controller
     {
         return ApiResponse::success(
             new PermissionResource($permission),
-            'Permission detail retrieved successfully'
+            'Detail permission berhasil diambil'
         );
     }
 
@@ -73,7 +73,7 @@ class PermissionController extends Controller
 
         return ApiResponse::success(
             new PermissionResource($permission),
-            'Permission updated successfully'
+            'Permission berhasil diperbarui'
         );
     }
 
@@ -86,7 +86,7 @@ class PermissionController extends Controller
 
         return ApiResponse::success(
             null,
-            'Permission deleted successfully'
+            'Permission berhasil dihapus'
         );
     }
 }
