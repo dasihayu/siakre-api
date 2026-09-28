@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
         foreach (UserRole::cases() as $role) {
             $slug = strtolower($role->value);
 
-            User::firstOrCreate(
+            $user = User::firstOrCreate(
                 ['email' => "{$slug}@example.com"],
                 [
                     'name' => ucfirst($slug).' User',
@@ -28,6 +28,8 @@ class UserSeeder extends Seeder
                     'email_verified_at' => now(),
                 ]
             );
+
+            $user->assignRole($role->value);
         }
     }
 }

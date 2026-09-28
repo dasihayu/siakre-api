@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ApiResponse;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use PHPOpenSourceSaver\JWTAuth\JWTGuard;
 
 class AuthController extends Controller
 {
@@ -18,12 +18,13 @@ class AuthController extends Controller
         $credentials = $request->validated();
 
         if (! $token = Auth::guard('api')->attempt($credentials)) {
-            return response()->json([
-                'message' => 'Email atau password salah.',
-            ], 401);
+            return ApiResponse::error('Email atau password salah.', 401);
         }
 
-        return $this->createNewTokenResponse($token);
+        /** @var User $user */
+        $user = Auth::guard('api')->user();
+
+        return ApiResponse::auth($user, $token, message: 'Login berhasil');
     }
 
     /**
@@ -31,9 +32,17 @@ class AuthController extends Controller
      */
     public function me(): JsonResponse
     {
-        return response()->json([
-            'user' => Auth::guard('api')->user(),
-        ]);
+        /** @var User $user */
+        $user = Auth::guard('api')->user();
+
+        return ApiResponse::success([
+            'user' => [
+                'id' => $user->id,
+                'nama' => $user->nama ?? $user->name,
+                'email' => $user->email,
+                'role' => is_object($user->role) ? $user->role->value : $user->role,
+            ],
+        ], 'Profil pengguna berhasil diambil');
     }
 
     /**
@@ -43,9 +52,7 @@ class AuthController extends Controller
     {
         Auth::guard('api')->logout();
 
-        return response()->json([
-            'message' => 'Berhasil keluar.',
-        ]);
+        return ApiResponse::success(null, 'Berhasil logout');
     }
 
     /**
@@ -56,22 +63,9 @@ class AuthController extends Controller
         /** @var string $token */
         $token = Auth::guard('api')->refresh();
 
-        return $this->createNewTokenResponse($token);
-    }
+        /** @var User $user */
+        $user = Auth::guard('api')->user();
 
-    /**
-     * Get the token array structure.
-     */
-    protected function createNewTokenResponse(string $token, int $status = 200): JsonResponse
-    {
-        /** @var JWTGuard $guard */
-        $guard = Auth::guard('api');
-
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => $guard->factory()->getTTL() * 60,
-            'user' => $guard->user(),
-        ], $status);
+        return ApiResponse::auth($user, $token, message: 'Token berhasil diperbarui');
     }
 }
