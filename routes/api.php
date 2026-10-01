@@ -6,6 +6,8 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PerguruanTinggiController;
+use App\Http\Controllers\ProdiController;
+use App\Http\Controllers\UppsController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -38,3 +40,5 @@ Route::middleware(['auth:api', 'role:ADMINISTRATOR'])->group(function () {
 });
 
 Route::apiResource('perguruan-tinggi', PerguruanTinggiController::class);
+Route::apiResource('prodi', ProdiController::class);
+Route::apiResource('upps', UppsController::class);
