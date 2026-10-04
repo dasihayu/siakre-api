@@ -8,28 +8,31 @@ use App\Helpers\ApiResponse;
 
 class UppsController extends Controller
 {
-    // Tampil semua data (beserta relasinya)
+    // Tampil semua data (Read)
     public function index()
     {
-        // with() digunakan untuk memanggil data relasi secara langsung (Eager Loading)
         $data = Upps::with(['perguruanTinggi', 'prodi'])->get();
         return ApiResponse::success($data, 'Berhasil mengambil data UPPS');
     }
 
-    // Tambah data
+    // Tambah data (Sesuai Flowchart: Tambah)
     public function store(Request $request)
     {
-        // Validasi input
         $request->validate([
-            'id_pt'         => 'required|exists:perguruan_tinggis,id', // Pastikan ID ada di tabel perguruan_tinggis
-            'kode_upps'     => 'required|string',
+            'id_pt'         => 'required|exists:perguruan_tinggis,id',
+            // Cek Kode Duplikat sesuai flowchart
+            'kode_upps'     => 'required|string|unique:upps,kode_upps', 
             'nama_upps'     => 'required|string',
             'pimpinan_upps' => 'nullable|string',
-            'prodi_id'      => 'required|exists:prodi,id', // Pastikan ID ada di tabel prodi
+            'prodi_id'      => 'required|exists:prodi,id',
             'jenis'         => 'required|string',
+        ], [
+            'kode_upps.unique' => 'Kode UPPS Sudah Ada' // Pesan error spesifik
         ]);
 
         $upps = Upps::create($request->all());
+        
+        // Tampilkan Pesan Berhasil
         return ApiResponse::success($upps, 'Data UPPS berhasil ditambahkan', 201);
     }
 
@@ -45,7 +48,7 @@ class UppsController extends Controller
         return ApiResponse::success($upps, 'Berhasil mengambil detail data UPPS');
     }
 
-    // Update data
+    // Update data (Sesuai Flowchart: Edit)
     public function update(Request $request, string $id)
     {
         $upps = Upps::find($id);
@@ -56,18 +59,22 @@ class UppsController extends Controller
 
         $request->validate([
             'id_pt'         => 'required|exists:perguruan_tinggis,id',
-            'kode_upps'     => 'required|string',
+            'kode_upps'     => 'required|string|unique:upps,kode_upps,' . $id,
             'nama_upps'     => 'required|string',
             'pimpinan_upps' => 'nullable|string',
             'prodi_id'      => 'required|exists:prodi,id',
             'jenis'         => 'required|string',
+        ], [
+            'kode_upps.unique' => 'Kode UPPS Sudah Ada'
         ]);
 
         $upps->update($request->all());
+        
+        // Tampilkan Pesan Berhasil
         return ApiResponse::success($upps, 'Data UPPS berhasil diupdate');
     }
 
-    // Hapus data
+    // Hapus data (Sesuai Flowchart: Hapus)
     public function destroy(string $id)
     {
         $upps = Upps::find($id);
@@ -76,7 +83,10 @@ class UppsController extends Controller
             return ApiResponse::error('Data tidak ditemukan', 404);
         }
 
+        // Langsung eksekusi hapus sesuai flowchart Master UPPS terbaru
         $upps->delete();
-        return ApiResponse::success(null, 'Data UPPS berhasil dihapus');
+        
+        // Tampilkan Pesan Berhasil
+        return ApiResponse::success(null, 'Data berhasil dihapus');
     }
 }

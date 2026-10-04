@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('prodi', function (Blueprint $table) {
             $table->id();
-            $table->string('kode_prodi')->default('PR01');
+            $table->string('kode_prodi')->default('PR01')->unique();
             $table->string('nama_prodi')->default('Informatika');
             $table->string('akreditasi')->nullable()->default('Unggul');
             $table->timestamps();
