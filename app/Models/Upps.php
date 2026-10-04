@@ -9,7 +9,7 @@ class Upps extends Model
 {
     use HasFactory;
 
-    protected $table = 'Upps';
+    protected $table = 'upps';
     
     protected $fillable = [
         'id_pt', 
