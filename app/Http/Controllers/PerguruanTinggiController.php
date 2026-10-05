@@ -67,7 +67,7 @@ class PerguruanTinggiController extends Controller
         }
 
         // Cek Relasi ke Fakultas / UPPS (Sesuai flowchart)
-        // Kita import model Upps secara langsung di sini untuk mengecek relasi
+        // import model Upps untuk mengecek relasi
         $adaDataTerikat = \App\Models\Upps::where('id_pt', $id)->exists();
 
         // Ada Data Terikat? Ya

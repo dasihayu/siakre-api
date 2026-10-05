@@ -18,5 +18,11 @@ class DatabaseSeeder extends Seeder
             RoleAndPermissionSeeder::class,
             UserSeeder::class,
         ]);
+        
+        $this->call([
+            PerguruanTinggiSeeder::class,
+            ProdiSeeder::class,
+            UppsSeeder::class,
+        ]);
     }
 }

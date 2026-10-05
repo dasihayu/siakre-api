@@ -6,7 +6,7 @@ use App\Models\Prodi;
 use App\Models\Upps;
 use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
-use Illuminate\Support\Facades\DB; // Tambahkan ini untuk mengecek tabel yang mungkin belum ada Model-nya
+use Illuminate\Support\Facades\DB; // untuk mengecek tabel yang mungkin belum ada Model-nya
 
 class ProdiController extends Controller
 {
@@ -25,7 +25,6 @@ class ProdiController extends Controller
             'kode_prodi' => 'required|string|unique:prodi,kode_prodi',
             'nama_prodi' => 'required|string',
             'akreditasi' => 'required|string',
-            // Tambahkan validasi lain seperti kaprodi atau jenjang jika ada di tabelmu
         ]);
 
         $prodi = Prodi::create($request->all());
@@ -77,22 +76,16 @@ class ProdiController extends Controller
             return ApiResponse::error('Data tidak ditemukan', 404);
         }
 
-        // Cek Keterikatan Data Kurikulum, UPPS / Mahasiswa (Sesuai Flowchart)
-        // 1. Cek di tabel UPPS (pakai Model karena modelnya sudah kita buat)
+        // Cek Keterikatan Data Kurikulum, UPPS / Mahasiswa
+        // 1. Cek di tabel UPPS 
         $terikatUpps = Upps::where('prodi_id', $id)->exists();
 
-        
-
-        // Ada Data Terikat? Ya
         if ($terikatUpps) {
-            // Tampilkan Pesan Error 'Prodi Masih Digunakan'
             return ApiResponse::error('Prodi Masih Digunakan', 400);
         }
 
-        // Ada Data Terikat? Tidak -> Hapus Prodi dari Database
         $prodi->delete();
 
-        
         // Tampilkan Pesan Berhasil
         return ApiResponse::success(null, 'Data berhasil dihapus');
     }
