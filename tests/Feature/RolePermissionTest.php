@@ -4,6 +4,7 @@ use App\Enums\UserRole;
 use App\Models\User;
 use Database\Seeders\RoleAndPermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 uses(RefreshDatabase::class);
 
@@ -11,7 +12,7 @@ beforeEach(function () {
     $this->seed(RoleAndPermissionSeeder::class);
 });
 
-test('user permissions are correctly serialized in auth response', function () {
+test('user permissions are correctly serialized in JWT token claims', function () {
     /** @var User $user */
     $user = User::factory()->create([
         'email' => 'kaprodi@univ.ac.id',
@@ -27,7 +28,11 @@ test('user permissions are correctly serialized in auth response', function () {
 
     $response->assertStatus(200);
 
-    $permissions = $response->json('data.authorization.permissions');
+    expect($response->json('data.authorization.permissions'))->toBeNull();
+
+    $token = $response->json('data.authorization.access_token');
+    $payload = JWTAuth::setToken($token)->getPayload();
+    $permissions = $payload->get('permissions');
 
     expect($permissions)->toContain('dosen.create')
         ->toContain('dosen.read')
@@ -36,7 +41,7 @@ test('user permissions are correctly serialized in auth response', function () {
         ->toContain('led.read');
 });
 
-test('dosen role has restricted permissions compared to kaprodi', function () {
+test('dosen role has restricted permissions in JWT token claims compared to kaprodi', function () {
     /** @var User $user */
     $user = User::factory()->create([
         'email' => 'dosen@univ.ac.id',
@@ -50,7 +55,11 @@ test('dosen role has restricted permissions compared to kaprodi', function () {
         'password' => 'password123',
     ]);
 
-    $permissions = $response->json('data.authorization.permissions');
+    expect($response->json('data.authorization.permissions'))->toBeNull();
+
+    $token = $response->json('data.authorization.access_token');
+    $payload = JWTAuth::setToken($token)->getPayload();
+    $permissions = $payload->get('permissions');
 
     expect($permissions)->toContain('dosen.read')
         ->toContain('penelitian.create');

@@ -37,6 +37,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return [
             'role' => $this->role?->value,
+            'permissions' => $this->permissions_array,
         ];
     }
 
