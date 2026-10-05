@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('nama_pt')->default('Polines'); // Mandatory dengan default 'Polines'
             $table->string('alamat')->nullable()->default('Jakarta'); // Default 'Jakarta'
             $table->string('pimpinan')->nullable()->default('Dyonisius Beti'); // Default 'Dyonisius Beti'
-            $table->string('visi')->nullable(); // Visi & Misi diubah ke text agar bisa menampung kalimat panjang
+            $table->string('visi')->nullable(); // 
             $table->string('misi')->nullable(); //
             $table->timestamps();
         });
