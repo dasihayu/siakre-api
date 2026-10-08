@@ -8,6 +8,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UppsController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\KurikulumController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -39,8 +40,32 @@ Route::middleware(['auth:api', 'role:ADMINISTRATOR'])->group(function () {
     Route::delete('/permissions/{permission}', [PermissionController::class, 'destroy'])->middleware('permission:permission.delete');
 });
 
-Route::middleware('auth:api')->group(function () {
-    Route::apiResource('perguruan-tinggi', PerguruanTinggiController::class);
-    Route::apiResource('prodi', ProdiController::class);
-    Route::apiResource('upps', UppsController::class);
+Route::middleware(['auth:api'])->group(function () {
+    // --- CRUD Master Perguruan Tinggi ---
+    Route::get('/perguruan-tinggi', [PerguruanTinggiController::class, 'index']);
+    Route::post('/perguruan-tinggi', [PerguruanTinggiController::class, 'store']);
+    Route::get('/perguruan-tinggi/{id}', [PerguruanTinggiController::class, 'show']);
+    Route::put('/perguruan-tinggi/{id}', [PerguruanTinggiController::class, 'update']);
+    Route::delete('/perguruan-tinggi/{id}', [PerguruanTinggiController::class, 'destroy']);
+
+    // --- CRUD Master Program Studi (Prodi) ---
+    Route::get('/prodi', [ProdiController::class, 'index']);
+    Route::post('/prodi', [ProdiController::class, 'store']);
+    Route::get('/prodi/{id}', [ProdiController::class, 'show']);
+    Route::put('/prodi/{id}', [ProdiController::class, 'update']);
+    Route::delete('/prodi/{id}', [ProdiController::class, 'destroy']);
+
+    // --- CRUD Master UPPS ---
+    Route::get('/upps', [UppsController::class, 'index']);
+    Route::post('/upps', [UppsController::class, 'store']);
+    Route::get('/upps/{id}', [UppsController::class, 'show']);
+    Route::put('/upps/{id}', [UppsController::class, 'update']);
+    Route::delete('/upps/{id}', [UppsController::class, 'destroy']);
+
+    // --- CRUD Master Kurikulum ---
+    Route::get('/kurikulum', [KurikulumController::class, 'index']);
+    Route::post('/kurikulum', [KurikulumController::class, 'store']);
+    Route::get('/kurikulum/{id}', [KurikulumController::class, 'show']);
+    Route::put('/kurikulum/{id}', [KurikulumController::class, 'update']);
+    Route::delete('/kurikulum/{id}', [KurikulumController::class, 'destroy']);
 });
