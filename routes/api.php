@@ -9,6 +9,11 @@ use App\Http\Controllers\UppsController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\KurikulumController;
+use App\Http\Controllers\CplController;
+use App\Http\Controllers\MataKuliahController;
+use App\Http\Controllers\MataKuliahCplController;
+use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\DataKelulusanController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -68,4 +73,36 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/kurikulum/{id}', [KurikulumController::class, 'show']);
     Route::put('/kurikulum/{id}', [KurikulumController::class, 'update']);
     Route::delete('/kurikulum/{id}', [KurikulumController::class, 'destroy']);
+
+    // --- CRUD Master CPL ---
+    Route::get('/cpl', [CplController::class, 'index']);
+    Route::post('/cpl', [CplController::class, 'store']);
+    Route::get('/cpl/{id}', [CplController::class, 'show']);
+    Route::put('/cpl/{id}', [CplController::class, 'update']);
+    Route::delete('/cpl/{id}', [CplController::class, 'destroy']);
+
+    // --- CRUD Master Mata Kuliah ---
+    Route::get('/mata-kuliah', [MataKuliahController::class, 'index']);
+    Route::post('/mata-kuliah', [MataKuliahController::class, 'store']);
+    Route::get('/mata-kuliah/{id}', [MataKuliahController::class, 'show']);
+    Route::put('/mata-kuliah/{id}', [MataKuliahController::class, 'update']);
+    Route::delete('/mata-kuliah/{id}', [MataKuliahController::class, 'destroy']);
+
+    // --- Mapping Mata Kuliah ke CPL ---
+    Route::get('/mata-kuliah/{mataKuliahId}/cpl', [MataKuliahCplController::class, 'index']);
+    Route::post('/mata-kuliah/{mataKuliahId}/cpl/sync', [MataKuliahCplController::class, 'sync']);
+
+    // --- CRUD Data Mahasiswa ---
+    Route::get('/mahasiswa', [MahasiswaController::class, 'index']);
+    Route::post('/mahasiswa', [MahasiswaController::class, 'store']);
+    Route::get('/mahasiswa/{id}', [MahasiswaController::class, 'show']);
+    Route::put('/mahasiswa/{id}', [MahasiswaController::class, 'update']);
+    Route::delete('/mahasiswa/{id}', [MahasiswaController::class, 'destroy']);
+
+    // --- CRUD Data Kelulusan ---
+    Route::get('/data-kelulusan', [DataKelulusanController::class, 'index']);
+    Route::post('/data-kelulusan', [DataKelulusanController::class, 'store']);
+    Route::get('/data-kelulusan/{id}', [DataKelulusanController::class, 'show']);
+    Route::put('/data-kelulusan/{id}', [DataKelulusanController::class, 'update']);
+    Route::delete('/data-kelulusan/{id}', [DataKelulusanController::class, 'destroy']);
 });
