@@ -23,6 +23,10 @@ class DatabaseSeeder extends Seeder
             PerguruanTinggiSeeder::class,
             ProdiSeeder::class,
             UppsSeeder::class,
+            KurikulumSeeder::class,
+            CplSeeder::class, 
+            MataKuliahSeeder::class,
+            MahasiswaSeeder::class,
         ]);
     }
 }
