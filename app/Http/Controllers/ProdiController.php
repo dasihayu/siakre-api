@@ -76,17 +76,20 @@ class ProdiController extends Controller
             return ApiResponse::error('Data tidak ditemukan', 404);
         }
 
-        // Cek Keterikatan Data Kurikulum, UPPS / Mahasiswa
-        // 1. Cek di tabel UPPS 
-        $terikatUpps = Upps::where('prodi_id', $id)->exists();
-
-        if ($terikatUpps) {
-            return ApiResponse::error('Prodi Masih Digunakan', 400);
+        try {
+            // Langsung coba hapus
+            $prodi->delete();
+            return ApiResponse::success(null, 'Data berhasil dihapus');
+            
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Tangkap error jika ditolak oleh sistem database (terikat foreign key)
+            // Code 23000 adalah kode standar database untuk Integrity constraint violation
+            if ($e->getCode() == "23000") {
+                return ApiResponse::error('Prodi Masih Digunakan', 400);
+            }
+            
+            // Jika ada error database lain
+            return ApiResponse::error('Gagal menghapus data', 500);
         }
-
-        $prodi->delete();
-
-        // Tampilkan Pesan Berhasil
-        return ApiResponse::success(null, 'Data berhasil dihapus');
     }
 }
