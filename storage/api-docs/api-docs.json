@@ -1,0 +1,2412 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Akreditasi API",
+        "description": "Dokumentasi REST API Sistem Informasi Akreditasi",
+        "contact": {
+            "email": "admin@akreditasi.ac.id"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000",
+            "description": "API Server"
+        }
+    ],
+    "paths": {
+        "/api/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login pengguna",
+                "description": "Login dengan email dan password untuk mendapatkan JWT Bearer token",
+                "operationId": "ab51b73c928b70e12ed4976216ee3d32",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "admin@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login berhasil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Login berhasil"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "eyJ0eXAiOiJKV1Qi..."
+                                                },
+                                                "token_type": {
+                                                    "type": "string",
+                                                    "example": "bearer"
+                                                },
+                                                "expires_in": {
+                                                    "type": "integer",
+                                                    "example": 3600
+                                                },
+                                                "user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "nama": {
+                                                            "type": "string",
+                                                            "example": "Admin"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "admin@example.com"
+                                                        },
+                                                        "role": {
+                                                            "type": "string",
+                                                            "example": "admin"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Kredensial tidak valid",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Email atau password salah."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/me": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Ambil profil pengguna login",
+                "description": "Mengambil data profil user yang sedang aktif",
+                "operationId": "fe4ddd59a75bb3a84342871d79c7f59f",
+                "responses": {
+                    "200": {
+                        "description": "Profil berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Profil pengguna berhasil diambil"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "nama": {
+                                                            "type": "string",
+                                                            "example": "Admin"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "admin@example.com"
+                                                        },
+                                                        "role": {
+                                                            "type": "string",
+                                                            "example": "admin"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout",
+                "description": "Invalidasi token saat ini",
+                "operationId": "2a90075aa39be55c2138e1870bd6a25d",
+                "responses": {
+                    "200": {
+                        "description": "Berhasil logout",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Berhasil logout"
+                                        },
+                                        "data": {
+                                            "type": "null"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/refresh": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Refresh JWT token",
+                "description": "Perbarui token yang sudah kedaluwarsa atau mendekati kedaluwarsa",
+                "operationId": "247dfce5c801101cf56ac30ef2ec2fe0",
+                "responses": {
+                    "200": {
+                        "description": "Token berhasil diperbarui",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token berhasil diperbarui"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "eyJ0eXAiOiJKV1Qi..."
+                                                },
+                                                "token_type": {
+                                                    "type": "string",
+                                                    "example": "bearer"
+                                                },
+                                                "expires_in": {
+                                                    "type": "integer",
+                                                    "example": 3600
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cpl": {
+            "get": {
+                "tags": [
+                    "Cpl"
+                ],
+                "summary": "Index Cpl",
+                "operationId": "e198a99ba460e60c92243317ddb1ba61",
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Cpl"
+                ],
+                "summary": "Store Cpl",
+                "operationId": "57226cb6a4f66b08db675a05df82a839",
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cpl/{id}": {
+            "get": {
+                "tags": [
+                    "Cpl"
+                ],
+                "summary": "Show Cpl",
+                "operationId": "6663a18933ee646d5e9043ddc50e5ae8",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Cpl"
+                ],
+                "summary": "Update Cpl",
+                "operationId": "f9b53cd8d80762951e161d145a5c9da2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Cpl"
+                ],
+                "summary": "Destroy Cpl",
+                "operationId": "a03d478c4d396025d7de6d9d3d9fe5e5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/data-kelulusan": {
+            "get": {
+                "tags": [
+                    "Data Kelulusan"
+                ],
+                "summary": "Index Data Kelulusan",
+                "operationId": "a25b78f58c418c3edf7da07730d4bb41",
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Data Kelulusan"
+                ],
+                "summary": "Store Data Kelulusan",
+                "operationId": "141d050522673f0eedfe7daa2a174eb2",
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/data-kelulusan/{id}": {
+            "get": {
+                "tags": [
+                    "Data Kelulusan"
+                ],
+                "summary": "Show Data Kelulusan",
+                "operationId": "59d12292263dc0b47bd8ee85d97acbdf",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Data Kelulusan"
+                ],
+                "summary": "Update Data Kelulusan",
+                "operationId": "c8aa81e481fe5479a1aeb7242a400bb5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Data Kelulusan"
+                ],
+                "summary": "Destroy Data Kelulusan",
+                "operationId": "60c98662355b7ab207c20dc979ab2af6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/kurikulum": {
+            "get": {
+                "tags": [
+                    "Kurikulum"
+                ],
+                "summary": "Index Kurikulum",
+                "operationId": "748b00aae309a43b5256261fa653ec0d",
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Kurikulum"
+                ],
+                "summary": "Store Kurikulum",
+                "operationId": "4ffc9c5ae38c79d2019bb8bbe9270594",
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/kurikulum/{id}": {
+            "get": {
+                "tags": [
+                    "Kurikulum"
+                ],
+                "summary": "Show Kurikulum",
+                "operationId": "b263a48aa361e5a6064a5bfebc21d561",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Kurikulum"
+                ],
+                "summary": "Update Kurikulum",
+                "operationId": "3a172bdc811c8ceee262e4f3eac217db",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Kurikulum"
+                ],
+                "summary": "Destroy Kurikulum",
+                "operationId": "d7d44319855b3aa183008118cbe3822c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/mahasiswa": {
+            "get": {
+                "tags": [
+                    "Mahasiswa"
+                ],
+                "summary": "Index Mahasiswa",
+                "operationId": "0d52b49f05c1f6baf1b423458dc71b58",
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Mahasiswa"
+                ],
+                "summary": "Store Mahasiswa",
+                "operationId": "712ac23539c655329364a6b17a911d05",
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/mahasiswa/{id}": {
+            "get": {
+                "tags": [
+                    "Mahasiswa"
+                ],
+                "summary": "Show Mahasiswa",
+                "operationId": "d569f64d6a084785b903b2a80c4b56a1",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Mahasiswa"
+                ],
+                "summary": "Update Mahasiswa",
+                "operationId": "c9633730b5363a62b59153c80b40f9d2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Mahasiswa"
+                ],
+                "summary": "Destroy Mahasiswa",
+                "operationId": "e0d3036caa67b1131b7dd4bfed0faaee",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/mata-kuliah/{mataKuliahId}/cpl": {
+            "get": {
+                "tags": [
+                    "Mata Kuliah Cpl"
+                ],
+                "summary": "Index Mata Kuliah Cpl",
+                "operationId": "e86ab7f1da836308855b758bf170a5e0",
+                "parameters": [
+                    {
+                        "name": "mataKuliahId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/mata-kuliah/{mataKuliahId}/cpl/sync": {
+            "post": {
+                "tags": [
+                    "Mata Kuliah Cpl"
+                ],
+                "summary": "Sync Mata Kuliah Cpl",
+                "operationId": "02cebe607e8bfa3398b7b6e51d1b4d2e",
+                "parameters": [
+                    {
+                        "name": "mataKuliahId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/mata-kuliah": {
+            "get": {
+                "tags": [
+                    "Mata Kuliah"
+                ],
+                "summary": "Index Mata Kuliah",
+                "operationId": "d607d2d309ac897ad400db9bc44487fa",
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Mata Kuliah"
+                ],
+                "summary": "Store Mata Kuliah",
+                "operationId": "a3fdbfa26739753dede96f44ec894cfd",
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/mata-kuliah/{id}": {
+            "get": {
+                "tags": [
+                    "Mata Kuliah"
+                ],
+                "summary": "Show Mata Kuliah",
+                "operationId": "5374545e738610b6e4a5b1e03712f5ea",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Mata Kuliah"
+                ],
+                "summary": "Update Mata Kuliah",
+                "operationId": "f9b9e55cf6c98aa588bd9a0404eb0d96",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Mata Kuliah"
+                ],
+                "summary": "Destroy Mata Kuliah",
+                "operationId": "a9d42be6ac35d612a3cb675db75a2081",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/perguruan-tinggi": {
+            "get": {
+                "tags": [
+                    "Perguruan Tinggi"
+                ],
+                "summary": "Index Perguruan Tinggi",
+                "operationId": "75e11a581b511f88391d727241d7692a",
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Perguruan Tinggi"
+                ],
+                "summary": "Store Perguruan Tinggi",
+                "operationId": "cf7fd265ac01df89e0a78613ce4c915b",
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/perguruan-tinggi/{id}": {
+            "get": {
+                "tags": [
+                    "Perguruan Tinggi"
+                ],
+                "summary": "Show Perguruan Tinggi",
+                "operationId": "8f320d67fedaa3f44df76aaafcfd95e4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Perguruan Tinggi"
+                ],
+                "summary": "Update Perguruan Tinggi",
+                "operationId": "b3f516165dbc8abc2a623a7652532e08",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Perguruan Tinggi"
+                ],
+                "summary": "Destroy Perguruan Tinggi",
+                "operationId": "3a735b14a28c46ff268508f41f5af454",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/permissions": {
+            "get": {
+                "tags": [
+                    "Permission"
+                ],
+                "summary": "Index Permission",
+                "operationId": "1462866c7dd2186e8a425e624ca3d7a0",
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Permission"
+                ],
+                "summary": "Store Permission",
+                "operationId": "c3a9c1ae63bd96ba18f3246c417e8ee5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "guard_name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/permissions/{permission}": {
+            "get": {
+                "tags": [
+                    "Permission"
+                ],
+                "summary": "Show Permission",
+                "operationId": "39af9b8e91239bda15a228c51f7ff1ec",
+                "parameters": [
+                    {
+                        "name": "permission",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Permission"
+                ],
+                "summary": "Update Permission",
+                "operationId": "c622bfebc8b2235609e437f823cb407e",
+                "parameters": [
+                    {
+                        "name": "permission",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "guard_name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Permission"
+                ],
+                "summary": "Destroy Permission",
+                "operationId": "8a830d00901b8f878bbb352ef0755c7e",
+                "parameters": [
+                    {
+                        "name": "permission",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/prodi": {
+            "get": {
+                "tags": [
+                    "Prodi"
+                ],
+                "summary": "Index Prodi",
+                "operationId": "f13736f2cbea76d2e7a201cc9e93f6d0",
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Prodi"
+                ],
+                "summary": "Store Prodi",
+                "operationId": "fa639c93c0d53a4676f8a2eeb721e912",
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/prodi/{id}": {
+            "get": {
+                "tags": [
+                    "Prodi"
+                ],
+                "summary": "Show Prodi",
+                "operationId": "ee4546b17eccec771efaeacf7785e5ff",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Prodi"
+                ],
+                "summary": "Update Prodi",
+                "operationId": "e6282b4d5f64f911dbbddaf581f167b0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Prodi"
+                ],
+                "summary": "Destroy Prodi",
+                "operationId": "61d19fbf0c20f5d060478fd90d430736",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/roles": {
+            "get": {
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Index Role",
+                "operationId": "ee9d13fcdd49e5b8ac531368b17fa8dc",
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Store Role",
+                "operationId": "994e1dab849d8f74c943a2ab6f03e811",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "guard_name": {
+                                        "type": "string"
+                                    },
+                                    "permissions": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/roles/{role}": {
+            "get": {
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Show Role",
+                "operationId": "4fede95041b96469da922e5bd3ee783c",
+                "parameters": [
+                    {
+                        "name": "role",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Update Role",
+                "operationId": "d3bf7de66edb1058d3c8045118b31a14",
+                "parameters": [
+                    {
+                        "name": "role",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "guard_name": {
+                                        "type": "string"
+                                    },
+                                    "permissions": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Destroy Role",
+                "operationId": "c9b432ecf9d82b3eae243589fbd50245",
+                "parameters": [
+                    {
+                        "name": "role",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/upps": {
+            "get": {
+                "tags": [
+                    "Upps"
+                ],
+                "summary": "Index Upps",
+                "operationId": "c8164f9ee6d35d1b9f79bcd3dbad3edb",
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Upps"
+                ],
+                "summary": "Store Upps",
+                "operationId": "d4bdc93265624680cb3064c45d848630",
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/upps/{id}": {
+            "get": {
+                "tags": [
+                    "Upps"
+                ],
+                "summary": "Show Upps",
+                "operationId": "1f7f6c82c4af91fc0d4f12ac2fadab77",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Upps"
+                ],
+                "summary": "Update Upps",
+                "operationId": "aec31970c0e7569d23d0d174db20545a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Upps"
+                ],
+                "summary": "Destroy Upps",
+                "operationId": "d462777e713b25b5f0c7da800fc015e4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/users": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Index User",
+                "operationId": "f71ec30c30933fd1ecbc15c94418f687",
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Store User",
+                "operationId": "f4d2be32c228930e4abaae075a97bed0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "nama": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    },
+                                    "role": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/users/{user}": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Show User",
+                "operationId": "a3c52d71906eaae3b3dd6c04f66cda1c",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update User",
+                "operationId": "a69bd70ea1630c6aa2b42cacc1c2030f",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "nama": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    },
+                                    "role": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Destroy User",
+                "operationId": "b3a5231fc233a1ed7b09dd63d6e9e9b4",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Masukkan JWT token Anda. Contoh: Bearer {token}",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Autentikasi Pengguna & Manajemen Token JWT"
+        },
+        {
+            "name": "Cpl",
+            "description": "Endpoint API Cpl"
+        },
+        {
+            "name": "Data Kelulusan",
+            "description": "Endpoint API Data Kelulusan"
+        },
+        {
+            "name": "Kurikulum",
+            "description": "Endpoint API Kurikulum"
+        },
+        {
+            "name": "Mahasiswa",
+            "description": "Endpoint API Mahasiswa"
+        },
+        {
+            "name": "Mata Kuliah Cpl",
+            "description": "Endpoint API Mata Kuliah Cpl"
+        },
+        {
+            "name": "Mata Kuliah",
+            "description": "Endpoint API Mata Kuliah"
+        },
+        {
+            "name": "Perguruan Tinggi",
+            "description": "Endpoint API Perguruan Tinggi"
+        },
+        {
+            "name": "Permission",
+            "description": "Endpoint API Permission"
+        },
+        {
+            "name": "Prodi",
+            "description": "Endpoint API Prodi"
+        },
+        {
+            "name": "Role",
+            "description": "Endpoint API Role"
+        },
+        {
+            "name": "Upps",
+            "description": "Endpoint API Upps"
+        },
+        {
+            "name": "User",
+            "description": "Endpoint API User"
+        }
+    ]
+}

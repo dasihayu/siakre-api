@@ -34,14 +34,13 @@ test('user can login with correct credentials', function () {
                     'access_token',
                     'token_type',
                     'expires_in',
-                    'permissions',
                 ],
             ],
         ])
         ->assertJson([
             'success' => true,
             'code' => 200,
-            'message' => 'Login successful',
+            'message' => 'Login berhasil',
         ]);
 });
 
@@ -60,7 +59,7 @@ test('user cannot login with invalid credentials', function () {
         ->assertJson([
             'success' => false,
             'code' => 401,
-            'message' => 'Invalid email or password.',
+            'message' => 'Email atau password salah.',
             'errors' => null,
             'data' => null,
         ]);
@@ -82,7 +81,7 @@ test('validation error returns standard 422 error structure', function () {
         ->assertJson([
             'success' => false,
             'code' => 422,
-            'message' => 'Input validation failed',
+            'message' => 'Validasi input gagal',
             'data' => null,
         ]);
 });
@@ -98,7 +97,7 @@ test('authenticated user can fetch profile', function () {
         ->assertJson([
             'success' => true,
             'code' => 200,
-            'message' => 'User profile retrieved successfully',
+            'message' => 'Profil pengguna berhasil diambil',
             'data' => [
                 'user' => [
                     'id' => $user->id,
@@ -119,6 +118,6 @@ test('authenticated user can logout', function () {
         ->assertJson([
             'success' => true,
             'code' => 200,
-            'message' => 'Successfully logged out',
+            'message' => 'Berhasil logout',
         ]);
 });

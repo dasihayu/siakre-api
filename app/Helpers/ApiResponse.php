@@ -11,7 +11,7 @@ class ApiResponse
     /**
      * Format respons autentikasi (Login Berhasil - 200 OK)
      */
-    public static function auth(mixed $user, string $token, ?array $permissions = null, string $message = 'Login berhasil', int $code = 200): JsonResponse
+    public static function auth(mixed $user, string $token, string $message = 'Login berhasil', int $code = 200): JsonResponse
     {
         $userArray = [
             'id' => $user->id ?? null,
@@ -21,19 +21,6 @@ class ApiResponse
                 ? $user->role->value
                 : ($user->role ?? null),
         ];
-
-        $userPermissions = $permissions;
-        if ($userPermissions === null) {
-            if (is_object($user) && method_exists($user, 'getAllPermissions')) {
-                $userPermissions = $user->getAllPermissions()->pluck('name')->toArray();
-            }
-
-            if (empty($userPermissions) && is_object($user) && isset($user->permissions_array)) {
-                $userPermissions = $user->permissions_array;
-            }
-
-            $userPermissions = $userPermissions ?? [];
-        }
 
         return new JsonResponse([
             'success' => true,
@@ -45,7 +32,6 @@ class ApiResponse
                     'access_token' => $token,
                     'token_type' => 'Bearer',
                     'expires_in' => (int) config('jwt.ttl', 60) * 60,
-                    'permissions' => $userPermissions,
                 ],
             ],
         ], $code);
