@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: [self-hosted, Linux, X64, api-akademik]
+    runs-on: [self-hosted, Linux, X64]
 
     steps:
       - name: Deploy application
