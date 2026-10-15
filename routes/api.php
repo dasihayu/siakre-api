@@ -13,6 +13,7 @@ use App\Http\Controllers\CplController;
 use App\Http\Controllers\MataKuliahController;
 use App\Http\Controllers\MataKuliahCplController;
 use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\AnggotaUppsController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -98,4 +99,10 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('/mahasiswa/{id}', [MahasiswaController::class, 'update']);
     Route::delete('/mahasiswa/{id}', [MahasiswaController::class, 'destroy']);
 
+    // --- CRUD Anggota UPPS ---
+    Route::get('/anggota-upps', [AnggotaUppsController::class, 'index']);
+    Route::post('/anggota-upps', [AnggotaUppsController::class, 'store']);
+    Route::get('/anggota-upps/{id}', [AnggotaUppsController::class, 'show']);
+    Route::put('/anggota-upps/{id}', [AnggotaUppsController::class, 'update']);
+    Route::delete('/anggota-upps/{id}', [AnggotaUppsController::class, 'destroy']);
 });
