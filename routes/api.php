@@ -13,7 +13,6 @@ use App\Http\Controllers\CplController;
 use App\Http\Controllers\MataKuliahController;
 use App\Http\Controllers\MataKuliahCplController;
 use App\Http\Controllers\MahasiswaController;
-use App\Http\Controllers\DataKelulusanController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -99,10 +98,4 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('/mahasiswa/{id}', [MahasiswaController::class, 'update']);
     Route::delete('/mahasiswa/{id}', [MahasiswaController::class, 'destroy']);
 
-    // --- CRUD Data Kelulusan ---
-    Route::get('/data-kelulusan', [DataKelulusanController::class, 'index']);
-    Route::post('/data-kelulusan', [DataKelulusanController::class, 'store']);
-    Route::get('/data-kelulusan/{id}', [DataKelulusanController::class, 'show']);
-    Route::put('/data-kelulusan/{id}', [DataKelulusanController::class, 'update']);
-    Route::delete('/data-kelulusan/{id}', [DataKelulusanController::class, 'destroy']);
 });
