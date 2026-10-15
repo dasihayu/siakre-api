@@ -5,18 +5,45 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-akademik-production
+  cancel-in-progress: false
+
 jobs:
   deploy:
-    runs-on: self-hosted
+    runs-on: [self-hosted, Linux, X64]
 
     steps:
-      - name: Deploy to Local Server
+      - name: Deploy application
+        shell: bash
         run: |
-          cd /var/www/akademik
-          git pull origin main
-          composer install --no-dev --optimize-autoloader
+          set -Eeuo pipefail
+
+          cd /var/www/api-akademik
+
+          echo "Fetching latest code..."
+          git fetch origin main
+          git merge --ff-only origin/main
+
+          echo "Installing production dependencies..."
+          composer install \
+            --no-dev \
+            --prefer-dist \
+            --optimize-autoloader \
+            --no-interaction \
+            --no-scripts
+
+          echo "Refreshing Laravel package discovery..."
+          rm -f bootstrap/cache/packages.php bootstrap/cache/services.php
+          php artisan package:discover --ansi
+
+          echo "Rebuilding Laravel caches..."
           php artisan config:clear
           php artisan config:cache
           php artisan route:cache
           php artisan view:cache
 
+          echo "Deployment completed successfully."
