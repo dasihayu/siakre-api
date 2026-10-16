@@ -45,7 +45,7 @@ test('administrator can list users with pagination and standard response format'
         ]);
 });
 
-test('administrator can create a new user', function () {
+test('administrator can create a new user with polines email', function () {
     /** @var User $admin */
     $admin = User::factory()->create(['role' => UserRole::ADMINISTRATOR]);
     $admin->assignRole(UserRole::ADMINISTRATOR->value);
@@ -53,7 +53,7 @@ test('administrator can create a new user', function () {
 
     $userData = [
         'nama' => 'Dr. Andi Wijaya',
-        'email' => 'andi@univ.ac.id',
+        'email' => 'andi@polines.ac.id',
         'password' => 'password123',
         'role' => UserRole::KAPRODI->value,
     ];
@@ -67,12 +67,49 @@ test('administrator can create a new user', function () {
             'code' => 201,
             'data' => [
                 'nama' => 'Dr. Andi Wijaya',
-                'email' => 'andi@univ.ac.id',
+                'email' => 'andi@polines.ac.id',
                 'role' => 'KAPRODI',
             ],
         ]);
 
-    $this->assertDatabaseHas('users', ['email' => 'andi@univ.ac.id']);
+    $this->assertDatabaseHas('users', ['email' => 'andi@polines.ac.id']);
+});
+
+test('creating user with non-polines email is rejected with 422', function () {
+    /** @var User $admin */
+    $admin = User::factory()->create(['role' => UserRole::ADMINISTRATOR]);
+    $admin->assignRole(UserRole::ADMINISTRATOR->value);
+    $token = auth('api')->login($admin);
+
+    $userData = [
+        'nama' => 'Dr. Andi Wijaya',
+        'email' => 'andi@gmail.com',
+        'password' => 'password123',
+        'role' => UserRole::KAPRODI->value,
+    ];
+
+    $response = $this->withHeader('Authorization', "Bearer {$token}")
+        ->postJson('/api/users', $userData);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['email']);
+});
+
+test('updating user with non-polines email is rejected with 422', function () {
+    /** @var User $admin */
+    $admin = User::factory()->create(['role' => UserRole::ADMINISTRATOR]);
+    $admin->assignRole(UserRole::ADMINISTRATOR->value);
+    $token = auth('api')->login($admin);
+
+    $targetUser = User::factory()->create(['role' => UserRole::DOSEN]);
+
+    $response = $this->withHeader('Authorization', "Bearer {$token}")
+        ->putJson("/api/users/{$targetUser->id}", [
+            'email' => 'invalid@yahoo.com',
+        ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['email']);
 });
 
 test('administrator can view user detail', function () {
