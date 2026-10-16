@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
-use Closure;
+use App\Rules\PolinesEmailRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -25,17 +25,7 @@ class GoogleLoginRequest extends FormRequest
     {
         return [
             'google_id' => ['required', 'string'],
-            'email' => [
-                'required',
-                'string',
-                'email',
-                function (string $attribute, mixed $value, Closure $fail): void {
-                    $domain = strtolower((string) substr(strrchr((string) $value, '@'), 1));
-                    if ($domain !== 'polines.ac.id' && ! str_ends_with($domain, '.polines.ac.id')) {
-                        $fail('Hanya email dengan domain *.polines.ac.id yang diizinkan.');
-                    }
-                },
-            ],
+            'email' => ['required', 'string', 'email', new PolinesEmailRule],
             'name' => ['required', 'string'],
             'avatar' => ['nullable', 'string'],
         ];
