@@ -11,31 +11,28 @@ class ApiResponse
     /**
      * Format respons autentikasi (Login Berhasil - 200 OK)
      */
-    public static function auth(mixed $user, string $token, string $message = 'Login berhasil', int $code = 200): JsonResponse
-    {
-        $userArray = [
-            'id' => $user->id ?? null,
-            'nama' => $user->nama ?? $user->name ?? null,
-            'email' => $user->email ?? null,
-            'role' => isset($user->role) && is_object($user->role) && method_exists($user->role, 'value')
-                ? $user->role->value
-                : ($user->role ?? null),
-        ];
-
-        return new JsonResponse([
-            'success' => true,
-            'code' => $code,
-            'message' => $message,
-            'data' => [
-                'user' => $userArray,
-                'authorization' => [
-                    'access_token' => $token,
-                    'token_type' => 'Bearer',
-                    'expires_in' => (int) config('jwt.ttl', 60) * 60,
-                ],
+    public static function auth($user, $token, array $permissions = [], string $message = 'Login successful')
+{
+    return response()->json([
+        'success' => true,
+        'code' => 200,
+        'message' => $message,
+        'data' => [
+            'user' => [
+                'id' => $user->id,
+                'nama' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
             ],
-        ], $code);
-    }
+            'authorization' => [
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'expires_in' => 3600,
+                'permissions' => $permissions,
+            ],
+        ],
+    ], 200);
+}
 
     /**
      * Format respons sukses data tunggal atau daftar (200 OK / 201 Created)
@@ -106,7 +103,7 @@ class ApiResponse
     /**
      * Format respons error validasi (422 Unprocessable Entity)
      */
-    public static function validationError(mixed $errors, string $message = 'Validasi gagal', int $code = 422): JsonResponse
+    public static function validationError(mixed $errors, string $message = 'Validation failed', int $code = 422): JsonResponse
     {
         return new JsonResponse([
             'success' => false,

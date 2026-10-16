@@ -29,6 +29,9 @@ class DatabaseSeeder extends Seeder
             MahasiswaSeeder::class,
             MataKuliahCplSeeder::class,
             AnggotaUppsSeeder::class,
+            AngkatanSeeder::class,
+            KelasSeeder::class,
+            TahunAkademikSeeder::class,
         ]);
     }
 }
