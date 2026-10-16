@@ -13,6 +13,10 @@ use App\Http\Controllers\CplController;
 use App\Http\Controllers\MataKuliahController;
 use App\Http\Controllers\MataKuliahCplController;
 use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\DataKelulusanController;
+use App\Http\Controllers\AngkatanController;
+use App\Http\Controllers\KelasController;
+use App\Http\Controllers\TahunAkademikController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -98,4 +102,31 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('/mahasiswa/{id}', [MahasiswaController::class, 'update']);
     Route::delete('/mahasiswa/{id}', [MahasiswaController::class, 'destroy']);
 
+    // --- CRUD Data Kelulusan ---
+    Route::get('/data-kelulusan', [DataKelulusanController::class, 'index']);
+    Route::post('/data-kelulusan', [DataKelulusanController::class, 'store']);
+    Route::get('/data-kelulusan/{id}', [DataKelulusanController::class, 'show']);
+    Route::put('/data-kelulusan/{id}', [DataKelulusanController::class, 'update']);
+    Route::delete('/data-kelulusan/{id}', [DataKelulusanController::class, 'destroy']);
+
+    // --- CRUD Master Angkatan ---
+    Route::get('/angkatan', [AngkatanController::class, 'index']);
+    Route::post('/angkatan', [AngkatanController::class, 'store']);
+    Route::get('/angkatan/{id}', [AngkatanController::class, 'show']);
+    Route::put('/angkatan/{id}', [AngkatanController::class, 'update']);
+    Route::delete('/angkatan/{id}', [AngkatanController::class, 'destroy']);
+
+    // --- CRUD Master Kelas ---
+    Route::get('/kelas', [KelasController::class, 'index']);
+    Route::post('/kelas', [KelasController::class, 'store']);
+    Route::get('/kelas/{id}', [KelasController::class, 'show']);
+    Route::put('/kelas/{id}', [KelasController::class, 'update']);
+    Route::delete('/kelas/{id}', [KelasController::class, 'destroy']);
+
+    // --- CRUD Master Tahun Akademik ---
+    Route::get('/tahun-akademik', [TahunAkademikController::class, 'index']);
+    Route::post('/tahun-akademik', [TahunAkademikController::class, 'store']);
+    Route::get('/tahun-akademik/{id}', [TahunAkademikController::class, 'show']);
+    Route::put('/tahun-akademik/{id}', [TahunAkademikController::class, 'update']);
+    Route::delete('/tahun-akademik/{id}', [TahunAkademikController::class, 'destroy']);
 });
