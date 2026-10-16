@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('data_mahasiswa', function (Blueprint $table) {
             $table->id();
-            $table->string('nim')->unique();
-            $table->string('nama_mahasiswa');
-            $table->integer('tahun_masuk');
-            $table->string('jenis_pendaftaran');
-            $table->boolean('mahasiswa_internasional')->default(false);
+            $table->integer('nim')->unique(); 
+            $table->string('nama_mahasiswa'); // nama_mahasiswa string
+            $table->integer('tahun_masuk'); // tahun_masuk date
+            $table->string('jenis_pendaftaran'); // jenis_pendaftaran string
+            $table->date('tanggal_kelulusan')->nullable(); // tanggal_kelulusan date
+            $table->integer('masa_studi_bulan')->default(48); // masa_studi_bulan int, default 48
             $table->timestamps();
         });
     }
