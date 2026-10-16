@@ -1,26 +1,26 @@
 <?php
 
+use App\Http\Controllers\AnggotaUppsController;
+use App\Http\Controllers\AngkatanController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CplController;
+use App\Http\Controllers\KelasController;
+use App\Http\Controllers\KurikulumController;
+use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\MataKuliahController;
+use App\Http\Controllers\MataKuliahCplController;
 use App\Http\Controllers\PerguruanTinggiController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\TahunAkademikController;
 use App\Http\Controllers\UppsController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\KurikulumController;
-use App\Http\Controllers\CplController;
-use App\Http\Controllers\MataKuliahController;
-use App\Http\Controllers\MataKuliahCplController;
-use App\Http\Controllers\MahasiswaController;
-use App\Http\Controllers\AnggotaUppsController;
-use App\Http\Controllers\DataKelulusanController;
-use App\Http\Controllers\AngkatanController;
-use App\Http\Controllers\KelasController;
-use App\Http\Controllers\TahunAkademikController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/google', [AuthController::class, 'googleLogin'])->name('google.login');
 
     Route::middleware('auth:api')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
@@ -109,12 +109,6 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/anggota-upps/{id}', [AnggotaUppsController::class, 'show']);
     Route::put('/anggota-upps/{id}', [AnggotaUppsController::class, 'update']);
     Route::delete('/anggota-upps/{id}', [AnggotaUppsController::class, 'destroy']);
-    // --- CRUD Data Kelulusan ---
-    Route::get('/data-kelulusan', [DataKelulusanController::class, 'index']);
-    Route::post('/data-kelulusan', [DataKelulusanController::class, 'store']);
-    Route::get('/data-kelulusan/{id}', [DataKelulusanController::class, 'show']);
-    Route::put('/data-kelulusan/{id}', [DataKelulusanController::class, 'update']);
-    Route::delete('/data-kelulusan/{id}', [DataKelulusanController::class, 'destroy']);
 
     // --- CRUD Master Angkatan ---
     Route::get('/angkatan', [AngkatanController::class, 'index']);

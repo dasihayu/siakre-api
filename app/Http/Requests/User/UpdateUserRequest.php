@@ -4,6 +4,7 @@ namespace App\Http\Requests\User;
 
 use App\Enums\UserRole;
 use App\Models\User;
+use App\Rules\PolinesEmailRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -32,7 +33,14 @@ class UpdateUserRequest extends FormRequest
         return [
             'name' => ['sometimes', 'nullable', 'string', 'max:255'],
             'nama' => ['sometimes', 'nullable', 'string', 'max:255'],
-            'email' => ['sometimes', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($userId)],
+            'email' => [
+                'sometimes',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($userId),
+                new PolinesEmailRule,
+            ],
             'password' => ['sometimes', 'nullable', 'string', 'min:8'],
             'role' => ['sometimes', Rule::enum(UserRole::class)],
         ];

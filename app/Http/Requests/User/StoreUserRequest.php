@@ -3,6 +3,7 @@
 namespace App\Http\Requests\User;
 
 use App\Enums\UserRole;
+use App\Rules\PolinesEmailRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -27,7 +28,7 @@ class StoreUserRequest extends FormRequest
         return [
             'name' => ['required_without:nama', 'nullable', 'string', 'max:255'],
             'nama' => ['required_without:name', 'nullable', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email', new PolinesEmailRule],
             'password' => ['required', 'string', 'min:8'],
             'role' => ['required', Rule::enum(UserRole::class)],
         ];
