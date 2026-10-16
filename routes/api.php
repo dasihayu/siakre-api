@@ -13,6 +13,7 @@ use App\Http\Controllers\CplController;
 use App\Http\Controllers\MataKuliahController;
 use App\Http\Controllers\MataKuliahCplController;
 use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\AnggotaUppsController;
 use App\Http\Controllers\DataKelulusanController;
 use App\Http\Controllers\AngkatanController;
 use App\Http\Controllers\KelasController;
@@ -102,6 +103,12 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('/mahasiswa/{id}', [MahasiswaController::class, 'update']);
     Route::delete('/mahasiswa/{id}', [MahasiswaController::class, 'destroy']);
 
+    // --- CRUD Anggota UPPS ---
+    Route::get('/anggota-upps', [AnggotaUppsController::class, 'index']);
+    Route::post('/anggota-upps', [AnggotaUppsController::class, 'store']);
+    Route::get('/anggota-upps/{id}', [AnggotaUppsController::class, 'show']);
+    Route::put('/anggota-upps/{id}', [AnggotaUppsController::class, 'update']);
+    Route::delete('/anggota-upps/{id}', [AnggotaUppsController::class, 'destroy']);
     // --- CRUD Data Kelulusan ---
     Route::get('/data-kelulusan', [DataKelulusanController::class, 'index']);
     Route::post('/data-kelulusan', [DataKelulusanController::class, 'store']);
