@@ -17,11 +17,12 @@ class MahasiswaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nim'                    => 'required|string|unique:data_mahasiswa,nim',
-            'nama_mahasiswa'         => 'required|string',
-            'tahun_masuk'            => 'required|integer',
-            'jenis_pendaftaran'      => 'required|string',
-            'mahasiswa_internasional'=> 'required|boolean',
+            'nim'               => 'required|integer|unique:data_mahasiswa,nim',
+            'nama_mahasiswa'    => 'required|string',
+            'tahun_masuk'       => 'required|integer',
+            'jenis_pendaftaran' => 'required|string',
+            'tanggal_kelulusan' => 'nullable|date',
+            'masa_studi_bulan'  => 'required|integer',
         ], [
             'nim.unique' => 'NIM Mahasiswa Sudah Ada'
         ]);
@@ -51,11 +52,12 @@ class MahasiswaController extends Controller
         }
 
         $request->validate([
-            'nim'                    => 'required|string|unique:data_mahasiswa,nim,' . $id . ',id',
-            'nama_mahasiswa'         => 'required|string',
-            'tahun_masuk'            => 'required|integer',
-            'jenis_pendaftaran'      => 'required|string',
-            'mahasiswa_internasional'=> 'required|boolean',
+            'nim'               => 'required|integer|unique:data_mahasiswa,nim,' . $id,
+            'nama_mahasiswa'    => 'required|string',
+            'tahun_masuk'       => 'required|integer',
+            'jenis_pendaftaran' => 'required|string',
+            'tanggal_kelulusan' => 'nullable|date',
+            'masa_studi_bulan'  => 'required|integer',
         ], [
             'nim.unique' => 'NIM Mahasiswa Sudah Ada'
         ]);
