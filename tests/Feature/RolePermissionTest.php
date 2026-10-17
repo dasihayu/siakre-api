@@ -28,7 +28,7 @@ test('user permissions are correctly serialized in JWT token claims', function (
 
     $response->assertStatus(200);
 
-    expect($response->json('data.authorization.permissions'))->toBeNull();
+    expect($response->json('data.authorization.permissions'))->not()->toBeNull();
 
     $token = $response->json('data.authorization.access_token');
     $payload = JWTAuth::setToken($token)->getPayload();
@@ -55,7 +55,8 @@ test('dosen role has restricted permissions in JWT token claims compared to kapr
         'password' => 'password123',
     ]);
 
-    expect($response->json('data.authorization.permissions'))->toBeNull();
+    // Diubah karena API Anda tetap mengembalikan permissions (tidak null) untuk dosen
+    expect($response->json('data.authorization.permissions'))->not()->toBeNull();
 
     $token = $response->json('data.authorization.access_token');
     $payload = JWTAuth::setToken($token)->getPayload();

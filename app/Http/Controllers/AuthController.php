@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
 use App\Helpers\ApiResponse;
+use App\Http\Requests\Auth\GoogleLoginRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Role;
 
 class AuthController extends Controller
 {
@@ -25,6 +28,48 @@ class AuthController extends Controller
         $user = Auth::guard('api')->user();
 
         return ApiResponse::auth($user, $token, message: 'Login berhasil');
+    }
+
+    /**
+     * Login or register via Google authentication.
+     */
+    public function googleLogin(GoogleLoginRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+
+        $user = User::where('google_id', $data['google_id'])
+            ->orWhere('email', $data['email'])
+            ->first();
+
+        if ($user) {
+            $updates = [];
+            if (empty($user->google_id)) {
+                $updates['google_id'] = $data['google_id'];
+            }
+            if (isset($data['avatar']) && $user->avatar !== $data['avatar']) {
+                $updates['avatar'] = $data['avatar'];
+            }
+            if (! empty($updates)) {
+                $user->update($updates);
+            }
+        } else {
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'google_id' => $data['google_id'],
+                'avatar' => $data['avatar'] ?? null,
+                'role' => UserRole::DOSEN,
+                'email_verified_at' => now(),
+            ]);
+
+            Role::findOrCreate(UserRole::DOSEN->value, 'api');
+            $user->assignRole(UserRole::DOSEN->value);
+        }
+
+        /** @var string $token */
+        $token = Auth::guard('api')->login($user);
+
+        return ApiResponse::auth($user, $token, $user->permissions_array, message: 'Login Google berhasil');
     }
 
     /**

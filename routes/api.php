@@ -1,10 +1,19 @@
 <?php
 
+use App\Http\Controllers\AnggotaUppsController;
+use App\Http\Controllers\AngkatanController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CplController;
+use App\Http\Controllers\KelasController;
+use App\Http\Controllers\KurikulumController;
+use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\MataKuliahController;
+use App\Http\Controllers\MataKuliahCplController;
 use App\Http\Controllers\PerguruanTinggiController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\TahunAkademikController;
 use App\Http\Controllers\UppsController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -13,10 +22,18 @@ use App\Http\Controllers\CplController;
 use App\Http\Controllers\MataKuliahController;
 use App\Http\Controllers\MataKuliahCplController;
 use App\Http\Controllers\MahasiswaController;
-use App\Http\Controllers\DataKelulusanController;
+use App\Http\Controllers\AnggotaUppsController;
+use App\Http\Controllers\AngkatanController;
+use App\Http\Controllers\KelasController;
+use App\Http\Controllers\TahunAkademikController;
+use App\Http\Controllers\KegiatanMahasiswaController;
+use App\Http\Controllers\AngkatanKelasController;
+use App\Http\Controllers\EnrollmentKelasController;
+use App\Http\Controllers\StatusMahasiswaController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/google', [AuthController::class, 'googleLogin'])->name('google.login');
 
     Route::middleware('auth:api')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
@@ -99,10 +116,59 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('/mahasiswa/{id}', [MahasiswaController::class, 'update']);
     Route::delete('/mahasiswa/{id}', [MahasiswaController::class, 'destroy']);
 
-    // --- CRUD Data Kelulusan ---
-    Route::get('/data-kelulusan', [DataKelulusanController::class, 'index']);
-    Route::post('/data-kelulusan', [DataKelulusanController::class, 'store']);
-    Route::get('/data-kelulusan/{id}', [DataKelulusanController::class, 'show']);
-    Route::put('/data-kelulusan/{id}', [DataKelulusanController::class, 'update']);
-    Route::delete('/data-kelulusan/{id}', [DataKelulusanController::class, 'destroy']);
+    // --- CRUD Anggota UPPS ---
+    Route::get('/anggota-upps', [AnggotaUppsController::class, 'index']);
+    Route::post('/anggota-upps', [AnggotaUppsController::class, 'store']);
+    Route::get('/anggota-upps/{id}', [AnggotaUppsController::class, 'show']);
+    Route::put('/anggota-upps/{id}', [AnggotaUppsController::class, 'update']);
+    Route::delete('/anggota-upps/{id}', [AnggotaUppsController::class, 'destroy']);
+
+    // --- CRUD Master Angkatan ---
+    Route::get('/angkatan', [AngkatanController::class, 'index']);
+    Route::post('/angkatan', [AngkatanController::class, 'store']);
+    Route::get('/angkatan/{id}', [AngkatanController::class, 'show']);
+    Route::put('/angkatan/{id}', [AngkatanController::class, 'update']);
+    Route::delete('/angkatan/{id}', [AngkatanController::class, 'destroy']);
+
+    // --- CRUD Master Kelas ---
+    Route::get('/kelas', [KelasController::class, 'index']);
+    Route::post('/kelas', [KelasController::class, 'store']);
+    Route::get('/kelas/{id}', [KelasController::class, 'show']);
+    Route::put('/kelas/{id}', [KelasController::class, 'update']);
+    Route::delete('/kelas/{id}', [KelasController::class, 'destroy']);
+
+    // --- CRUD Master Tahun Akademik ---
+    Route::get('/tahun-akademik', [TahunAkademikController::class, 'index']);
+    Route::post('/tahun-akademik', [TahunAkademikController::class, 'store']);
+    Route::get('/tahun-akademik/{id}', [TahunAkademikController::class, 'show']);
+    Route::put('/tahun-akademik/{id}', [TahunAkademikController::class, 'update']);
+    Route::delete('/tahun-akademik/{id}', [TahunAkademikController::class, 'destroy']);
+
+    // --- CRUD Kegiatan Mahasiswa ---
+    Route::get('/kegiatan-mahasiswa', [KegiatanMahasiswaController::class, 'index']);
+    Route::post('/kegiatan-mahasiswa', [KegiatanMahasiswaController::class, 'store']);
+    Route::get('/kegiatan-mahasiswa/{id}', [KegiatanMahasiswaController::class, 'show']);
+    Route::put('/kegiatan-mahasiswa/{id}', [KegiatanMahasiswaController::class, 'update']);
+    Route::delete('/kegiatan-mahasiswa/{id}', [KegiatanMahasiswaController::class, 'destroy']);
+
+    // --- CRUD Angkatan Kelas ---
+    Route::get('/angkatan-kelas', [AngkatanKelasController::class, 'index']);
+    Route::post('/angkatan-kelas', [AngkatanKelasController::class, 'store']);
+    Route::get('/angkatan-kelas/{id}', [AngkatanKelasController::class, 'show']);
+    Route::put('/angkatan-kelas/{id}', [AngkatanKelasController::class, 'update']);
+    Route::delete('/angkatan-kelas/{id}', [AngkatanKelasController::class, 'destroy']);
+
+    // --- CRUD Enrollment Mahasiswa Angkatan Kelas ---
+    Route::get('/enrollment-kelas', [EnrollmentKelasController::class, 'index']);
+    Route::post('/enrollment-kelas', [EnrollmentKelasController::class, 'store']);
+    Route::get('/enrollment-kelas/{id}', [EnrollmentKelasController::class, 'show']);
+    Route::put('/enrollment-kelas/{id}', [EnrollmentKelasController::class, 'update']);
+    Route::delete('/enrollment-kelas/{id}', [EnrollmentKelasController::class, 'destroy']);
+
+    // --- CRUD Status Mahasiswa ---
+    Route::get('/status-mahasiswa', [StatusMahasiswaController::class, 'index']);
+    Route::post('/status-mahasiswa', [StatusMahasiswaController::class, 'store']);
+    Route::get('/status-mahasiswa/{id}', [StatusMahasiswaController::class, 'show']);
+    Route::put('/status-mahasiswa/{id}', [StatusMahasiswaController::class, 'update']);
+    Route::delete('/status-mahasiswa/{id}', [StatusMahasiswaController::class, 'destroy']);
 });

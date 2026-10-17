@@ -27,8 +27,15 @@ class DatabaseSeeder extends Seeder
             CplSeeder::class, 
             MataKuliahSeeder::class,
             MahasiswaSeeder::class,
-            DataKelulusanSeeder::class,
             MataKuliahCplSeeder::class,
+            AnggotaUppsSeeder::class,
+            AngkatanSeeder::class,
+            KelasSeeder::class,
+            TahunAkademikSeeder::class,
+            KegiatanMahasiswaSeeder::class,
+            AngkatanKelasSeeder::class,
+            EnrollmentKelasSeeder::class,
+            StatusMahasiswaSeeder::class,
         ]);
     }
 }

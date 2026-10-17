@@ -16,6 +16,7 @@ class Mahasiswa extends Model
         'nama_mahasiswa',
         'tahun_masuk',
         'jenis_pendaftaran',
-        'mahasiswa_internasional'
+        'tanggal_kelulusan',
+        'masa_studi_bulan',
     ];
 }
