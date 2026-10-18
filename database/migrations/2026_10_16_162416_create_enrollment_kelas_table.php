@@ -12,13 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('enrollment_mahasiswa_angkatan_kelas', function (Blueprint $table) {
-            $table->id(); 
+            $table->id();
             $table->foreignId('id_mahasiswa')->constrained('data_mahasiswa')->onDelete('restrict');
             $table->foreignId('angkatan_kelas_id')->constrained('angkatan_kelas')->onDelete('restrict');
             $table->foreignId('prodi_id')->constrained('prodi')->onDelete('restrict');
             $table->timestamps();
         });
     }
+
     /**
      * Reverse the migrations.
      */

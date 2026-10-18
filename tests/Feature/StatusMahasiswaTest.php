@@ -1,43 +1,44 @@
 <?php
 
-use App\Models\Kelas;
 use App\Models\Angkatan;
-use App\Models\Prodi;
-use App\Models\TahunAkademik;
 use App\Models\AngkatanKelas;
-use App\Models\Mahasiswa;
 use App\Models\EnrollmentKelas;
+use App\Models\Kelas;
+use App\Models\Mahasiswa;
+use App\Models\Prodi;
 use App\Models\StatusMahasiswa;
+use App\Models\TahunAkademik;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-function setupStatusDependencies() {
+function setupStatusDependencies()
+{
     $prodi = Prodi::create(['kode_prodi' => 'PR-ST', 'nama_prodi' => 'Sastra', 'akreditasi' => 'A']);
     $ta = TahunAkademik::create(['tahun' => '2026']);
     $kelas = Kelas::create(['kelas' => 'SA-1A']);
     $angkatan = Angkatan::create(['angkatan' => '2026']);
-    
+
     $angkatanKelas = AngkatanKelas::create([
-        'kelas_id'          => $kelas->id,
-        'angkatan_id'       => $angkatan->id,
-        'prodi_id'          => $prodi->id,
+        'kelas_id' => $kelas->id,
+        'angkatan_id' => $angkatan->id,
+        'prodi_id' => $prodi->id,
         'tahun_akademik_id' => $ta->id,
     ]);
 
     $mahasiswa = Mahasiswa::create([
-        'nim'               => 11223344,
-        'nama_mahasiswa'    => 'Mahasiswa Status',
-        'tahun_masuk'       => 2026,
+        'nim' => 11223344,
+        'nama_mahasiswa' => 'Mahasiswa Status',
+        'tahun_masuk' => 2026,
         'jenis_pendaftaran' => 'Reguler',
-        'masa_studi_bulan'  => 48,
+        'masa_studi_bulan' => 48,
     ]);
 
     $enrollment = EnrollmentKelas::create([
-        'id_mahasiswa'      => $mahasiswa->id,
+        'id_mahasiswa' => $mahasiswa->id,
         'angkatan_kelas_id' => $angkatanKelas->id,
-        'prodi_id'          => $prodi->id,
+        'prodi_id' => $prodi->id,
     ]);
 
     return $enrollment;
@@ -52,10 +53,10 @@ test('authenticated user can list status mahasiswa', function () {
     $token = auth('api')->login($user);
 
     $enrollment = setupStatusDependencies();
-    
+
     StatusMahasiswa::create([
         'id_enrollment_mahasiswa_angkatan_kelas' => $enrollment->id,
-        'status'                                 => 'Cuti',
+        'status' => 'Cuti',
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
@@ -73,7 +74,7 @@ test('authenticated user can create status mahasiswa', function () {
 
     $payload = [
         'id_enrollment_mahasiswa_angkatan_kelas' => $enrollment->id,
-        'status'                                 => 'Aktif',
+        'status' => 'Aktif',
     ];
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
@@ -87,7 +88,7 @@ test('authenticated user can create status mahasiswa', function () {
 
     $this->assertDatabaseHas('status_mahasiswa', [
         'id_enrollment_mahasiswa_angkatan_kelas' => $enrollment->id,
-        'status'                                 => 'Aktif',
+        'status' => 'Aktif',
     ]);
 });
 
@@ -99,32 +100,32 @@ test('authenticated user can view detail, update, and delete status mahasiswa', 
 
     $status = StatusMahasiswa::create([
         'id_enrollment_mahasiswa_angkatan_kelas' => $enrollment->id,
-        'status'                                 => 'Aktif',
+        'status' => 'Aktif',
     ]);
 
     // View
     $this->withHeader('Authorization', "Bearer {$token}")
-         ->getJson("/api/status-mahasiswa/{$status->id}")
-         ->assertStatus(200)
-         ->assertJsonPath('data.status', 'Aktif');
+        ->getJson("/api/status-mahasiswa/{$status->id}")
+        ->assertStatus(200)
+        ->assertJsonPath('data.status', 'Aktif');
 
     // Update
     $this->withHeader('Authorization', "Bearer {$token}")
-         ->putJson("/api/status-mahasiswa/{$status->id}", [
+        ->putJson("/api/status-mahasiswa/{$status->id}", [
             'id_enrollment_mahasiswa_angkatan_kelas' => $enrollment->id,
-            'status'                                 => 'Lulus',
-         ])
-         ->assertStatus(200);
+            'status' => 'Lulus',
+        ])
+        ->assertStatus(200);
 
     $this->assertDatabaseHas('status_mahasiswa', [
-        'id'     => $status->id,
+        'id' => $status->id,
         'status' => 'Lulus',
     ]);
 
     // Delete
     $this->withHeader('Authorization', "Bearer {$token}")
-         ->deleteJson("/api/status-mahasiswa/{$status->id}")
-         ->assertStatus(200);
+        ->deleteJson("/api/status-mahasiswa/{$status->id}")
+        ->assertStatus(200);
 
     $this->assertDatabaseMissing('status_mahasiswa', [
         'id' => $status->id,

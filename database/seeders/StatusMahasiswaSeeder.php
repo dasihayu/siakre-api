@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\StatusMahasiswa;
 use App\Models\EnrollmentKelas;
+use App\Models\StatusMahasiswa;
+use Illuminate\Database\Seeder;
 
 class StatusMahasiswaSeeder extends Seeder
 {
@@ -15,7 +15,7 @@ class StatusMahasiswaSeeder extends Seeder
         if ($enrollment) {
             StatusMahasiswa::create([
                 'id_enrollment_mahasiswa_angkatan_kelas' => $enrollment->id,
-                'status'                                 => 'Aktif',
+                'status' => 'Aktif',
             ]);
         }
     }

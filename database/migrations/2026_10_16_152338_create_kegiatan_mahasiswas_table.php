@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id(); // PK int
             $table->foreignId('mahasiswa_id')->constrained('data_mahasiswa')->onDelete('restrict');
             $table->foreignId('tahun_akademik_id')->constrained('tahun_akademik')->onDelete('restrict');
-            $table->string('nama_kegiatan'); 
+            $table->string('nama_kegiatan');
             $table->string('jenis_kegiatan');
-            $table->string('peran'); 
+            $table->string('peran');
             $table->string('tingkat');
             $table->date('tanggal_mulai');
             $table->date('tanggal_selesai')->nullable();
@@ -26,7 +26,6 @@ return new class extends Migration
             $table->timestamps();
         });
     }
-    
 
     /**
      * Reverse the migrations.
