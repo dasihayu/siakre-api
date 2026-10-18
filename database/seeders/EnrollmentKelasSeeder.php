@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
+use App\Models\AngkatanKelas;
 use App\Models\EnrollmentKelas;
 use App\Models\Mahasiswa;
-use App\Models\AngkatanKelas;
 use App\Models\Prodi;
+use Illuminate\Database\Seeder;
 
 class EnrollmentKelasSeeder extends Seeder
 {
@@ -18,9 +18,9 @@ class EnrollmentKelasSeeder extends Seeder
 
         if ($mahasiswa && $angkatanKelas && $prodi) {
             EnrollmentKelas::create([
-                'id_mahasiswa'      => $mahasiswa->id,
+                'id_mahasiswa' => $mahasiswa->id,
                 'angkatan_kelas_id' => $angkatanKelas->id,
-                'prodi_id'          => $prodi->id,
+                'prodi_id' => $prodi->id,
             ]);
         }
     }

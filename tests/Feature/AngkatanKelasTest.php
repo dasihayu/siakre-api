@@ -1,10 +1,10 @@
 <?php
 
-use App\Models\Kelas;
 use App\Models\Angkatan;
+use App\Models\AngkatanKelas;
+use App\Models\Kelas;
 use App\Models\Prodi;
 use App\Models\TahunAkademik;
-use App\Models\AngkatanKelas;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -22,11 +22,11 @@ test('authenticated user can list angkatan kelas', function () {
     $ta = TahunAkademik::create(['tahun' => '2026']);
     $kelas = Kelas::create(['kelas' => 'TI-2A']); // Sesuaikan kolom tabel kelas
     $angkatan = Angkatan::create(['angkatan' => 2024]);
-    
+
     AngkatanKelas::create([
-        'kelas_id'          => $kelas->id,
-        'angkatan_id'       => $angkatan->id,
-        'prodi_id'          => $prodi->id,
+        'kelas_id' => $kelas->id,
+        'angkatan_id' => $angkatan->id,
+        'prodi_id' => $prodi->id,
         'tahun_akademik_id' => $ta->id,
     ]);
 
@@ -47,9 +47,9 @@ test('authenticated user can create angkatan kelas', function () {
     $angkatan = Angkatan::create(['angkatan' => 2026]);
 
     $payload = [
-        'kelas_id'          => $kelas->id,
-        'angkatan_id'       => $angkatan->id,
-        'prodi_id'          => $prodi->id,
+        'kelas_id' => $kelas->id,
+        'angkatan_id' => $angkatan->id,
+        'prodi_id' => $prodi->id,
         'tahun_akademik_id' => $ta->id,
     ];
 
@@ -79,37 +79,37 @@ test('authenticated user can view detail, update, and delete angkatan kelas', fu
     $angkatan = Angkatan::create(['angkatan' => 2025]);
 
     $angkatanKelas = AngkatanKelas::create([
-        'kelas_id'          => $kelas->id,
-        'angkatan_id'       => $angkatan->id,
-        'prodi_id'          => $prodi->id,
+        'kelas_id' => $kelas->id,
+        'angkatan_id' => $angkatan->id,
+        'prodi_id' => $prodi->id,
         'tahun_akademik_id' => $ta->id,
     ]);
 
     // View
     $this->withHeader('Authorization', "Bearer {$token}")
-         ->getJson("/api/angkatan-kelas/{$angkatanKelas->id}")
-         ->assertStatus(200)
-         ->assertJsonPath('data.kelas_id', $kelas->id);
+        ->getJson("/api/angkatan-kelas/{$angkatanKelas->id}")
+        ->assertStatus(200)
+        ->assertJsonPath('data.kelas_id', $kelas->id);
 
     // Update
     $this->withHeader('Authorization', "Bearer {$token}")
-         ->putJson("/api/angkatan-kelas/{$angkatanKelas->id}", [
-            'kelas_id'          => $kelasBaru->id,
-            'angkatan_id'       => $angkatan->id,
-            'prodi_id'          => $prodi->id,
+        ->putJson("/api/angkatan-kelas/{$angkatanKelas->id}", [
+            'kelas_id' => $kelasBaru->id,
+            'angkatan_id' => $angkatan->id,
+            'prodi_id' => $prodi->id,
             'tahun_akademik_id' => $ta->id,
-         ])
-         ->assertStatus(200);
+        ])
+        ->assertStatus(200);
 
     $this->assertDatabaseHas('angkatan_kelas', [
-        'id'       => $angkatanKelas->id,
+        'id' => $angkatanKelas->id,
         'kelas_id' => $kelasBaru->id,
     ]);
 
     // Delete
     $this->withHeader('Authorization', "Bearer {$token}")
-         ->deleteJson("/api/angkatan-kelas/{$angkatanKelas->id}")
-         ->assertStatus(200);
+        ->deleteJson("/api/angkatan-kelas/{$angkatanKelas->id}")
+        ->assertStatus(200);
 
     $this->assertDatabaseMissing('angkatan_kelas', [
         'id' => $angkatanKelas->id,

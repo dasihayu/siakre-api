@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
+use App\Models\Angkatan;
 use App\Models\AngkatanKelas;
 use App\Models\Kelas;
-use App\Models\Angkatan;
 use App\Models\Prodi;
 use App\Models\TahunAkademik;
+use Illuminate\Database\Seeder;
 
 class AngkatanKelasSeeder extends Seeder
 {
@@ -20,9 +20,9 @@ class AngkatanKelasSeeder extends Seeder
 
         if ($kelas && $angkatan && $prodi && $ta) {
             AngkatanKelas::create([
-                'kelas_id'          => $kelas->id,
-                'angkatan_id'       => $angkatan->id,
-                'prodi_id'          => $prodi->id,
+                'kelas_id' => $kelas->id,
+                'angkatan_id' => $angkatan->id,
+                'prodi_id' => $prodi->id,
                 'tahun_akademik_id' => $ta->id,
             ]);
         }
