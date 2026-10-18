@@ -24,6 +24,9 @@ use App\Http\Controllers\TahunAkademikController;
 use App\Http\Controllers\UppsController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EnrollmentMataKuliahController;
+use App\Http\Controllers\MataKuliahAngkatanKelasController;
+
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -166,6 +169,20 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('/status-mahasiswa/{id}', [StatusMahasiswaController::class, 'update']);
     Route::delete('/status-mahasiswa/{id}', [StatusMahasiswaController::class, 'destroy']);
 
+    // --- CRUD Enrollment Mata Kuliah ---
+    Route::get('/enrollment-mata-kuliah', [EnrollmentMataKuliahController::class, 'index']);
+    Route::post('/enrollment-mata-kuliah', [EnrollmentMataKuliahController::class, 'store']);
+    Route::get('/enrollment-mata-kuliah/{id}', [EnrollmentMataKuliahController::class, 'show']);
+    Route::put('/enrollment-mata-kuliah/{id}', [EnrollmentMataKuliahController::class, 'update']);
+    Route::delete('/enrollment-mata-kuliah/{id}', [EnrollmentMataKuliahController::class, 'destroy']);
+
+    // --- CRUD Mata Kuliah Angkatan Kelas ---
+    Route::get('/mata-kuliah-angkatan-kelas', [MataKuliahAngkatanKelasController::class, 'index']);
+    Route::post('/mata-kuliah-angkatan-kelas', [MataKuliahAngkatanKelasController::class, 'store']);
+    Route::get('/mata-kuliah-angkatan-kelas/{id}', [MataKuliahAngkatanKelasController::class, 'show']);
+    Route::put('/mata-kuliah-angkatan-kelas/{id}', [MataKuliahAngkatanKelasController::class, 'update']);
+    Route::delete('/mata-kuliah-angkatan-kelas/{id}', [MataKuliahAngkatanKelasController::class, 'destroy']);
+   
     // --- CRUD Prestasi Mahasiswa ---
     Route::get('/prestasi-mahasiswa', [PrestasiMahasiswaController::class, 'index']);
     Route::post('/prestasi-mahasiswa', [PrestasiMahasiswaController::class, 'store']);
