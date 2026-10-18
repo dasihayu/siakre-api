@@ -41,3 +41,33 @@ test('authenticated user can list and create angkatan', function () {
         'angkatan' => 2026,
     ]);
 });
+test('authenticated user can update and delete angkatan', function () {
+    $user = User::factory()->create();
+    $token = auth('api')->login($user);
+
+    $angkatan = Angkatan::create(['angkatan' => 2021]);
+
+    // Test PUT update angkatan
+    $responsePut = $this->withHeader('Authorization', "Bearer {$token}")
+        ->putJson("/api/angkatan/{$angkatan->id}", ['angkatan' => 2022]);
+
+    $responsePut->assertStatus(200)
+        ->assertJson([
+            'success' => true,
+            'message' => 'Angkatan berhasil diperbarui',
+        ]);
+
+    $this->assertDatabaseHas('angkatan', ['id' => $angkatan->id, 'angkatan' => 2022]);
+
+    // Test DELETE angkatan
+    $responseDelete = $this->withHeader('Authorization', "Bearer {$token}")
+        ->deleteJson("/api/angkatan/{$angkatan->id}");
+
+    $responseDelete->assertStatus(200)
+        ->assertJson([
+            'success' => true,
+            'message' => 'Angkatan berhasil dihapus',
+        ]);
+
+    $this->assertDatabaseMissing('angkatan', ['id' => $angkatan->id]);
+});
