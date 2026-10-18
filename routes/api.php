@@ -26,6 +26,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EnrollmentMataKuliahController;
 use App\Http\Controllers\MataKuliahAngkatanKelasController;
+use App\Http\Controllers\NilaiMahasiswaController;
 
 
 Route::prefix('auth')->group(function () {
@@ -203,4 +204,11 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/jenis-prestasi/{id}', [JenisPrestasiController::class, 'show']);
     Route::put('/jenis-prestasi/{id}', [JenisPrestasiController::class, 'update']);
     Route::delete('/jenis-prestasi/{id}', [JenisPrestasiController::class, 'destroy']);
+
+    // --- CRUD Data Nilai Mahasiswa ---
+    Route::get('/nilai-mahasiswa', [NilaiMahasiswaController::class, 'index']);
+    Route::post('/nilai-mahasiswa', [NilaiMahasiswaController::class, 'store']);
+    Route::get('/nilai-mahasiswa/{id}', [NilaiMahasiswaController::class, 'show']);
+    Route::put('/nilai-mahasiswa/{id}', [NilaiMahasiswaController::class, 'update']);
+    Route::delete('/nilai-mahasiswa/{id}', [NilaiMahasiswaController::class, 'destroy']);
 });
