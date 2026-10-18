@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
             $slug = strtolower($role->value);
 
             $user = User::firstOrCreate(
-                ['email' => "{$slug}@example.com"],
+                ['email' => "{$slug}@polines.ac.id"],
                 [
                     'name' => ucfirst($slug).' User',
                     'password' => $password,
