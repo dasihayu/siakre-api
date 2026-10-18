@@ -36,6 +36,8 @@ class DatabaseSeeder extends Seeder
             AngkatanKelasSeeder::class,
             EnrollmentKelasSeeder::class,
             StatusMahasiswaSeeder::class,
+            EnrollmentMataKuliahSeeder::class,
+            MataKuliahAngkatanKelasSeeder::class,
         ]);
     }
 }
