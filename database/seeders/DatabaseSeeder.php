@@ -41,6 +41,7 @@ class DatabaseSeeder extends Seeder
             PrestasiMahasiswaSeeder::class,
             EvidencePrestasiMahasiswaSeeder::class,
             JenisPrestasiSeeder::class,
+            NilaiMahasiswaSeeder::class,
         ]);
     }
 }
