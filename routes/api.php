@@ -2,8 +2,13 @@
 
 use App\Http\Controllers\AnggotaUppsController;
 use App\Http\Controllers\AngkatanController;
+use App\Http\Controllers\AngkatanKelasController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CplController;
+use App\Http\Controllers\EnrollmentKelasController;
+use App\Http\Controllers\EvidencePrestasiMahasiswaController;
+use App\Http\Controllers\JenisPrestasiController;
+use App\Http\Controllers\KegiatanMahasiswaController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\KurikulumController;
 use App\Http\Controllers\MahasiswaController;
@@ -11,16 +16,14 @@ use App\Http\Controllers\MataKuliahController;
 use App\Http\Controllers\MataKuliahCplController;
 use App\Http\Controllers\PerguruanTinggiController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\PrestasiMahasiswaController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\StatusMahasiswaController;
 use App\Http\Controllers\TahunAkademikController;
 use App\Http\Controllers\UppsController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\KegiatanMahasiswaController;
-use App\Http\Controllers\AngkatanKelasController;
-use App\Http\Controllers\EnrollmentKelasController;
-use App\Http\Controllers\StatusMahasiswaController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -162,4 +165,25 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/status-mahasiswa/{id}', [StatusMahasiswaController::class, 'show']);
     Route::put('/status-mahasiswa/{id}', [StatusMahasiswaController::class, 'update']);
     Route::delete('/status-mahasiswa/{id}', [StatusMahasiswaController::class, 'destroy']);
+
+    // --- CRUD Prestasi Mahasiswa ---
+    Route::get('/prestasi-mahasiswa', [PrestasiMahasiswaController::class, 'index']);
+    Route::post('/prestasi-mahasiswa', [PrestasiMahasiswaController::class, 'store']);
+    Route::get('/prestasi-mahasiswa/{id}', [PrestasiMahasiswaController::class, 'show']);
+    Route::put('/prestasi-mahasiswa/{id}', [PrestasiMahasiswaController::class, 'update']);
+    Route::delete('/prestasi-mahasiswa/{id}', [PrestasiMahasiswaController::class, 'destroy']);
+
+    // --- CRUD Evidence Prestasi Mahasiswa ---
+    Route::get('/evidence-prestasi-mahasiswa', [EvidencePrestasiMahasiswaController::class, 'index']);
+    Route::post('/evidence-prestasi-mahasiswa', [EvidencePrestasiMahasiswaController::class, 'store']);
+    Route::get('/evidence-prestasi-mahasiswa/{id}', [EvidencePrestasiMahasiswaController::class, 'show']);
+    Route::put('/evidence-prestasi-mahasiswa/{id}', [EvidencePrestasiMahasiswaController::class, 'update']);
+    Route::delete('/evidence-prestasi-mahasiswa/{id}', [EvidencePrestasiMahasiswaController::class, 'destroy']);
+
+    // --- CRUD Jenis Prestasi ---
+    Route::get('/jenis-prestasi', [JenisPrestasiController::class, 'index']);
+    Route::post('/jenis-prestasi', [JenisPrestasiController::class, 'store']);
+    Route::get('/jenis-prestasi/{id}', [JenisPrestasiController::class, 'show']);
+    Route::put('/jenis-prestasi/{id}', [JenisPrestasiController::class, 'update']);
+    Route::delete('/jenis-prestasi/{id}', [JenisPrestasiController::class, 'destroy']);
 });

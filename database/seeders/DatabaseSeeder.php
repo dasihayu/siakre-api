@@ -18,13 +18,13 @@ class DatabaseSeeder extends Seeder
             RoleAndPermissionSeeder::class,
             UserSeeder::class,
         ]);
-        
+
         $this->call([
             PerguruanTinggiSeeder::class,
             ProdiSeeder::class,
             UppsSeeder::class,
             KurikulumSeeder::class,
-            CplSeeder::class, 
+            CplSeeder::class,
             MataKuliahSeeder::class,
             MahasiswaSeeder::class,
             MataKuliahCplSeeder::class,
@@ -36,6 +36,9 @@ class DatabaseSeeder extends Seeder
             AngkatanKelasSeeder::class,
             EnrollmentKelasSeeder::class,
             StatusMahasiswaSeeder::class,
+            PrestasiMahasiswaSeeder::class,
+            EvidencePrestasiMahasiswaSeeder::class,
+            JenisPrestasiSeeder::class,
         ]);
     }
 }
