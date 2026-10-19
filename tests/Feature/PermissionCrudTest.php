@@ -53,14 +53,14 @@ test('admin can create a new permission', function () {
 });
 
 test('admin can show permission detail', function () {
-    $permission = Permission::findByName('dosen.read', 'api');
+    $permission = Permission::findByName('perguruan_tinggi.read', 'api');
 
     $response = $this->actingAs($this->admin, 'api')
         ->getJson("/api/permissions/{$permission->id}");
 
     $response->assertStatus(200)
         ->assertJsonPath('success', true)
-        ->assertJsonPath('data.name', 'dosen.read');
+        ->assertJsonPath('data.name', 'perguruan_tinggi.read');
 });
 
 test('admin can update a permission', function () {

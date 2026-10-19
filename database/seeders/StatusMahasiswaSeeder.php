@@ -8,15 +8,23 @@ use Illuminate\Database\Seeder;
 
 class StatusMahasiswaSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
-        $enrollment = EnrollmentKelas::first();
+        $enrollments = EnrollmentKelas::with('mahasiswa')->get();
 
-        if ($enrollment) {
-            StatusMahasiswa::create([
-                'id_enrollment_mahasiswa_angkatan_kelas' => $enrollment->id,
-                'status' => 'Aktif',
-            ]);
+        foreach ($enrollments as $enrollment) {
+            $status = $enrollment->mahasiswa?->tanggal_kelulusan ? 'Lulus' : 'Aktif';
+
+            StatusMahasiswa::firstOrCreate(
+                ['id_enrollment_mahasiswa_angkatan_kelas' => $enrollment->id],
+                [
+                    'id_enrollment_mahasiswa_angkatan_kelas' => $enrollment->id,
+                    'status' => $status,
+                ]
+            );
         }
     }
 }

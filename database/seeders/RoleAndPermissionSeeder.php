@@ -18,14 +18,39 @@ class RoleAndPermissionSeeder extends Seeder
         // Reset cached roles and permissions
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Daftar Fitur dalam Sistem Akreditasi LAM INFOKOM
-        $features = [
-            'dosen',
-            'kriteria',
-            'penelitian',
-            'pengabdian',
-            'led',
-            'lkps',
+        // 22 Modul Entitas Sistem Akreditasi sesuai Dokumen Matriks Hak Akses
+        $modules = [
+            // Data Master Akademik
+            'perguruan_tinggi',
+            'prodi',
+            'kelas',
+            'upps',
+            'anggota_upps',
+            'mata_kuliah',
+            'tahun_akademik',
+            'angkatan',
+
+            // Kurikulum & CPL
+            'kurikulum',
+            'cpl',
+            'mata_kuliah_cpl',
+
+            // Mahasiswa
+            'mahasiswa',
+            'status_mahasiswa',
+            'kegiatan_mahasiswa',
+            'nilai_mahasiswa',
+            'prestasi_mahasiswa',
+            'evidence_prestasi_mahasiswa',
+            'jenis_prestasi',
+
+            // Transaksional / Enrollment
+            'angkatan_kelas',
+            'enrollment_kelas',
+            'enrollment_mata_kuliah',
+            'mata_kuliah_angkatan_kelas',
+
+            // Manajemen Hak Akses & Pengguna (Admin)
             'user',
             'role',
             'permission',
@@ -34,67 +59,214 @@ class RoleAndPermissionSeeder extends Seeder
         // Actions CRUD
         $actions = ['create', 'read', 'update', 'delete'];
 
-        // Create Permissions per Feature (Format: {feature}.{action}, misal: dosen.create)
-        $allPermissions = [];
-        foreach ($features as $feature) {
+        // Create Permissions per Modul (Format: {module}.{action}, misal: perguruan_tinggi.read)
+        foreach ($modules as $module) {
             foreach ($actions as $action) {
-                $permissionName = "{$feature}.{$action}";
-                Permission::findOrCreate($permissionName, 'api');
-                $allPermissions[] = $permissionName;
+                Permission::findOrCreate("{$module}.{$action}", 'api');
             }
         }
 
-        // Create Roles and Assign Permissions
-        // 1. ADMINISTRATOR (Full Permissions)
+        // Helper closures untuk membangun daftar permissions
+        $crud = fn (string $module) => [
+            "{$module}.create",
+            "{$module}.read",
+            "{$module}.update",
+            "{$module}.delete",
+        ];
+
+        $readOnly = fn (string $module) => [
+            "{$module}.read",
+        ];
+
+        $cru = fn (string $module) => [
+            "{$module}.create",
+            "{$module}.read",
+            "{$module}.update",
+        ];
+
+        // 1. ADMINISTRATOR: Memegang kendali penuh (CRUD) ke seluruh sistem
         $adminRole = Role::findOrCreate(UserRole::ADMINISTRATOR->value, 'api');
-        $adminRole->givePermissionTo(Permission::all());
+        $adminRole->syncPermissions(Permission::all());
 
-        // 2. KAPRODI (Program Director - Full CRUD on Dosen, LED, LKPS, Penelitian, Pengabdian)
-        $kaprodiRole = Role::findOrCreate(UserRole::KAPRODI->value, 'api');
-        $kaprodiRole->givePermissionTo([
-            'dosen.create', 'dosen.read', 'dosen.update', 'dosen.delete',
-            'kriteria.read',
-            'penelitian.create', 'penelitian.read', 'penelitian.update', 'penelitian.delete',
-            'pengabdian.create', 'pengabdian.read', 'pengabdian.update', 'pengabdian.delete',
-            'led.create', 'led.read', 'led.update', 'led.delete',
-            'lkps.create', 'lkps.read', 'lkps.update', 'lkps.delete',
-        ]);
+        // 2. OPERATOR: Administrasi data mahasiswa, kelas, enrollment (Bukan struktur Kurikulum/CPL)
+        $operatorModulesCrud = [
+            'kelas',
+            'upps',
+            'anggota_upps',
+            'tahun_akademik',
+            'angkatan',
+            'mahasiswa',
+            'status_mahasiswa',
+            'kegiatan_mahasiswa',
+            'prestasi_mahasiswa',
+            'evidence_prestasi_mahasiswa',
+            'jenis_prestasi',
+            'angkatan_kelas',
+            'enrollment_kelas',
+            'enrollment_mata_kuliah',
+            'mata_kuliah_angkatan_kelas',
+        ];
 
-        // 3. DOSEN (Lecturer - Read Dosen, CRUD own Penelitian & Pengabdian)
-        $dosenRole = Role::findOrCreate(UserRole::DOSEN->value, 'api');
-        $dosenRole->givePermissionTo([
-            'dosen.read',
-            'kriteria.read',
-            'penelitian.create', 'penelitian.read', 'penelitian.update',
-            'pengabdian.create', 'pengabdian.read', 'pengabdian.update',
-        ]);
+        $operatorModulesRead = [
+            'perguruan_tinggi',
+            'prodi',
+            'mata_kuliah',
+            'kurikulum',
+            'cpl',
+            'mata_kuliah_cpl',
+            'nilai_mahasiswa',
+        ];
 
-        // 4. OPERATOR (Data Entry)
+        $operatorPermissions = [];
+        foreach ($operatorModulesCrud as $m) {
+            $operatorPermissions = array_merge($operatorPermissions, $crud($m));
+        }
+        foreach ($operatorModulesRead as $m) {
+            $operatorPermissions = array_merge($operatorPermissions, $readOnly($m));
+        }
+
         $operatorRole = Role::findOrCreate(UserRole::OPERATOR->value, 'api');
-        $operatorRole->givePermissionTo([
-            'dosen.create', 'dosen.read', 'dosen.update',
-            'kriteria.read',
-            'lkps.create', 'lkps.read', 'lkps.update',
-        ]);
+        $operatorRole->syncPermissions($operatorPermissions);
 
-        // 5. REVIEWER (Assessor / Auditor - Read Only across LED, LKPS, Kriteria)
+        // 3. KAPRODI: Merancang standar akademik (CRUD Kurikulum, CPL, Mata Kuliah, Pivot Matkul-CPL)
+        $kaprodiModulesCrud = [
+            'mata_kuliah',
+            'kurikulum',
+            'cpl',
+            'mata_kuliah_cpl',
+        ];
+
+        $kaprodiModulesRead = [
+            'perguruan_tinggi',
+            'prodi',
+            'kelas',
+            'upps',
+            'anggota_upps',
+            'tahun_akademik',
+            'angkatan',
+            'mahasiswa',
+            'status_mahasiswa',
+            'kegiatan_mahasiswa',
+            'nilai_mahasiswa',
+            'prestasi_mahasiswa',
+            'evidence_prestasi_mahasiswa',
+            'jenis_prestasi',
+            'angkatan_kelas',
+            'enrollment_kelas',
+            'enrollment_mata_kuliah',
+            'mata_kuliah_angkatan_kelas',
+        ];
+
+        $kaprodiPermissions = [];
+        foreach ($kaprodiModulesCrud as $m) {
+            $kaprodiPermissions = array_merge($kaprodiPermissions, $crud($m));
+        }
+        foreach ($kaprodiModulesRead as $m) {
+            $kaprodiPermissions = array_merge($kaprodiPermissions, $readOnly($m));
+        }
+
+        $kaprodiRole = Role::findOrCreate(UserRole::KAPRODI->value, 'api');
+        $kaprodiRole->syncPermissions($kaprodiPermissions);
+
+        // 4. DOSEN: CRU pada Nilai Mahasiswa, Read-Only pada entitas lainnya
+        $dosenModulesRead = [
+            'perguruan_tinggi',
+            'prodi',
+            'kelas',
+            'upps',
+            'anggota_upps',
+            'mata_kuliah',
+            'tahun_akademik',
+            'angkatan',
+            'kurikulum',
+            'cpl',
+            'mata_kuliah_cpl',
+            'mahasiswa',
+            'status_mahasiswa',
+            'kegiatan_mahasiswa',
+            'prestasi_mahasiswa',
+            'evidence_prestasi_mahasiswa',
+            'jenis_prestasi',
+            'angkatan_kelas',
+            'enrollment_kelas',
+            'enrollment_mata_kuliah',
+            'mata_kuliah_angkatan_kelas',
+        ];
+
+        $dosenPermissions = $cru('nilai_mahasiswa');
+        foreach ($dosenModulesRead as $m) {
+            $dosenPermissions = array_merge($dosenPermissions, $readOnly($m));
+        }
+
+        $dosenRole = Role::findOrCreate(UserRole::DOSEN->value, 'api');
+        $dosenRole->syncPermissions($dosenPermissions);
+
+        // 5. REVIEWER: Akses murni Read-Only ke semua 22 modul sistem
+        $reviewerModules = [
+            'perguruan_tinggi',
+            'prodi',
+            'kelas',
+            'upps',
+            'anggota_upps',
+            'mata_kuliah',
+            'tahun_akademik',
+            'angkatan',
+            'kurikulum',
+            'cpl',
+            'mata_kuliah_cpl',
+            'mahasiswa',
+            'status_mahasiswa',
+            'kegiatan_mahasiswa',
+            'nilai_mahasiswa',
+            'prestasi_mahasiswa',
+            'evidence_prestasi_mahasiswa',
+            'jenis_prestasi',
+            'angkatan_kelas',
+            'enrollment_kelas',
+            'enrollment_mata_kuliah',
+            'mata_kuliah_angkatan_kelas',
+        ];
+
+        $reviewerPermissions = [];
+        foreach ($reviewerModules as $m) {
+            $reviewerPermissions = array_merge($reviewerPermissions, $readOnly($m));
+        }
+
         $reviewerRole = Role::findOrCreate(UserRole::REVIEWER->value, 'api');
-        $reviewerRole->givePermissionTo([
-            'dosen.read',
-            'kriteria.read',
-            'penelitian.read',
-            'pengabdian.read',
-            'led.read',
-            'lkps.read',
-        ]);
+        $reviewerRole->syncPermissions($reviewerPermissions);
 
-        // 6. PIMPINAN (Executive / Dean - Read Only Dashboard & Reports)
+        // 6. PIMPINAN: Read-Only global kecuali Pivot Mata Kuliah CPL (-)
+        $pimpinanModules = [
+            'perguruan_tinggi',
+            'prodi',
+            'kelas',
+            'upps',
+            'anggota_upps',
+            'mata_kuliah',
+            'tahun_akademik',
+            'angkatan',
+            'kurikulum',
+            'cpl',
+            // 'mata_kuliah_cpl' (-) Tidak punya akses sama sekali
+            'mahasiswa',
+            'status_mahasiswa',
+            'kegiatan_mahasiswa',
+            'nilai_mahasiswa',
+            'prestasi_mahasiswa',
+            'evidence_prestasi_mahasiswa',
+            'jenis_prestasi',
+            'angkatan_kelas',
+            'enrollment_kelas',
+            'enrollment_mata_kuliah',
+            'mata_kuliah_angkatan_kelas',
+        ];
+
+        $pimpinanPermissions = [];
+        foreach ($pimpinanModules as $m) {
+            $pimpinanPermissions = array_merge($pimpinanPermissions, $readOnly($m));
+        }
+
         $pimpinanRole = Role::findOrCreate(UserRole::PIMPINAN->value, 'api');
-        $pimpinanRole->givePermissionTo([
-            'dosen.read',
-            'kriteria.read',
-            'led.read',
-            'lkps.read',
-        ]);
+        $pimpinanRole->syncPermissions($pimpinanPermissions);
     }
 }

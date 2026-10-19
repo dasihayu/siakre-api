@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Angkatan;
 use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class AngkatanController extends Controller
 {
@@ -63,7 +64,7 @@ class AngkatanController extends Controller
 
         try {
             $validated = $request->validate([
-                'tahun' => 'required|string|max:10|unique:angkatans,tahun,' . $id,
+                'angkatan' => 'required|integer|unique:angkatan,angkatan,' . $id,
             ]);
 
             $angkatan->update($validated);
