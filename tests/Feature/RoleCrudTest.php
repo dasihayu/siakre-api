@@ -40,7 +40,7 @@ test('admin can create a new role with permissions', function () {
     $response = $this->actingAs($this->admin, 'api')
         ->postJson('/api/roles', [
             'name' => 'SUPERVISOR',
-            'permissions' => ['dosen.read', 'kriteria.read'],
+            'permissions' => ['perguruan_tinggi.read', 'prodi.read'],
         ]);
 
     $response->assertStatus(201)
@@ -53,8 +53,8 @@ test('admin can create a new role with permissions', function () {
     ]);
 
     $role = Role::findByName('SUPERVISOR', 'api');
-    expect($role->hasPermissionTo('dosen.read'))->toBeTrue()
-        ->and($role->hasPermissionTo('kriteria.read'))->toBeTrue();
+    expect($role->hasPermissionTo('perguruan_tinggi.read'))->toBeTrue()
+        ->and($role->hasPermissionTo('prodi.read'))->toBeTrue();
 });
 
 test('admin can show role detail', function () {
