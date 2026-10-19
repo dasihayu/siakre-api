@@ -161,6 +161,7 @@ class GenerateSwaggerDocsCommand extends Command
             'PrestasiMahasiswa' => 'Prestasi Mahasiswa',
             'EvidencePrestasiMahasiswa' => 'Evidence Prestasi Mahasiswa',
             'JenisPrestasi' => 'Jenis Prestasi',
+            'NilaiMahasiswa' => 'Nilai Mahasiswa',
         ];
 
         return $customTags[$base] ?? Str::headline($base);
@@ -804,6 +805,9 @@ PHP;
         $isDate = str_contains($ruleStr, 'date') || str_contains($field, 'tanggal');
 
         $type = $isInteger ? 'integer' : 'string';
+        if (in_array($field, ['nilai_angka', 'bobot_nilai'])) {
+            $type = 'number';
+        }
         $format = $isDate ? 'date' : (str_contains($field, 'email') ? 'email' : null);
 
         // Cari data riil dari record database
@@ -861,6 +865,8 @@ PHP;
             'id_enrollment_mahasiswa_angkatan_kelas' => ['table' => 'enrollment_mahasiswa_angkatan_kelas', 'col' => 'id'],
             'mata_kuliah_id' => ['table' => 'mata_kuliah', 'col' => 'id'],
             'enrollment_mata_kuliah_id' => ['table' => 'enrollment_mata_kuliah', 'col' => 'id'],
+            'enrollment_mahasiswa_angkatan_kelas_id' => ['table' => 'enrollment_mahasiswa_angkatan_kelas', 'col' => 'id'],
+            'mata_kuliah_angkatan_kelas_id' => ['table' => 'mata_kuliah_angkatan_kelas', 'col' => 'id'],
             'dosen_id' => ['table' => 'users', 'col' => 'id'],
         ];
 
@@ -978,6 +984,12 @@ PHP;
             'nama_mahasiswa' => 'Nama lengkap mahasiswa terdaftar',
             'tahun_masuk' => 'Tahun kalender mahasiswa pertama kali terdaftar',
             'jenis_pendaftaran' => 'Jalur penerimaan mahasiswa (Reguler, SNBP, SNBT, Mandiri)',
+            'enrollment_mahasiswa_angkatan_kelas_id' => 'ID referensi enrollment mahasiswa pada angkatan kelas',
+            'mata_kuliah_angkatan_kelas_id' => 'ID referensi penawaran mata kuliah pada angkatan kelas',
+            'nilai_angka' => 'Nilai capaian akademik mahasiswa dalam format angka (0.00 - 100.00)',
+            'nilai_huruf' => 'Indeks prestasi huruf mutu (A, AB, B, BC, C, D, E)',
+            'bobot_nilai' => 'Bobot angka mutu kredit akademik (4.00, 3.50, 3.00, 2.50, 2.00, 1.00, 0.00)',
+            'status_kelulusan' => 'Status kelulusan mata kuliah (Lulus / Tidak Lulus)',
             'tanggal_kelulusan' => 'Tanggal kelulusan resmi yudisium mahasiswa',
             'masa_studi_bulan' => 'Lama masa studi mahasiswa dalam satuan bulan',
             'angkatan' => 'Tahun angkatan mahasiswa',

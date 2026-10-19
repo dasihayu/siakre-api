@@ -64,7 +64,7 @@ class EnrollmentMataKuliahDoc
 | `mata_kuliah_id` | `integer` | **Ya (Required)** | ID referensi Mata Kuliah | `12` |
 | `dosen_id` | `integer` | *Tidak (Opsional / Nullable)* | ID referensi Dosen pengampu (User) | `6` |
 | `evidence` | `integer` | *Tidak (Opsional / Nullable)* | Nama file atau link berkas bukti sertifikat pendukung | `1` |
-| `mata_kuliah_angkatan_kelas_id` | `integer` | *Tidak (Opsional / Nullable)* | Mata Kuliah Angkatan Kelas Id | `1` |
+| `mata_kuliah_angkatan_kelas_id` | `integer` | *Tidak (Opsional / Nullable)* | ID referensi penawaran mata kuliah pada angkatan kelas | `1` |
 
 ### 📤 3. Struktur Response
 | Status HTTP | Field / Properti | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |
@@ -78,7 +78,7 @@ class EnrollmentMataKuliahDoc
 | | `data.mata_kuliah_id` | `integer` | **Ya (Required)** | ID referensi Mata Kuliah | `12` |
 | | `data.dosen_id` | `integer` | *Tidak (Opsional / Nullable)* | ID referensi Dosen pengampu (User) | `6` |
 | | `data.evidence` | `integer` | *Tidak (Opsional / Nullable)* | Nama file atau link berkas bukti sertifikat pendukung | `1` |
-| | `data.mata_kuliah_angkatan_kelas_id` | `string` | *Tidak (Opsional / Nullable)* | Mata Kuliah Angkatan Kelas Id | `null` |
+| | `data.mata_kuliah_angkatan_kelas_id` | `string` | *Tidak (Opsional / Nullable)* | ID referensi penawaran mata kuliah pada angkatan kelas | `null` |
 | | `data.created_at` | `string` | **Ya (Required)** | Created At | `"2026-10-19 03:13:36"` |
 | | `data.updated_at` | `string` | **Ya (Required)** | Updated At | `"2026-10-19 03:13:36"` |
 | **422 Unprocessable** | `success` | `boolean` | **Ya (Required)** | Indikator kegagalan validasi (`false`) | `false` |
@@ -99,7 +99,7 @@ class EnrollmentMataKuliahDoc
                     new OA\Property(property: 'mata_kuliah_id', type: 'integer', example: 12, description: 'ID referensi Mata Kuliah'),
                     new OA\Property(property: 'dosen_id', type: 'integer', example: 6, description: 'ID referensi Dosen pengampu (User)', nullable: true),
                     new OA\Property(property: 'evidence', type: 'integer', example: 1, description: 'Nama file atau link berkas bukti sertifikat pendukung', nullable: true),
-                    new OA\Property(property: 'mata_kuliah_angkatan_kelas_id', type: 'integer', example: 1, description: 'Mata Kuliah Angkatan Kelas Id', nullable: true),
+                    new OA\Property(property: 'mata_kuliah_angkatan_kelas_id', type: 'integer', example: 1, description: 'ID referensi penawaran mata kuliah pada angkatan kelas', nullable: true),
                 ]
             )
         ),
@@ -191,7 +191,7 @@ class EnrollmentMataKuliahDoc
 | `mata_kuliah_id` | `integer` | **Ya (Required)** | ID referensi Mata Kuliah | `12` |
 | `dosen_id` | `integer` | *Tidak (Opsional / Nullable)* | ID referensi Dosen pengampu (User) | `6` |
 | `evidence` | `integer` | *Tidak (Opsional / Nullable)* | Nama file atau link berkas bukti sertifikat pendukung | `1` |
-| `mata_kuliah_angkatan_kelas_id` | `integer` | *Tidak (Opsional / Nullable)* | Mata Kuliah Angkatan Kelas Id | `1` |
+| `mata_kuliah_angkatan_kelas_id` | `integer` | *Tidak (Opsional / Nullable)* | ID referensi penawaran mata kuliah pada angkatan kelas | `1` |
 
 ### 📤 4. Struktur Response
 | Status HTTP | Field / Properti | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |
@@ -205,7 +205,7 @@ class EnrollmentMataKuliahDoc
 | | `data.mata_kuliah_id` | `integer` | **Ya (Required)** | ID referensi Mata Kuliah | `12` |
 | | `data.dosen_id` | `integer` | *Tidak (Opsional / Nullable)* | ID referensi Dosen pengampu (User) | `6` |
 | | `data.evidence` | `integer` | *Tidak (Opsional / Nullable)* | Nama file atau link berkas bukti sertifikat pendukung | `1` |
-| | `data.mata_kuliah_angkatan_kelas_id` | `string` | *Tidak (Opsional / Nullable)* | Mata Kuliah Angkatan Kelas Id | `null` |
+| | `data.mata_kuliah_angkatan_kelas_id` | `string` | *Tidak (Opsional / Nullable)* | ID referensi penawaran mata kuliah pada angkatan kelas | `null` |
 | | `data.created_at` | `string` | **Ya (Required)** | Created At | `"2026-10-19 03:13:36"` |
 | | `data.updated_at` | `string` | **Ya (Required)** | Updated At | `"2026-10-19 03:13:36"` |
 | **422 Unprocessable** | `success` | `boolean` | **Ya (Required)** | Indikator kegagalan validasi (`false`) | `false` |
@@ -236,7 +236,7 @@ class EnrollmentMataKuliahDoc
                     new OA\Property(property: 'mata_kuliah_id', type: 'integer', example: 12, description: 'ID referensi Mata Kuliah'),
                     new OA\Property(property: 'dosen_id', type: 'integer', example: 6, description: 'ID referensi Dosen pengampu (User)', nullable: true),
                     new OA\Property(property: 'evidence', type: 'integer', example: 1, description: 'Nama file atau link berkas bukti sertifikat pendukung', nullable: true),
-                    new OA\Property(property: 'mata_kuliah_angkatan_kelas_id', type: 'integer', example: 1, description: 'Mata Kuliah Angkatan Kelas Id', nullable: true),
+                    new OA\Property(property: 'mata_kuliah_angkatan_kelas_id', type: 'integer', example: 1, description: 'ID referensi penawaran mata kuliah pada angkatan kelas', nullable: true),
                 ]
             )
         ),

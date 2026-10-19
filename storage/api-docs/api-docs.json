@@ -1612,7 +1612,7 @@
                     "Enrollment Mata Kuliah"
                 ],
                 "summary": "Tambah Data Enrollment Mata Kuliah Baru",
-                "description": "### 📋 1. Request Headers\n| Header | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- |\n| `Authorization` | `string` | **Ya (Required)** | Token Bearer JWT hasil otentikasi login | `Bearer eyJhbGci...` |\n| `Content-Type` | `string` | **Ya (Required)** | Tipe konten payload body permintaan | `application/json` |\n| `Accept` | `string` | **Ya (Required)** | Tipe konten respon server yang diharapkan | `application/json` |\n\n### 📥 2. Request Body\n| Parameter | Tipe Data | Wajib / Required | Keterangan | Contoh Riil |\n| :--- | :--- | :--- | :--- | :--- |\n| `tahun_akademik_id` | `integer` | **Ya (Required)** | ID referensi Tahun Akademik | `4` |\n| `mata_kuliah_id` | `integer` | **Ya (Required)** | ID referensi Mata Kuliah | `12` |\n| `dosen_id` | `integer` | *Tidak (Opsional / Nullable)* | ID referensi Dosen pengampu (User) | `6` |\n| `evidence` | `integer` | *Tidak (Opsional / Nullable)* | Nama file atau link berkas bukti sertifikat pendukung | `1` |\n| `mata_kuliah_angkatan_kelas_id` | `integer` | *Tidak (Opsional / Nullable)* | Mata Kuliah Angkatan Kelas Id | `1` |\n\n### 📤 3. Struktur Response\n| Status HTTP | Field / Properti | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| **201 Created** | `success` | `boolean` | **Ya (Required)** | Indikator status keberhasilan (`true`) | `true` |\n| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (201) | `201` |\n| | `message` | `string` | **Ya (Required)** | Pesan informasi respon server | \"Data berhasil dibuat\" |\n| | `data` | `object` | **Ya (Required)** | Objek data entitas hasil operasi | `{ ... }` |\n| | `data.id` | `integer` | **Ya (Required)** | Id | `12` |\n| | `data.tahun_akademik_id` | `integer` | **Ya (Required)** | ID referensi Tahun Akademik | `4` |\n| | `data.mata_kuliah_id` | `integer` | **Ya (Required)** | ID referensi Mata Kuliah | `12` |\n| | `data.dosen_id` | `integer` | *Tidak (Opsional / Nullable)* | ID referensi Dosen pengampu (User) | `6` |\n| | `data.evidence` | `integer` | *Tidak (Opsional / Nullable)* | Nama file atau link berkas bukti sertifikat pendukung | `1` |\n| | `data.mata_kuliah_angkatan_kelas_id` | `string` | *Tidak (Opsional / Nullable)* | Mata Kuliah Angkatan Kelas Id | `null` |\n| | `data.created_at` | `string` | **Ya (Required)** | Created At | `\"2026-10-19 03:13:36\"` |\n| | `data.updated_at` | `string` | **Ya (Required)** | Updated At | `\"2026-10-19 03:13:36\"` |\n| **422 Unprocessable** | `success` | `boolean` | **Ya (Required)** | Indikator kegagalan validasi (`false`) | `false` |\n| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (422) | `422` |\n| | `message` | `string` | **Ya (Required)** | Ringkasan pesan kegagalan validasi | \\\"The given data was invalid.\\\" |\n| | `errors` | `object` | **Ya (Required)** | Kamus pesan kesalahan validasi per field input | `{\\\"field\\\": [\\\"Pesan error\\\"]}` |\n| **401 Unauthorized** | `message` | `string` | **Ya (Required)** | Pesan otentikasi gagal saat token kosong atau kedaluwarsa | \\\"Unauthenticated.\\\" |\n| **403 Forbidden** | `message` | `string` | **Ya (Required)** | Pesan penolakan izin akses Role/Permission | \\\"User does not have the right permissions.\\\" |\n| **400 Bad Request** | `message` | `string` | **Ya (Required)** | Permintaan tidak valid atau data berelasi masih terikat | \\\"Permintaan tidak valid\\\" |",
+                "description": "### 📋 1. Request Headers\n| Header | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- |\n| `Authorization` | `string` | **Ya (Required)** | Token Bearer JWT hasil otentikasi login | `Bearer eyJhbGci...` |\n| `Content-Type` | `string` | **Ya (Required)** | Tipe konten payload body permintaan | `application/json` |\n| `Accept` | `string` | **Ya (Required)** | Tipe konten respon server yang diharapkan | `application/json` |\n\n### 📥 2. Request Body\n| Parameter | Tipe Data | Wajib / Required | Keterangan | Contoh Riil |\n| :--- | :--- | :--- | :--- | :--- |\n| `tahun_akademik_id` | `integer` | **Ya (Required)** | ID referensi Tahun Akademik | `4` |\n| `mata_kuliah_id` | `integer` | **Ya (Required)** | ID referensi Mata Kuliah | `12` |\n| `dosen_id` | `integer` | *Tidak (Opsional / Nullable)* | ID referensi Dosen pengampu (User) | `6` |\n| `evidence` | `integer` | *Tidak (Opsional / Nullable)* | Nama file atau link berkas bukti sertifikat pendukung | `1` |\n| `mata_kuliah_angkatan_kelas_id` | `integer` | *Tidak (Opsional / Nullable)* | ID referensi penawaran mata kuliah pada angkatan kelas | `1` |\n\n### 📤 3. Struktur Response\n| Status HTTP | Field / Properti | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| **201 Created** | `success` | `boolean` | **Ya (Required)** | Indikator status keberhasilan (`true`) | `true` |\n| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (201) | `201` |\n| | `message` | `string` | **Ya (Required)** | Pesan informasi respon server | \"Data berhasil dibuat\" |\n| | `data` | `object` | **Ya (Required)** | Objek data entitas hasil operasi | `{ ... }` |\n| | `data.id` | `integer` | **Ya (Required)** | Id | `12` |\n| | `data.tahun_akademik_id` | `integer` | **Ya (Required)** | ID referensi Tahun Akademik | `4` |\n| | `data.mata_kuliah_id` | `integer` | **Ya (Required)** | ID referensi Mata Kuliah | `12` |\n| | `data.dosen_id` | `integer` | *Tidak (Opsional / Nullable)* | ID referensi Dosen pengampu (User) | `6` |\n| | `data.evidence` | `integer` | *Tidak (Opsional / Nullable)* | Nama file atau link berkas bukti sertifikat pendukung | `1` |\n| | `data.mata_kuliah_angkatan_kelas_id` | `string` | *Tidak (Opsional / Nullable)* | ID referensi penawaran mata kuliah pada angkatan kelas | `null` |\n| | `data.created_at` | `string` | **Ya (Required)** | Created At | `\"2026-10-19 03:13:36\"` |\n| | `data.updated_at` | `string` | **Ya (Required)** | Updated At | `\"2026-10-19 03:13:36\"` |\n| **422 Unprocessable** | `success` | `boolean` | **Ya (Required)** | Indikator kegagalan validasi (`false`) | `false` |\n| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (422) | `422` |\n| | `message` | `string` | **Ya (Required)** | Ringkasan pesan kegagalan validasi | \\\"The given data was invalid.\\\" |\n| | `errors` | `object` | **Ya (Required)** | Kamus pesan kesalahan validasi per field input | `{\\\"field\\\": [\\\"Pesan error\\\"]}` |\n| **401 Unauthorized** | `message` | `string` | **Ya (Required)** | Pesan otentikasi gagal saat token kosong atau kedaluwarsa | \\\"Unauthenticated.\\\" |\n| **403 Forbidden** | `message` | `string` | **Ya (Required)** | Pesan penolakan izin akses Role/Permission | \\\"User does not have the right permissions.\\\" |\n| **400 Bad Request** | `message` | `string` | **Ya (Required)** | Permintaan tidak valid atau data berelasi masih terikat | \\\"Permintaan tidak valid\\\" |",
                 "operationId": "6335c8b1923c90a31b2698f141fac290",
                 "requestBody": {
                     "required": true,
@@ -1647,7 +1647,7 @@
                                         "nullable": true
                                     },
                                     "mata_kuliah_angkatan_kelas_id": {
-                                        "description": "Mata Kuliah Angkatan Kelas Id",
+                                        "description": "ID referensi penawaran mata kuliah pada angkatan kelas",
                                         "type": "integer",
                                         "example": 1,
                                         "nullable": true
@@ -1736,7 +1736,7 @@
                     "Enrollment Mata Kuliah"
                 ],
                 "summary": "Perbarui Data Enrollment Mata Kuliah",
-                "description": "### 📋 1. Request Headers\n| Header | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- |\n| `Authorization` | `string` | **Ya (Required)** | Token Bearer JWT hasil otentikasi login | `Bearer eyJhbGci...` |\n| `Content-Type` | `string` | **Ya (Required)** | Tipe konten payload body permintaan | `application/json` |\n| `Accept` | `string` | **Ya (Required)** | Tipe konten respon server yang diharapkan | `application/json` |\n\n### 🔍 2. Path Parameters\n| Parameter | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- |\n| `id` | `integer` | **Ya (Required)** | Parameter ID unik id pada path URL | `1` |\n\n### 📥 3. Request Body\n| Parameter | Tipe Data | Wajib / Required | Keterangan | Contoh Riil |\n| :--- | :--- | :--- | :--- | :--- |\n| `tahun_akademik_id` | `integer` | **Ya (Required)** | ID referensi Tahun Akademik | `4` |\n| `mata_kuliah_id` | `integer` | **Ya (Required)** | ID referensi Mata Kuliah | `12` |\n| `dosen_id` | `integer` | *Tidak (Opsional / Nullable)* | ID referensi Dosen pengampu (User) | `6` |\n| `evidence` | `integer` | *Tidak (Opsional / Nullable)* | Nama file atau link berkas bukti sertifikat pendukung | `1` |\n| `mata_kuliah_angkatan_kelas_id` | `integer` | *Tidak (Opsional / Nullable)* | Mata Kuliah Angkatan Kelas Id | `1` |\n\n### 📤 4. Struktur Response\n| Status HTTP | Field / Properti | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| **200 OK** | `success` | `boolean` | **Ya (Required)** | Indikator status keberhasilan (`true`) | `true` |\n| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (200) | `200` |\n| | `message` | `string` | **Ya (Required)** | Pesan informasi respon server | \"Operasi berhasil\" |\n| | `data` | `object` | **Ya (Required)** | Objek data entitas hasil operasi | `{ ... }` |\n| | `data.id` | `integer` | **Ya (Required)** | Id | `12` |\n| | `data.tahun_akademik_id` | `integer` | **Ya (Required)** | ID referensi Tahun Akademik | `4` |\n| | `data.mata_kuliah_id` | `integer` | **Ya (Required)** | ID referensi Mata Kuliah | `12` |\n| | `data.dosen_id` | `integer` | *Tidak (Opsional / Nullable)* | ID referensi Dosen pengampu (User) | `6` |\n| | `data.evidence` | `integer` | *Tidak (Opsional / Nullable)* | Nama file atau link berkas bukti sertifikat pendukung | `1` |\n| | `data.mata_kuliah_angkatan_kelas_id` | `string` | *Tidak (Opsional / Nullable)* | Mata Kuliah Angkatan Kelas Id | `null` |\n| | `data.created_at` | `string` | **Ya (Required)** | Created At | `\"2026-10-19 03:13:36\"` |\n| | `data.updated_at` | `string` | **Ya (Required)** | Updated At | `\"2026-10-19 03:13:36\"` |\n| **422 Unprocessable** | `success` | `boolean` | **Ya (Required)** | Indikator kegagalan validasi (`false`) | `false` |\n| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (422) | `422` |\n| | `message` | `string` | **Ya (Required)** | Ringkasan pesan kegagalan validasi | \\\"The given data was invalid.\\\" |\n| | `errors` | `object` | **Ya (Required)** | Kamus pesan kesalahan validasi per field input | `{\\\"field\\\": [\\\"Pesan error\\\"]}` |\n| **401 Unauthorized** | `message` | `string` | **Ya (Required)** | Pesan otentikasi gagal saat token kosong atau kedaluwarsa | \\\"Unauthenticated.\\\" |\n| **403 Forbidden** | `message` | `string` | **Ya (Required)** | Pesan penolakan izin akses Role/Permission | \\\"User does not have the right permissions.\\\" |\n| **404 Not Found** | `message` | `string` | **Ya (Required)** | Data referensi dengan ID yang diminta tidak ditemukan di database | \\\"Data tidak ditemukan\\\" |\n| **400 Bad Request** | `message` | `string` | **Ya (Required)** | Permintaan tidak valid atau data berelasi masih terikat | \\\"Permintaan tidak valid\\\" |",
+                "description": "### 📋 1. Request Headers\n| Header | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- |\n| `Authorization` | `string` | **Ya (Required)** | Token Bearer JWT hasil otentikasi login | `Bearer eyJhbGci...` |\n| `Content-Type` | `string` | **Ya (Required)** | Tipe konten payload body permintaan | `application/json` |\n| `Accept` | `string` | **Ya (Required)** | Tipe konten respon server yang diharapkan | `application/json` |\n\n### 🔍 2. Path Parameters\n| Parameter | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- |\n| `id` | `integer` | **Ya (Required)** | Parameter ID unik id pada path URL | `1` |\n\n### 📥 3. Request Body\n| Parameter | Tipe Data | Wajib / Required | Keterangan | Contoh Riil |\n| :--- | :--- | :--- | :--- | :--- |\n| `tahun_akademik_id` | `integer` | **Ya (Required)** | ID referensi Tahun Akademik | `4` |\n| `mata_kuliah_id` | `integer` | **Ya (Required)** | ID referensi Mata Kuliah | `12` |\n| `dosen_id` | `integer` | *Tidak (Opsional / Nullable)* | ID referensi Dosen pengampu (User) | `6` |\n| `evidence` | `integer` | *Tidak (Opsional / Nullable)* | Nama file atau link berkas bukti sertifikat pendukung | `1` |\n| `mata_kuliah_angkatan_kelas_id` | `integer` | *Tidak (Opsional / Nullable)* | ID referensi penawaran mata kuliah pada angkatan kelas | `1` |\n\n### 📤 4. Struktur Response\n| Status HTTP | Field / Properti | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| **200 OK** | `success` | `boolean` | **Ya (Required)** | Indikator status keberhasilan (`true`) | `true` |\n| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (200) | `200` |\n| | `message` | `string` | **Ya (Required)** | Pesan informasi respon server | \"Operasi berhasil\" |\n| | `data` | `object` | **Ya (Required)** | Objek data entitas hasil operasi | `{ ... }` |\n| | `data.id` | `integer` | **Ya (Required)** | Id | `12` |\n| | `data.tahun_akademik_id` | `integer` | **Ya (Required)** | ID referensi Tahun Akademik | `4` |\n| | `data.mata_kuliah_id` | `integer` | **Ya (Required)** | ID referensi Mata Kuliah | `12` |\n| | `data.dosen_id` | `integer` | *Tidak (Opsional / Nullable)* | ID referensi Dosen pengampu (User) | `6` |\n| | `data.evidence` | `integer` | *Tidak (Opsional / Nullable)* | Nama file atau link berkas bukti sertifikat pendukung | `1` |\n| | `data.mata_kuliah_angkatan_kelas_id` | `string` | *Tidak (Opsional / Nullable)* | ID referensi penawaran mata kuliah pada angkatan kelas | `null` |\n| | `data.created_at` | `string` | **Ya (Required)** | Created At | `\"2026-10-19 03:13:36\"` |\n| | `data.updated_at` | `string` | **Ya (Required)** | Updated At | `\"2026-10-19 03:13:36\"` |\n| **422 Unprocessable** | `success` | `boolean` | **Ya (Required)** | Indikator kegagalan validasi (`false`) | `false` |\n| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (422) | `422` |\n| | `message` | `string` | **Ya (Required)** | Ringkasan pesan kegagalan validasi | \\\"The given data was invalid.\\\" |\n| | `errors` | `object` | **Ya (Required)** | Kamus pesan kesalahan validasi per field input | `{\\\"field\\\": [\\\"Pesan error\\\"]}` |\n| **401 Unauthorized** | `message` | `string` | **Ya (Required)** | Pesan otentikasi gagal saat token kosong atau kedaluwarsa | \\\"Unauthenticated.\\\" |\n| **403 Forbidden** | `message` | `string` | **Ya (Required)** | Pesan penolakan izin akses Role/Permission | \\\"User does not have the right permissions.\\\" |\n| **404 Not Found** | `message` | `string` | **Ya (Required)** | Data referensi dengan ID yang diminta tidak ditemukan di database | \\\"Data tidak ditemukan\\\" |\n| **400 Bad Request** | `message` | `string` | **Ya (Required)** | Permintaan tidak valid atau data berelasi masih terikat | \\\"Permintaan tidak valid\\\" |",
                 "operationId": "d565afc68c547ea3285c2fa740d5eedf",
                 "parameters": [
                     {
@@ -1783,7 +1783,7 @@
                                         "nullable": true
                                     },
                                     "mata_kuliah_angkatan_kelas_id": {
-                                        "description": "Mata Kuliah Angkatan Kelas Id",
+                                        "description": "ID referensi penawaran mata kuliah pada angkatan kelas",
                                         "type": "integer",
                                         "example": 1,
                                         "nullable": true
@@ -4191,6 +4191,311 @@
                 "summary": "Hapus Data Mata Kuliah",
                 "description": "### 📋 1. Request Headers\n| Header | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- |\n| `Authorization` | `string` | **Ya (Required)** | Token Bearer JWT hasil otentikasi login | `Bearer eyJhbGci...` |\n| `Accept` | `string` | **Ya (Required)** | Tipe konten respon server yang diharapkan | `application/json` |\n\n### 🔍 2. Path Parameters\n| Parameter | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- |\n| `id` | `integer` | **Ya (Required)** | Parameter ID unik id pada path URL | `1` |\n\n### 📤 3. Struktur Response\n| Status HTTP | Field / Properti | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| **200 OK** | `success` | `boolean` | **Ya (Required)** | Indikator status keberhasilan (`true`) | `true` |\n| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (200) | `200` |\n| | `message` | `string` | **Ya (Required)** | Pesan informasi respon server | \"Data berhasil dihapus\" |\n| | `data` | `null / object` | *Tidak (Opsional)* | Payload hasil operasi hapus | `null` |\n| **401 Unauthorized** | `message` | `string` | **Ya (Required)** | Pesan otentikasi gagal saat token kosong atau kedaluwarsa | \\\"Unauthenticated.\\\" |\n| **403 Forbidden** | `message` | `string` | **Ya (Required)** | Pesan penolakan izin akses Role/Permission | \\\"User does not have the right permissions.\\\" |\n| **404 Not Found** | `message` | `string` | **Ya (Required)** | Data referensi dengan ID yang diminta tidak ditemukan di database | \\\"Data tidak ditemukan\\\" |\n| **400 Bad Request** | `message` | `string` | **Ya (Required)** | Permintaan tidak valid atau data berelasi masih terikat | \\\"Permintaan tidak valid\\\" |",
                 "operationId": "a9d42be6ac35d612a3cb675db75a2081",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID data id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid / Data terkait masih digunakan"
+                    },
+                    "401": {
+                        "description": "Unauthenticated / Token tidak valid"
+                    },
+                    "403": {
+                        "description": "Forbidden / Tidak memiliki hak akses"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    },
+                    "422": {
+                        "description": "Validasi entitas gagal"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/nilai-mahasiswa": {
+            "get": {
+                "tags": [
+                    "Nilai Mahasiswa"
+                ],
+                "summary": "Daftar Semua Data Nilai Mahasiswa",
+                "description": "### 📋 1. Request Headers\n| Header | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- |\n| `Authorization` | `string` | **Ya (Required)** | Token Bearer JWT hasil otentikasi login | `Bearer eyJhbGci...` |\n| `Accept` | `string` | **Ya (Required)** | Tipe konten respon server yang diharapkan | `application/json` |\n\n### 📤 2. Struktur Response\n| Status HTTP | Field / Properti | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| **200 OK** | `success` | `boolean` | **Ya (Required)** | Indikator status keberhasilan (`true`) | `true` |\n| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (200) | `200` |\n| | `message` | `string` | **Ya (Required)** | Pesan informasi respon server | \"Operasi berhasil\" |\n| | `data` | `array[object]` | **Ya (Required)** | Koleksi daftar data entitas | `[ { ... } ]` |\n| | `data[].id` | `integer` | **Ya (Required)** | Id | `104` |\n| | `data[].enrollment_mahasiswa_angkatan_kelas_id` | `integer` | **Ya (Required)** | Enrollment Mahasiswa Angkatan Kelas Id | `12` |\n| | `data[].mata_kuliah_angkatan_kelas_id` | `integer` | **Ya (Required)** | Mata Kuliah Angkatan Kelas Id | `93` |\n| | `data[].nilai_angka` | `number` | **Ya (Required)** | Nilai Angka | `94.5` |\n| | `data[].nilai_huruf` | `string` | **Ya (Required)** | Nilai Huruf | `\"A\"` |\n| | `data[].bobot_nilai` | `number` | **Ya (Required)** | Bobot Nilai | `4` |\n| | `data[].status_kelulusan` | `string` | **Ya (Required)** | Status Kelulusan | `\"Lulus\"` |\n| | `data[].created_at` | `string` | **Ya (Required)** | Created At | `\"2026-10-19 03:56:52\"` |\n| | `data[].updated_at` | `string` | **Ya (Required)** | Updated At | `\"2026-10-19 03:56:52\"` |\n| **401 Unauthorized** | `message` | `string` | **Ya (Required)** | Pesan otentikasi gagal saat token kosong atau kedaluwarsa | \\\"Unauthenticated.\\\" |\n| **403 Forbidden** | `message` | `string` | **Ya (Required)** | Pesan penolakan izin akses Role/Permission | \\\"User does not have the right permissions.\\\" |\n| **400 Bad Request** | `message` | `string` | **Ya (Required)** | Permintaan tidak valid atau data berelasi masih terikat | \\\"Permintaan tidak valid\\\" |",
+                "operationId": "299b19a10b3bc74f9bd66addb449955f",
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid / Data terkait masih digunakan"
+                    },
+                    "401": {
+                        "description": "Unauthenticated / Token tidak valid"
+                    },
+                    "403": {
+                        "description": "Forbidden / Tidak memiliki hak akses"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    },
+                    "422": {
+                        "description": "Validasi entitas gagal"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Nilai Mahasiswa"
+                ],
+                "summary": "Tambah Data Nilai Mahasiswa Baru",
+                "description": "### 📋 1. Request Headers\n| Header | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- |\n| `Authorization` | `string` | **Ya (Required)** | Token Bearer JWT hasil otentikasi login | `Bearer eyJhbGci...` |\n| `Content-Type` | `string` | **Ya (Required)** | Tipe konten payload body permintaan | `application/json` |\n| `Accept` | `string` | **Ya (Required)** | Tipe konten respon server yang diharapkan | `application/json` |\n\n### 📥 2. Request Body\n| Parameter | Tipe Data | Wajib / Required | Keterangan | Contoh Riil |\n| :--- | :--- | :--- | :--- | :--- |\n| `enrollment_mahasiswa_angkatan_kelas_id` | `integer` | **Ya (Required)** | ID referensi enrollment mahasiswa pada angkatan kelas | `12` |\n| `mata_kuliah_angkatan_kelas_id` | `integer` | **Ya (Required)** | ID referensi penawaran mata kuliah pada angkatan kelas | `93` |\n| `nilai_angka` | `number` | **Ya (Required)** | Nilai capaian akademik mahasiswa dalam format angka (0.00 - 100.00) | `94.5` |\n| `nilai_huruf` | `string` | **Ya (Required)** | Indeks prestasi huruf mutu (A, AB, B, BC, C, D, E) | `A` |\n| `bobot_nilai` | `number` | **Ya (Required)** | Bobot angka mutu kredit akademik (4.00, 3.50, 3.00, 2.50, 2.00, 1.00, 0.00) | `4` |\n| `status_kelulusan` | `string` | **Ya (Required)** | Status kelulusan mata kuliah (Lulus / Tidak Lulus) | `Lulus` |\n\n### 📤 3. Struktur Response\n| Status HTTP | Field / Properti | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| **201 Created** | `success` | `boolean` | **Ya (Required)** | Indikator status keberhasilan (`true`) | `true` |\n| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (201) | `201` |\n| | `message` | `string` | **Ya (Required)** | Pesan informasi respon server | \"Data berhasil dibuat\" |\n| | `data` | `object` | **Ya (Required)** | Objek data entitas hasil operasi | `{ ... }` |\n| | `data.id` | `integer` | **Ya (Required)** | Id | `104` |\n| | `data.enrollment_mahasiswa_angkatan_kelas_id` | `integer` | **Ya (Required)** | ID referensi enrollment mahasiswa pada angkatan kelas | `12` |\n| | `data.mata_kuliah_angkatan_kelas_id` | `integer` | **Ya (Required)** | ID referensi penawaran mata kuliah pada angkatan kelas | `93` |\n| | `data.nilai_angka` | `number` | **Ya (Required)** | Nilai capaian akademik mahasiswa dalam format angka (0.00 - 100.00) | `94.5` |\n| | `data.nilai_huruf` | `string` | **Ya (Required)** | Indeks prestasi huruf mutu (A, AB, B, BC, C, D, E) | `\"A\"` |\n| | `data.bobot_nilai` | `number` | **Ya (Required)** | Bobot angka mutu kredit akademik (4.00, 3.50, 3.00, 2.50, 2.00, 1.00, 0.00) | `4` |\n| | `data.status_kelulusan` | `string` | **Ya (Required)** | Status kelulusan mata kuliah (Lulus / Tidak Lulus) | `\"Lulus\"` |\n| | `data.created_at` | `string` | **Ya (Required)** | Created At | `\"2026-10-19 03:56:52\"` |\n| | `data.updated_at` | `string` | **Ya (Required)** | Updated At | `\"2026-10-19 03:56:52\"` |\n| **422 Unprocessable** | `success` | `boolean` | **Ya (Required)** | Indikator kegagalan validasi (`false`) | `false` |\n| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (422) | `422` |\n| | `message` | `string` | **Ya (Required)** | Ringkasan pesan kegagalan validasi | \\\"The given data was invalid.\\\" |\n| | `errors` | `object` | **Ya (Required)** | Kamus pesan kesalahan validasi per field input | `{\\\"field\\\": [\\\"Pesan error\\\"]}` |\n| **401 Unauthorized** | `message` | `string` | **Ya (Required)** | Pesan otentikasi gagal saat token kosong atau kedaluwarsa | \\\"Unauthenticated.\\\" |\n| **403 Forbidden** | `message` | `string` | **Ya (Required)** | Pesan penolakan izin akses Role/Permission | \\\"User does not have the right permissions.\\\" |\n| **400 Bad Request** | `message` | `string` | **Ya (Required)** | Permintaan tidak valid atau data berelasi masih terikat | \\\"Permintaan tidak valid\\\" |",
+                "operationId": "f78812e549cef7e56f0f124430d0bcab",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "enrollment_mahasiswa_angkatan_kelas_id",
+                                    "mata_kuliah_angkatan_kelas_id",
+                                    "nilai_angka",
+                                    "nilai_huruf",
+                                    "bobot_nilai",
+                                    "status_kelulusan"
+                                ],
+                                "properties": {
+                                    "enrollment_mahasiswa_angkatan_kelas_id": {
+                                        "description": "ID referensi enrollment mahasiswa pada angkatan kelas",
+                                        "type": "integer",
+                                        "example": 12
+                                    },
+                                    "mata_kuliah_angkatan_kelas_id": {
+                                        "description": "ID referensi penawaran mata kuliah pada angkatan kelas",
+                                        "type": "integer",
+                                        "example": 93
+                                    },
+                                    "nilai_angka": {
+                                        "description": "Nilai capaian akademik mahasiswa dalam format angka (0.00 - 100.00)",
+                                        "type": "number",
+                                        "example": 94.5
+                                    },
+                                    "nilai_huruf": {
+                                        "description": "Indeks prestasi huruf mutu (A, AB, B, BC, C, D, E)",
+                                        "type": "string",
+                                        "example": "A"
+                                    },
+                                    "bobot_nilai": {
+                                        "description": "Bobot angka mutu kredit akademik (4.00, 3.50, 3.00, 2.50, 2.00, 1.00, 0.00)",
+                                        "type": "number",
+                                        "example": 4
+                                    },
+                                    "status_kelulusan": {
+                                        "description": "Status kelulusan mata kuliah (Lulus / Tidak Lulus)",
+                                        "type": "string",
+                                        "example": "Lulus"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Data berhasil dibuat"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid / Data terkait masih digunakan"
+                    },
+                    "401": {
+                        "description": "Unauthenticated / Token tidak valid"
+                    },
+                    "403": {
+                        "description": "Forbidden / Tidak memiliki hak akses"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    },
+                    "422": {
+                        "description": "Validasi entitas gagal"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/nilai-mahasiswa/{id}": {
+            "get": {
+                "tags": [
+                    "Nilai Mahasiswa"
+                ],
+                "summary": "Detail Data Nilai Mahasiswa",
+                "description": "### 📋 1. Request Headers\n| Header | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- |\n| `Authorization` | `string` | **Ya (Required)** | Token Bearer JWT hasil otentikasi login | `Bearer eyJhbGci...` |\n| `Accept` | `string` | **Ya (Required)** | Tipe konten respon server yang diharapkan | `application/json` |\n\n### 🔍 2. Path Parameters\n| Parameter | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- |\n| `id` | `integer` | **Ya (Required)** | Parameter ID unik id pada path URL | `1` |\n\n### 📤 3. Struktur Response\n| Status HTTP | Field / Properti | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| **200 OK** | `success` | `boolean` | **Ya (Required)** | Indikator status keberhasilan (`true`) | `true` |\n| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (200) | `200` |\n| | `message` | `string` | **Ya (Required)** | Pesan informasi respon server | \"Operasi berhasil\" |\n| | `data` | `object` | **Ya (Required)** | Objek data entitas hasil operasi | `{ ... }` |\n| | `data.id` | `integer` | **Ya (Required)** | Id | `104` |\n| | `data.enrollment_mahasiswa_angkatan_kelas_id` | `integer` | **Ya (Required)** | Enrollment Mahasiswa Angkatan Kelas Id | `12` |\n| | `data.mata_kuliah_angkatan_kelas_id` | `integer` | **Ya (Required)** | Mata Kuliah Angkatan Kelas Id | `93` |\n| | `data.nilai_angka` | `number` | **Ya (Required)** | Nilai Angka | `94.5` |\n| | `data.nilai_huruf` | `string` | **Ya (Required)** | Nilai Huruf | `\"A\"` |\n| | `data.bobot_nilai` | `number` | **Ya (Required)** | Bobot Nilai | `4` |\n| | `data.status_kelulusan` | `string` | **Ya (Required)** | Status Kelulusan | `\"Lulus\"` |\n| | `data.created_at` | `string` | **Ya (Required)** | Created At | `\"2026-10-19 03:56:52\"` |\n| | `data.updated_at` | `string` | **Ya (Required)** | Updated At | `\"2026-10-19 03:56:52\"` |\n| **401 Unauthorized** | `message` | `string` | **Ya (Required)** | Pesan otentikasi gagal saat token kosong atau kedaluwarsa | \\\"Unauthenticated.\\\" |\n| **403 Forbidden** | `message` | `string` | **Ya (Required)** | Pesan penolakan izin akses Role/Permission | \\\"User does not have the right permissions.\\\" |\n| **404 Not Found** | `message` | `string` | **Ya (Required)** | Data referensi dengan ID yang diminta tidak ditemukan di database | \\\"Data tidak ditemukan\\\" |\n| **400 Bad Request** | `message` | `string` | **Ya (Required)** | Permintaan tidak valid atau data berelasi masih terikat | \\\"Permintaan tidak valid\\\" |",
+                "operationId": "dddbdbdf6ea400f34cee249f202dc158",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID data id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid / Data terkait masih digunakan"
+                    },
+                    "401": {
+                        "description": "Unauthenticated / Token tidak valid"
+                    },
+                    "403": {
+                        "description": "Forbidden / Tidak memiliki hak akses"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    },
+                    "422": {
+                        "description": "Validasi entitas gagal"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Nilai Mahasiswa"
+                ],
+                "summary": "Perbarui Data Nilai Mahasiswa",
+                "description": "### 📋 1. Request Headers\n| Header | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- |\n| `Authorization` | `string` | **Ya (Required)** | Token Bearer JWT hasil otentikasi login | `Bearer eyJhbGci...` |\n| `Content-Type` | `string` | **Ya (Required)** | Tipe konten payload body permintaan | `application/json` |\n| `Accept` | `string` | **Ya (Required)** | Tipe konten respon server yang diharapkan | `application/json` |\n\n### 🔍 2. Path Parameters\n| Parameter | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- |\n| `id` | `integer` | **Ya (Required)** | Parameter ID unik id pada path URL | `1` |\n\n### 📥 3. Request Body\n| Parameter | Tipe Data | Wajib / Required | Keterangan | Contoh Riil |\n| :--- | :--- | :--- | :--- | :--- |\n| `enrollment_mahasiswa_angkatan_kelas_id` | `integer` | **Ya (Required)** | ID referensi enrollment mahasiswa pada angkatan kelas | `12` |\n| `mata_kuliah_angkatan_kelas_id` | `integer` | **Ya (Required)** | ID referensi penawaran mata kuliah pada angkatan kelas | `93` |\n| `nilai_angka` | `number` | **Ya (Required)** | Nilai capaian akademik mahasiswa dalam format angka (0.00 - 100.00) | `94.5` |\n| `nilai_huruf` | `string` | **Ya (Required)** | Indeks prestasi huruf mutu (A, AB, B, BC, C, D, E) | `A` |\n| `bobot_nilai` | `number` | **Ya (Required)** | Bobot angka mutu kredit akademik (4.00, 3.50, 3.00, 2.50, 2.00, 1.00, 0.00) | `4` |\n| `status_kelulusan` | `string` | **Ya (Required)** | Status kelulusan mata kuliah (Lulus / Tidak Lulus) | `Lulus` |\n\n### 📤 4. Struktur Response\n| Status HTTP | Field / Properti | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| **200 OK** | `success` | `boolean` | **Ya (Required)** | Indikator status keberhasilan (`true`) | `true` |\n| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (200) | `200` |\n| | `message` | `string` | **Ya (Required)** | Pesan informasi respon server | \"Operasi berhasil\" |\n| | `data` | `object` | **Ya (Required)** | Objek data entitas hasil operasi | `{ ... }` |\n| | `data.id` | `integer` | **Ya (Required)** | Id | `104` |\n| | `data.enrollment_mahasiswa_angkatan_kelas_id` | `integer` | **Ya (Required)** | ID referensi enrollment mahasiswa pada angkatan kelas | `12` |\n| | `data.mata_kuliah_angkatan_kelas_id` | `integer` | **Ya (Required)** | ID referensi penawaran mata kuliah pada angkatan kelas | `93` |\n| | `data.nilai_angka` | `number` | **Ya (Required)** | Nilai capaian akademik mahasiswa dalam format angka (0.00 - 100.00) | `94.5` |\n| | `data.nilai_huruf` | `string` | **Ya (Required)** | Indeks prestasi huruf mutu (A, AB, B, BC, C, D, E) | `\"A\"` |\n| | `data.bobot_nilai` | `number` | **Ya (Required)** | Bobot angka mutu kredit akademik (4.00, 3.50, 3.00, 2.50, 2.00, 1.00, 0.00) | `4` |\n| | `data.status_kelulusan` | `string` | **Ya (Required)** | Status kelulusan mata kuliah (Lulus / Tidak Lulus) | `\"Lulus\"` |\n| | `data.created_at` | `string` | **Ya (Required)** | Created At | `\"2026-10-19 03:56:52\"` |\n| | `data.updated_at` | `string` | **Ya (Required)** | Updated At | `\"2026-10-19 03:56:52\"` |\n| **422 Unprocessable** | `success` | `boolean` | **Ya (Required)** | Indikator kegagalan validasi (`false`) | `false` |\n| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (422) | `422` |\n| | `message` | `string` | **Ya (Required)** | Ringkasan pesan kegagalan validasi | \\\"The given data was invalid.\\\" |\n| | `errors` | `object` | **Ya (Required)** | Kamus pesan kesalahan validasi per field input | `{\\\"field\\\": [\\\"Pesan error\\\"]}` |\n| **401 Unauthorized** | `message` | `string` | **Ya (Required)** | Pesan otentikasi gagal saat token kosong atau kedaluwarsa | \\\"Unauthenticated.\\\" |\n| **403 Forbidden** | `message` | `string` | **Ya (Required)** | Pesan penolakan izin akses Role/Permission | \\\"User does not have the right permissions.\\\" |\n| **404 Not Found** | `message` | `string` | **Ya (Required)** | Data referensi dengan ID yang diminta tidak ditemukan di database | \\\"Data tidak ditemukan\\\" |\n| **400 Bad Request** | `message` | `string` | **Ya (Required)** | Permintaan tidak valid atau data berelasi masih terikat | \\\"Permintaan tidak valid\\\" |",
+                "operationId": "bf6b3ca8312a1afc045b31000772b698",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID data id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "enrollment_mahasiswa_angkatan_kelas_id",
+                                    "mata_kuliah_angkatan_kelas_id",
+                                    "nilai_angka",
+                                    "nilai_huruf",
+                                    "bobot_nilai",
+                                    "status_kelulusan"
+                                ],
+                                "properties": {
+                                    "enrollment_mahasiswa_angkatan_kelas_id": {
+                                        "description": "ID referensi enrollment mahasiswa pada angkatan kelas",
+                                        "type": "integer",
+                                        "example": 12
+                                    },
+                                    "mata_kuliah_angkatan_kelas_id": {
+                                        "description": "ID referensi penawaran mata kuliah pada angkatan kelas",
+                                        "type": "integer",
+                                        "example": 93
+                                    },
+                                    "nilai_angka": {
+                                        "description": "Nilai capaian akademik mahasiswa dalam format angka (0.00 - 100.00)",
+                                        "type": "number",
+                                        "example": 94.5
+                                    },
+                                    "nilai_huruf": {
+                                        "description": "Indeks prestasi huruf mutu (A, AB, B, BC, C, D, E)",
+                                        "type": "string",
+                                        "example": "A"
+                                    },
+                                    "bobot_nilai": {
+                                        "description": "Bobot angka mutu kredit akademik (4.00, 3.50, 3.00, 2.50, 2.00, 1.00, 0.00)",
+                                        "type": "number",
+                                        "example": 4
+                                    },
+                                    "status_kelulusan": {
+                                        "description": "Status kelulusan mata kuliah (Lulus / Tidak Lulus)",
+                                        "type": "string",
+                                        "example": "Lulus"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operasi berhasil"
+                    },
+                    "400": {
+                        "description": "Permintaan tidak valid / Data terkait masih digunakan"
+                    },
+                    "401": {
+                        "description": "Unauthenticated / Token tidak valid"
+                    },
+                    "403": {
+                        "description": "Forbidden / Tidak memiliki hak akses"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    },
+                    "422": {
+                        "description": "Validasi entitas gagal"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Nilai Mahasiswa"
+                ],
+                "summary": "Hapus Data Nilai Mahasiswa",
+                "description": "### 📋 1. Request Headers\n| Header | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- |\n| `Authorization` | `string` | **Ya (Required)** | Token Bearer JWT hasil otentikasi login | `Bearer eyJhbGci...` |\n| `Accept` | `string` | **Ya (Required)** | Tipe konten respon server yang diharapkan | `application/json` |\n\n### 🔍 2. Path Parameters\n| Parameter | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- |\n| `id` | `integer` | **Ya (Required)** | Parameter ID unik id pada path URL | `1` |\n\n### 📤 3. Struktur Response\n| Status HTTP | Field / Properti | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| **200 OK** | `success` | `boolean` | **Ya (Required)** | Indikator status keberhasilan (`true`) | `true` |\n| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (200) | `200` |\n| | `message` | `string` | **Ya (Required)** | Pesan informasi respon server | \"Data berhasil dihapus\" |\n| | `data` | `null / object` | *Tidak (Opsional)* | Payload hasil operasi hapus | `null` |\n| **401 Unauthorized** | `message` | `string` | **Ya (Required)** | Pesan otentikasi gagal saat token kosong atau kedaluwarsa | \\\"Unauthenticated.\\\" |\n| **403 Forbidden** | `message` | `string` | **Ya (Required)** | Pesan penolakan izin akses Role/Permission | \\\"User does not have the right permissions.\\\" |\n| **404 Not Found** | `message` | `string` | **Ya (Required)** | Data referensi dengan ID yang diminta tidak ditemukan di database | \\\"Data tidak ditemukan\\\" |\n| **400 Bad Request** | `message` | `string` | **Ya (Required)** | Permintaan tidak valid atau data berelasi masih terikat | \\\"Permintaan tidak valid\\\" |",
+                "operationId": "3213bd391f8e39704e994b0c09f6276e",
                 "parameters": [
                     {
                         "name": "id",
@@ -6794,6 +7099,10 @@
         {
             "name": "Mata Kuliah",
             "description": "Endpoint API Mata Kuliah"
+        },
+        {
+            "name": "Nilai Mahasiswa",
+            "description": "Endpoint API Nilai Mahasiswa"
         },
         {
             "name": "Perguruan Tinggi",
