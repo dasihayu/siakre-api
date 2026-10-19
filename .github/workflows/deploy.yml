@@ -40,6 +40,9 @@ jobs:
           rm -f bootstrap/cache/packages.php bootstrap/cache/services.php
           php artisan package:discover --ansi
 
+          echo "Generating Swagger documentation..."
+          php artisan docs:generate-all --force
+
           echo "Rebuilding Laravel caches..."
           php artisan config:clear
           php artisan config:cache

@@ -82,6 +82,13 @@ class GenerateSwaggerDocsCommand extends Command
             mkdir($docsPath, 0755, true);
         }
 
+        $this->ensureOpenApiBaseClass($docsPath);
+
+        $storageDocsPath = storage_path('api-docs');
+        if (! is_dir($storageDocsPath)) {
+            mkdir($storageDocsPath, 0775, true);
+        }
+
         $force = (bool) $this->option('force');
         $generatedCount = 0;
         $activeDocClasses = [];
@@ -126,6 +133,45 @@ class GenerateSwaggerDocsCommand extends Command
         $this->line('Akses Swagger UI di: '.url('/api/documentation'));
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * Pastikan class konfigurasi utama OpenAPI (Info, Server, SecurityScheme) ada.
+     */
+    protected function ensureOpenApiBaseClass(string $docsPath): void
+    {
+        $openApiPath = $docsPath.'/OpenApi.php';
+        if (! file_exists($openApiPath)) {
+            $content = <<<'PHP'
+<?php
+
+namespace App\Docs;
+
+use OpenApi\Attributes as OA;
+
+#[OA\Info(
+    version: '1.0.0',
+    title: 'Akreditasi API',
+    description: 'Dokumentasi REST API Sistem Informasi Akreditasi',
+    contact: new OA\Contact(email: 'admin@akreditasi.ac.id')
+)]
+#[OA\Server(
+    url: L5_SWAGGER_CONST_HOST,
+    description: 'API Server'
+)]
+#[OA\SecurityScheme(
+    securityScheme: 'bearerAuth',
+    type: 'http',
+    scheme: 'bearer',
+    bearerFormat: 'JWT',
+    description: 'Masukkan JWT token Anda. Contoh: Bearer {token}'
+)]
+class OpenApi {}
+
+PHP;
+            file_put_contents($openApiPath, $content);
+            $this->info('  + Berhasil membuat OpenApi.php (Konfigurasi dasar OpenAPI)');
+        }
     }
 
     /**
