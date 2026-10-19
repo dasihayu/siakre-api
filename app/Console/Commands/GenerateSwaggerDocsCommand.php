@@ -82,14 +82,13 @@ class GenerateSwaggerDocsCommand extends Command
             mkdir($docsPath, 0755, true);
         }
 
-        $this->ensureOpenApiBaseClass($docsPath);
+        $force = (bool) $this->option('force');
+        $this->ensureOpenApiBaseClass($docsPath, $force);
 
         $storageDocsPath = storage_path('api-docs');
         if (! is_dir($storageDocsPath)) {
             mkdir($storageDocsPath, 0775, true);
         }
-
-        $force = (bool) $this->option('force');
         $generatedCount = 0;
         $activeDocClasses = [];
 
@@ -106,7 +105,8 @@ class GenerateSwaggerDocsCommand extends Command
             }
 
             $tag = $this->determineTag($controllerShortName);
-            $content = $this->buildDocFileContent($docClassName, $tag, $controllerClass, $actions);
+            $entityName = $this->determineEntityName($controllerShortName);
+            $content = $this->buildDocFileContent($docClassName, $tag, $entityName, $controllerClass, $actions);
 
             file_put_contents($fileName, $content);
             $this->info("  + Berhasil membuat {$docClassName}.php");
@@ -138,10 +138,10 @@ class GenerateSwaggerDocsCommand extends Command
     /**
      * Pastikan class konfigurasi utama OpenAPI (Info, Server, SecurityScheme) ada.
      */
-    protected function ensureOpenApiBaseClass(string $docsPath): void
+    protected function ensureOpenApiBaseClass(string $docsPath, bool $force = false): void
     {
         $openApiPath = $docsPath.'/OpenApi.php';
-        if (! file_exists($openApiPath)) {
+        if (! file_exists($openApiPath) || $force) {
             $content = <<<'PHP'
 <?php
 
@@ -166,26 +166,78 @@ use OpenApi\Attributes as OA;
     bearerFormat: 'JWT',
     description: 'Masukkan JWT token Anda. Contoh: Bearer {token}'
 )]
+#[OA\Tag(
+    name: 'Autentikasi',
+    description: 'Endpoint API Autentikasi dan Manajemen Sesi Pengguna'
+)]
+#[OA\Tag(
+    name: 'Manajemen Pengguna & Hak Akses',
+    description: 'Pengelolaan Akun Pengguna, Role (Peran), dan Hak Akses (Permission)'
+)]
+#[OA\Tag(
+    name: 'Institusi & Program Studi',
+    description: 'Master Data Perguruan Tinggi, Unit Pengelola (UPPS), Anggota UPPS, dan Program Studi'
+)]
+#[OA\Tag(
+    name: 'Kurikulum & Standar CPL',
+    description: 'Pengelolaan Kurikulum Akademik, Capaian Pembelajaran Lulusan (CPL), Mata Kuliah, dan Pemetaan CPL'
+)]
+#[OA\Tag(
+    name: 'Struktur Akademik & Kelas',
+    description: 'Pengaturan Kalender Tahun Akademik, Angkatan Mahasiswa, Master Kelas, dan Relasi Angkatan Kelas'
+)]
+#[OA\Tag(
+    name: 'Data & Aktivitas Mahasiswa',
+    description: 'Pengelolaan Biodata Mahasiswa, Status Keaktifan Akademik, Enrollment Kelas, dan Kegiatan Mahasiswa'
+)]
+#[OA\Tag(
+    name: 'Prestasi & Portofolio Mahasiswa',
+    description: 'Pencatatan Prestasi Mahasiswa, Klasifikasi Jenis Prestasi, dan Berkas Bukti (Evidence) Akreditasi'
+)]
+#[OA\Tag(
+    name: 'Perkuliahan & Penilaian',
+    description: 'Pengelolaan Enrollment Mata Kuliah (KRS), Penjadwalan Angkatan Kelas, dan Rekapitulasi Nilai Mahasiswa'
+)]
 class OpenApi {}
 
 PHP;
             file_put_contents($openApiPath, $content);
-            $this->info('  + Berhasil membuat OpenApi.php (Konfigurasi dasar OpenAPI)');
+            $this->info('  + Berhasil memperbarui OpenApi.php (Konfigurasi dasar & Tag Groups OpenAPI)');
         }
     }
 
     /**
-     * Menentukan nama Tag yang rapi dan seragam.
+     * Menentukan nama Tag Group yang rapi dan terkelompok.
      */
     protected function determineTag(string $controllerShortName): string
     {
         $base = str_replace('Controller', '', $controllerShortName);
 
-        $customTags = [
+        return match ($base) {
             'Auth' => 'Autentikasi',
-            'User' => 'Manajemen User',
-            'Role' => 'Manajemen Role',
-            'Permission' => 'Manajemen Permission',
+            'User', 'Role', 'Permission' => 'Manajemen Pengguna & Hak Akses',
+            'PerguruanTinggi', 'Prodi', 'Upps', 'AnggotaUpps' => 'Institusi & Program Studi',
+            'Kurikulum', 'Cpl', 'MataKuliah', 'MataKuliahCpl' => 'Kurikulum & Standar CPL',
+            'TahunAkademik', 'Angkatan', 'Kelas', 'AngkatanKelas' => 'Struktur Akademik & Kelas',
+            'Mahasiswa', 'StatusMahasiswa', 'EnrollmentKelas', 'KegiatanMahasiswa' => 'Data & Aktivitas Mahasiswa',
+            'PrestasiMahasiswa', 'JenisPrestasi', 'EvidencePrestasiMahasiswa' => 'Prestasi & Portofolio Mahasiswa',
+            'EnrollmentMataKuliah', 'MataKuliahAngkatanKelas', 'NilaiMahasiswa' => 'Perkuliahan & Penilaian',
+            default => Str::headline($base),
+        };
+    }
+
+    /**
+     * Menentukan nama spesifik entitas untuk judul summary dan keterangan.
+     */
+    protected function determineEntityName(string $controllerShortName): string
+    {
+        $base = str_replace('Controller', '', $controllerShortName);
+
+        $customEntities = [
+            'Auth' => 'Autentikasi',
+            'User' => 'User',
+            'Role' => 'Role',
+            'Permission' => 'Permission',
             'PerguruanTinggi' => 'Perguruan Tinggi',
             'Prodi' => 'Program Studi',
             'Upps' => 'UPPS',
@@ -210,13 +262,13 @@ PHP;
             'NilaiMahasiswa' => 'Nilai Mahasiswa',
         ];
 
-        return $customTags[$base] ?? Str::headline($base);
+        return $customEntities[$base] ?? Str::headline($base);
     }
 
     /**
      * Membangun kode PHP file Doc lengkap dengan tabel Markdown deskripsi.
      */
-    protected function buildDocFileContent(string $className, string $tag, string $controllerClass, array $actions): string
+    protected function buildDocFileContent(string $className, string $tag, string $entityName, string $controllerClass, array $actions): string
     {
         $methodsCode = [];
         $registeredMethods = [];
@@ -279,14 +331,14 @@ PHP;
                 $isAuth,
                 $pathParams,
                 $props,
-                $tag,
+                $entityName,
                 $methodName,
                 $modelClass,
                 $controllerClass
             );
             $escapedDescription = var_export($markdownDescription, true);
 
-            $summary = $this->buildSummary($methodName, $tag);
+            $summary = $this->buildSummary($methodName, $entityName);
             $isPost = strtolower($httpMethod) === 'post';
             $isAuthMethod = ($controllerClass === 'App\\Http\\Controllers\\AuthController' || class_basename($controllerClass) === 'AuthController');
             $successCode = ($isPost && ! $isAuthMethod) ? 201 : 200;
@@ -320,7 +372,6 @@ namespace App\Docs;
 
 use OpenApi\Attributes as OA;
 
-#[OA\\Tag(name: '{$tag}', description: 'Endpoint API {$tag}')]
 class {$className}
 {
 {$allMethods}
@@ -337,7 +388,7 @@ PHP;
         bool $isAuth,
         array $pathParams,
         array $props,
-        string $tag,
+        string $entityName,
         string $methodName,
         ?string $modelClass,
         string $controllerClass = ''
@@ -488,21 +539,21 @@ PHP;
     /**
      * Membuat ringkasan yang jelas dan natural untuk setiap method.
      */
-    protected function buildSummary(string $methodName, string $tag): string
+    protected function buildSummary(string $methodName, string $entityName): string
     {
         return match ($methodName) {
-            'index' => "Daftar Semua Data {$tag}",
-            'store' => "Tambah Data {$tag} Baru",
-            'show' => "Detail Data {$tag}",
-            'update' => "Perbarui Data {$tag}",
-            'destroy' => "Hapus Data {$tag}",
-            'sync' => "Sinkronisasi {$tag}",
+            'index' => "Daftar Semua Data {$entityName}",
+            'store' => "Tambah Data {$entityName} Baru",
+            'show' => "Detail Data {$entityName}",
+            'update' => "Perbarui Data {$entityName}",
+            'destroy' => "Hapus Data {$entityName}",
+            'sync' => "Sinkronisasi {$entityName}",
             'login' => 'Login Pengguna dan Dapatkan Token JWT',
             'googleLogin' => 'Login Menggunakan Google ID Token',
             'me' => 'Profil Pengguna Terautentikasi',
             'logout' => 'Logout dan Invalidasi Token',
             'refresh' => 'Perbarui Token Akses JWT',
-            default => Str::headline($methodName).' '.$tag,
+            default => Str::headline($methodName).' '.$entityName,
         };
     }
 
