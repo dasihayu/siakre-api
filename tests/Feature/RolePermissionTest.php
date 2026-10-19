@@ -34,11 +34,11 @@ test('user permissions are correctly serialized in JWT token claims', function (
     $payload = JWTAuth::setToken($token)->getPayload();
     $permissions = $payload->get('permissions');
 
-    expect($permissions)->toContain('dosen.create')
-        ->toContain('dosen.read')
-        ->toContain('dosen.update')
-        ->toContain('dosen.delete')
-        ->toContain('led.read');
+    expect($permissions)->toContain('kurikulum.create')
+        ->toContain('kurikulum.read')
+        ->toContain('kurikulum.update')
+        ->toContain('kurikulum.delete')
+        ->toContain('cpl.read');
 });
 
 test('dosen role has restricted permissions in JWT token claims compared to kaprodi', function () {
@@ -55,16 +55,15 @@ test('dosen role has restricted permissions in JWT token claims compared to kapr
         'password' => 'password123',
     ]);
 
-    // Diubah karena API Anda tetap mengembalikan permissions (tidak null) untuk dosen
     expect($response->json('data.authorization.permissions'))->not()->toBeNull();
 
     $token = $response->json('data.authorization.access_token');
     $payload = JWTAuth::setToken($token)->getPayload();
     $permissions = $payload->get('permissions');
 
-    expect($permissions)->toContain('dosen.read')
-        ->toContain('penelitian.create');
+    expect($permissions)->toContain('nilai_mahasiswa.create')
+        ->toContain('kurikulum.read');
 
-    expect($permissions)->not->toContain('dosen.delete')
+    expect($permissions)->not->toContain('kurikulum.delete')
         ->not->toContain('user.create');
 });

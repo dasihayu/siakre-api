@@ -4,99 +4,288 @@ namespace App\Docs;
 
 use OpenApi\Attributes as OA;
 
-#[OA\Tag(name: 'Cpl', description: 'Endpoint API Cpl')]
+#[OA\Tag(name: 'Capaian Pembelajaran (CPL)', description: 'Endpoint API Capaian Pembelajaran (CPL)')]
 class CplDoc
 {
     #[OA\Get(
         path: '/api/cpl',
-        summary: 'Index Cpl',
-        tags: ['Cpl'],
+        summary: 'Daftar Semua Data Capaian Pembelajaran (CPL)',
+        description: '### 📋 1. Request Headers
+| Header | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |
+| :--- | :--- | :--- | :--- | :--- |
+| `Authorization` | `string` | **Ya (Required)** | Token Bearer JWT hasil otentikasi login | `Bearer eyJhbGci...` |
+| `Accept` | `string` | **Ya (Required)** | Tipe konten respon server yang diharapkan | `application/json` |
+
+### 📤 2. Struktur Response
+| Status HTTP | Field / Properti | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **200 OK** | `success` | `boolean` | **Ya (Required)** | Indikator status keberhasilan (`true`) | `true` |
+| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (200) | `200` |
+| | `message` | `string` | **Ya (Required)** | Pesan informasi respon server | "Operasi berhasil" |
+| | `data` | `array[object]` | **Ya (Required)** | Koleksi daftar data entitas | `[ { ... } ]` |
+| | `data[].id` | `integer` | **Ya (Required)** | Id | `8` |
+| | `data[].id_kurikulum` | `integer` | **Ya (Required)** | Id Kurikulum | `1` |
+| | `data[].kode_cpl` | `string` | **Ya (Required)** | Kode Cpl | `"CPL-08"` |
+| | `data[].deskripsi_cpl` | `string` | **Ya (Required)** | Deskripsi Cpl | `"Mampu mengonfigurasi, menganalisis performa, dan memitigasi celah keamanan jaringan komputer tingkat lanjut."` |
+| | `data[].kategori` | `string` | **Ya (Required)** | Kategori | `"Keterampilan Khusus"` |
+| | `data[].created_at` | `string` | **Ya (Required)** | Created At | `"2026-10-19 03:13:33"` |
+| | `data[].updated_at` | `string` | **Ya (Required)** | Updated At | `"2026-10-19 03:13:33"` |
+| **401 Unauthorized** | `message` | `string` | **Ya (Required)** | Pesan otentikasi gagal saat token kosong atau kedaluwarsa | \\"Unauthenticated.\\" |
+| **403 Forbidden** | `message` | `string` | **Ya (Required)** | Pesan penolakan izin akses Role/Permission | \\"User does not have the right permissions.\\" |
+| **400 Bad Request** | `message` | `string` | **Ya (Required)** | Permintaan tidak valid atau data berelasi masih terikat | \\"Permintaan tidak valid\\" |',
+        tags: ['Capaian Pembelajaran (CPL)'],
         security: [['bearerAuth' => []]],
         responses: [
             new OA\Response(response: 200, description: 'Operasi berhasil'),
-            new OA\Response(response: 400, description: 'Permintaan tidak valid'),
-            new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 400, description: 'Permintaan tidak valid / Data terkait masih digunakan'),
+            new OA\Response(response: 401, description: 'Unauthenticated / Token tidak valid'),
+            new OA\Response(response: 403, description: 'Forbidden / Tidak memiliki hak akses'),
             new OA\Response(response: 404, description: 'Data tidak ditemukan'),
+            new OA\Response(response: 422, description: 'Validasi entitas gagal'),
         ]
     )]
     public function index(): void {}
 
     #[OA\Post(
         path: '/api/cpl',
-        summary: 'Store Cpl',
-        tags: ['Cpl'],
+        summary: 'Tambah Data Capaian Pembelajaran (CPL) Baru',
+        description: '### 📋 1. Request Headers
+| Header | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |
+| :--- | :--- | :--- | :--- | :--- |
+| `Authorization` | `string` | **Ya (Required)** | Token Bearer JWT hasil otentikasi login | `Bearer eyJhbGci...` |
+| `Content-Type` | `string` | **Ya (Required)** | Tipe konten payload body permintaan | `application/json` |
+| `Accept` | `string` | **Ya (Required)** | Tipe konten respon server yang diharapkan | `application/json` |
+
+### 📥 2. Request Body
+| Parameter | Tipe Data | Wajib / Required | Keterangan | Contoh Riil |
+| :--- | :--- | :--- | :--- | :--- |
+| `id_kurikulum` | `integer` | **Ya (Required)** | ID referensi Kurikulum | `1` |
+| `kode_cpl` | `string` | **Ya (Required)** | Kode unik Capaian Pembelajaran Lulusan (CPL) | `CPL-08` |
+| `deskripsi_cpl` | `string` | **Ya (Required)** | Uraian kompetensi dan capaian pembelajaran | `Mampu mengonfigurasi, menganalisis performa, dan memitigasi celah keamanan jaringan komputer tingkat lanjut.` |
+| `kategori` | `string` | *Tidak (Opsional / Nullable)* | Kategori CPL (Sikap, Pengetahuan, Keterampilan Umum, Keterampilan Khusus) | `Keterampilan Khusus` |
+
+### 📤 3. Struktur Response
+| Status HTTP | Field / Properti | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **201 Created** | `success` | `boolean` | **Ya (Required)** | Indikator status keberhasilan (`true`) | `true` |
+| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (201) | `201` |
+| | `message` | `string` | **Ya (Required)** | Pesan informasi respon server | "Data berhasil dibuat" |
+| | `data` | `object` | **Ya (Required)** | Objek data entitas hasil operasi | `{ ... }` |
+| | `data.id` | `integer` | **Ya (Required)** | Id | `8` |
+| | `data.id_kurikulum` | `integer` | **Ya (Required)** | ID referensi Kurikulum | `1` |
+| | `data.kode_cpl` | `string` | **Ya (Required)** | Kode unik Capaian Pembelajaran Lulusan (CPL) | `"CPL-08"` |
+| | `data.deskripsi_cpl` | `string` | **Ya (Required)** | Uraian kompetensi dan capaian pembelajaran | `"Mampu mengonfigurasi, menganalisis performa, dan memitigasi celah keamanan jaringan komputer tingkat lanjut."` |
+| | `data.kategori` | `string` | *Tidak (Opsional / Nullable)* | Kategori CPL (Sikap, Pengetahuan, Keterampilan Umum, Keterampilan Khusus) | `"Keterampilan Khusus"` |
+| | `data.created_at` | `string` | **Ya (Required)** | Created At | `"2026-10-19 03:13:33"` |
+| | `data.updated_at` | `string` | **Ya (Required)** | Updated At | `"2026-10-19 03:13:33"` |
+| **422 Unprocessable** | `success` | `boolean` | **Ya (Required)** | Indikator kegagalan validasi (`false`) | `false` |
+| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (422) | `422` |
+| | `message` | `string` | **Ya (Required)** | Ringkasan pesan kegagalan validasi | \\"The given data was invalid.\\" |
+| | `errors` | `object` | **Ya (Required)** | Kamus pesan kesalahan validasi per field input | `{\\"field\\": [\\"Pesan error\\"]}` |
+| **401 Unauthorized** | `message` | `string` | **Ya (Required)** | Pesan otentikasi gagal saat token kosong atau kedaluwarsa | \\"Unauthenticated.\\" |
+| **403 Forbidden** | `message` | `string` | **Ya (Required)** | Pesan penolakan izin akses Role/Permission | \\"User does not have the right permissions.\\" |
+| **400 Bad Request** | `message` | `string` | **Ya (Required)** | Permintaan tidak valid atau data berelasi masih terikat | \\"Permintaan tidak valid\\" |',
+        tags: ['Capaian Pembelajaran (CPL)'],
         security: [['bearerAuth' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['id_kurikulum', 'kode_cpl', 'deskripsi_cpl'],
+                properties: [
+                    new OA\Property(property: 'id_kurikulum', type: 'integer', example: 1, description: 'ID referensi Kurikulum'),
+                    new OA\Property(property: 'kode_cpl', type: 'string', example: 'CPL-08', description: 'Kode unik Capaian Pembelajaran Lulusan (CPL)'),
+                    new OA\Property(property: 'deskripsi_cpl', type: 'string', example: 'Mampu mengonfigurasi, menganalisis performa, dan memitigasi celah keamanan jaringan komputer tingkat lanjut.', description: 'Uraian kompetensi dan capaian pembelajaran'),
+                    new OA\Property(property: 'kategori', type: 'string', example: 'Keterampilan Khusus', description: 'Kategori CPL (Sikap, Pengetahuan, Keterampilan Umum, Keterampilan Khusus)', nullable: true),
+                ]
+            )
+        ),
         responses: [
-            new OA\Response(response: 200, description: 'Operasi berhasil'),
-            new OA\Response(response: 400, description: 'Permintaan tidak valid'),
-            new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 201, description: 'Data berhasil dibuat'),
+            new OA\Response(response: 400, description: 'Permintaan tidak valid / Data terkait masih digunakan'),
+            new OA\Response(response: 401, description: 'Unauthenticated / Token tidak valid'),
+            new OA\Response(response: 403, description: 'Forbidden / Tidak memiliki hak akses'),
             new OA\Response(response: 404, description: 'Data tidak ditemukan'),
+            new OA\Response(response: 422, description: 'Validasi entitas gagal'),
         ]
     )]
     public function store(): void {}
 
     #[OA\Get(
         path: '/api/cpl/{id}',
-        summary: 'Show Cpl',
-        tags: ['Cpl'],
+        summary: 'Detail Data Capaian Pembelajaran (CPL)',
+        description: '### 📋 1. Request Headers
+| Header | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |
+| :--- | :--- | :--- | :--- | :--- |
+| `Authorization` | `string` | **Ya (Required)** | Token Bearer JWT hasil otentikasi login | `Bearer eyJhbGci...` |
+| `Accept` | `string` | **Ya (Required)** | Tipe konten respon server yang diharapkan | `application/json` |
+
+### 🔍 2. Path Parameters
+| Parameter | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |
+| :--- | :--- | :--- | :--- | :--- |
+| `id` | `integer` | **Ya (Required)** | Parameter ID unik id pada path URL | `1` |
+
+### 📤 3. Struktur Response
+| Status HTTP | Field / Properti | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **200 OK** | `success` | `boolean` | **Ya (Required)** | Indikator status keberhasilan (`true`) | `true` |
+| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (200) | `200` |
+| | `message` | `string` | **Ya (Required)** | Pesan informasi respon server | "Operasi berhasil" |
+| | `data` | `object` | **Ya (Required)** | Objek data entitas hasil operasi | `{ ... }` |
+| | `data.id` | `integer` | **Ya (Required)** | Id | `8` |
+| | `data.id_kurikulum` | `integer` | **Ya (Required)** | Id Kurikulum | `1` |
+| | `data.kode_cpl` | `string` | **Ya (Required)** | Kode Cpl | `"CPL-08"` |
+| | `data.deskripsi_cpl` | `string` | **Ya (Required)** | Deskripsi Cpl | `"Mampu mengonfigurasi, menganalisis performa, dan memitigasi celah keamanan jaringan komputer tingkat lanjut."` |
+| | `data.kategori` | `string` | **Ya (Required)** | Kategori | `"Keterampilan Khusus"` |
+| | `data.created_at` | `string` | **Ya (Required)** | Created At | `"2026-10-19 03:13:33"` |
+| | `data.updated_at` | `string` | **Ya (Required)** | Updated At | `"2026-10-19 03:13:33"` |
+| **401 Unauthorized** | `message` | `string` | **Ya (Required)** | Pesan otentikasi gagal saat token kosong atau kedaluwarsa | \\"Unauthenticated.\\" |
+| **403 Forbidden** | `message` | `string` | **Ya (Required)** | Pesan penolakan izin akses Role/Permission | \\"User does not have the right permissions.\\" |
+| **404 Not Found** | `message` | `string` | **Ya (Required)** | Data referensi dengan ID yang diminta tidak ditemukan di database | \\"Data tidak ditemukan\\" |
+| **400 Bad Request** | `message` | `string` | **Ya (Required)** | Permintaan tidak valid atau data berelasi masih terikat | \\"Permintaan tidak valid\\" |',
+        tags: ['Capaian Pembelajaran (CPL)'],
         security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'id',
                 in: 'path',
                 required: true,
-                schema: new OA\Schema(type: 'string', example: '1')
+                description: 'ID data id',
+                schema: new OA\Schema(type: 'integer', example: 1)
             ),
         ],
         responses: [
             new OA\Response(response: 200, description: 'Operasi berhasil'),
-            new OA\Response(response: 400, description: 'Permintaan tidak valid'),
-            new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 400, description: 'Permintaan tidak valid / Data terkait masih digunakan'),
+            new OA\Response(response: 401, description: 'Unauthenticated / Token tidak valid'),
+            new OA\Response(response: 403, description: 'Forbidden / Tidak memiliki hak akses'),
             new OA\Response(response: 404, description: 'Data tidak ditemukan'),
+            new OA\Response(response: 422, description: 'Validasi entitas gagal'),
         ]
     )]
     public function show(): void {}
 
     #[OA\Put(
         path: '/api/cpl/{id}',
-        summary: 'Update Cpl',
-        tags: ['Cpl'],
+        summary: 'Perbarui Data Capaian Pembelajaran (CPL)',
+        description: '### 📋 1. Request Headers
+| Header | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |
+| :--- | :--- | :--- | :--- | :--- |
+| `Authorization` | `string` | **Ya (Required)** | Token Bearer JWT hasil otentikasi login | `Bearer eyJhbGci...` |
+| `Content-Type` | `string` | **Ya (Required)** | Tipe konten payload body permintaan | `application/json` |
+| `Accept` | `string` | **Ya (Required)** | Tipe konten respon server yang diharapkan | `application/json` |
+
+### 🔍 2. Path Parameters
+| Parameter | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |
+| :--- | :--- | :--- | :--- | :--- |
+| `id` | `integer` | **Ya (Required)** | Parameter ID unik id pada path URL | `1` |
+
+### 📥 3. Request Body
+| Parameter | Tipe Data | Wajib / Required | Keterangan | Contoh Riil |
+| :--- | :--- | :--- | :--- | :--- |
+| `id_kurikulum` | `integer` | **Ya (Required)** | ID referensi Kurikulum | `1` |
+| `kode_cpl` | `string` | **Ya (Required)** | Kode unik Capaian Pembelajaran Lulusan (CPL) | `CPL-08` |
+| `deskripsi_cpl` | `string` | **Ya (Required)** | Uraian kompetensi dan capaian pembelajaran | `Mampu mengonfigurasi, menganalisis performa, dan memitigasi celah keamanan jaringan komputer tingkat lanjut.` |
+| `kategori` | `string` | *Tidak (Opsional / Nullable)* | Kategori CPL (Sikap, Pengetahuan, Keterampilan Umum, Keterampilan Khusus) | `Keterampilan Khusus` |
+
+### 📤 4. Struktur Response
+| Status HTTP | Field / Properti | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **200 OK** | `success` | `boolean` | **Ya (Required)** | Indikator status keberhasilan (`true`) | `true` |
+| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (200) | `200` |
+| | `message` | `string` | **Ya (Required)** | Pesan informasi respon server | "Operasi berhasil" |
+| | `data` | `object` | **Ya (Required)** | Objek data entitas hasil operasi | `{ ... }` |
+| | `data.id` | `integer` | **Ya (Required)** | Id | `8` |
+| | `data.id_kurikulum` | `integer` | **Ya (Required)** | ID referensi Kurikulum | `1` |
+| | `data.kode_cpl` | `string` | **Ya (Required)** | Kode unik Capaian Pembelajaran Lulusan (CPL) | `"CPL-08"` |
+| | `data.deskripsi_cpl` | `string` | **Ya (Required)** | Uraian kompetensi dan capaian pembelajaran | `"Mampu mengonfigurasi, menganalisis performa, dan memitigasi celah keamanan jaringan komputer tingkat lanjut."` |
+| | `data.kategori` | `string` | *Tidak (Opsional / Nullable)* | Kategori CPL (Sikap, Pengetahuan, Keterampilan Umum, Keterampilan Khusus) | `"Keterampilan Khusus"` |
+| | `data.created_at` | `string` | **Ya (Required)** | Created At | `"2026-10-19 03:13:33"` |
+| | `data.updated_at` | `string` | **Ya (Required)** | Updated At | `"2026-10-19 03:13:33"` |
+| **422 Unprocessable** | `success` | `boolean` | **Ya (Required)** | Indikator kegagalan validasi (`false`) | `false` |
+| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (422) | `422` |
+| | `message` | `string` | **Ya (Required)** | Ringkasan pesan kegagalan validasi | \\"The given data was invalid.\\" |
+| | `errors` | `object` | **Ya (Required)** | Kamus pesan kesalahan validasi per field input | `{\\"field\\": [\\"Pesan error\\"]}` |
+| **401 Unauthorized** | `message` | `string` | **Ya (Required)** | Pesan otentikasi gagal saat token kosong atau kedaluwarsa | \\"Unauthenticated.\\" |
+| **403 Forbidden** | `message` | `string` | **Ya (Required)** | Pesan penolakan izin akses Role/Permission | \\"User does not have the right permissions.\\" |
+| **404 Not Found** | `message` | `string` | **Ya (Required)** | Data referensi dengan ID yang diminta tidak ditemukan di database | \\"Data tidak ditemukan\\" |
+| **400 Bad Request** | `message` | `string` | **Ya (Required)** | Permintaan tidak valid atau data berelasi masih terikat | \\"Permintaan tidak valid\\" |',
+        tags: ['Capaian Pembelajaran (CPL)'],
         security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'id',
                 in: 'path',
                 required: true,
-                schema: new OA\Schema(type: 'string', example: '1')
+                description: 'ID data id',
+                schema: new OA\Schema(type: 'integer', example: 1)
             ),
         ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['id_kurikulum', 'kode_cpl', 'deskripsi_cpl'],
+                properties: [
+                    new OA\Property(property: 'id_kurikulum', type: 'integer', example: 1, description: 'ID referensi Kurikulum'),
+                    new OA\Property(property: 'kode_cpl', type: 'string', example: 'CPL-08', description: 'Kode unik Capaian Pembelajaran Lulusan (CPL)'),
+                    new OA\Property(property: 'deskripsi_cpl', type: 'string', example: 'Mampu mengonfigurasi, menganalisis performa, dan memitigasi celah keamanan jaringan komputer tingkat lanjut.', description: 'Uraian kompetensi dan capaian pembelajaran'),
+                    new OA\Property(property: 'kategori', type: 'string', example: 'Keterampilan Khusus', description: 'Kategori CPL (Sikap, Pengetahuan, Keterampilan Umum, Keterampilan Khusus)', nullable: true),
+                ]
+            )
+        ),
         responses: [
             new OA\Response(response: 200, description: 'Operasi berhasil'),
-            new OA\Response(response: 400, description: 'Permintaan tidak valid'),
-            new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 400, description: 'Permintaan tidak valid / Data terkait masih digunakan'),
+            new OA\Response(response: 401, description: 'Unauthenticated / Token tidak valid'),
+            new OA\Response(response: 403, description: 'Forbidden / Tidak memiliki hak akses'),
             new OA\Response(response: 404, description: 'Data tidak ditemukan'),
+            new OA\Response(response: 422, description: 'Validasi entitas gagal'),
         ]
     )]
     public function update(): void {}
 
     #[OA\Delete(
         path: '/api/cpl/{id}',
-        summary: 'Destroy Cpl',
-        tags: ['Cpl'],
+        summary: 'Hapus Data Capaian Pembelajaran (CPL)',
+        description: '### 📋 1. Request Headers
+| Header | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |
+| :--- | :--- | :--- | :--- | :--- |
+| `Authorization` | `string` | **Ya (Required)** | Token Bearer JWT hasil otentikasi login | `Bearer eyJhbGci...` |
+| `Accept` | `string` | **Ya (Required)** | Tipe konten respon server yang diharapkan | `application/json` |
+
+### 🔍 2. Path Parameters
+| Parameter | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |
+| :--- | :--- | :--- | :--- | :--- |
+| `id` | `integer` | **Ya (Required)** | Parameter ID unik id pada path URL | `1` |
+
+### 📤 3. Struktur Response
+| Status HTTP | Field / Properti | Tipe Data | Wajib / Required | Keterangan | Contoh Nilai |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **200 OK** | `success` | `boolean` | **Ya (Required)** | Indikator status keberhasilan (`true`) | `true` |
+| | `code` | `integer` | **Ya (Required)** | HTTP Status Code (200) | `200` |
+| | `message` | `string` | **Ya (Required)** | Pesan informasi respon server | "Data berhasil dihapus" |
+| | `data` | `null / object` | *Tidak (Opsional)* | Payload hasil operasi hapus | `null` |
+| **401 Unauthorized** | `message` | `string` | **Ya (Required)** | Pesan otentikasi gagal saat token kosong atau kedaluwarsa | \\"Unauthenticated.\\" |
+| **403 Forbidden** | `message` | `string` | **Ya (Required)** | Pesan penolakan izin akses Role/Permission | \\"User does not have the right permissions.\\" |
+| **404 Not Found** | `message` | `string` | **Ya (Required)** | Data referensi dengan ID yang diminta tidak ditemukan di database | \\"Data tidak ditemukan\\" |
+| **400 Bad Request** | `message` | `string` | **Ya (Required)** | Permintaan tidak valid atau data berelasi masih terikat | \\"Permintaan tidak valid\\" |',
+        tags: ['Capaian Pembelajaran (CPL)'],
         security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'id',
                 in: 'path',
                 required: true,
-                schema: new OA\Schema(type: 'string', example: '1')
+                description: 'ID data id',
+                schema: new OA\Schema(type: 'integer', example: 1)
             ),
         ],
         responses: [
             new OA\Response(response: 200, description: 'Operasi berhasil'),
-            new OA\Response(response: 400, description: 'Permintaan tidak valid'),
-            new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 400, description: 'Permintaan tidak valid / Data terkait masih digunakan'),
+            new OA\Response(response: 401, description: 'Unauthenticated / Token tidak valid'),
+            new OA\Response(response: 403, description: 'Forbidden / Tidak memiliki hak akses'),
             new OA\Response(response: 404, description: 'Data tidak ditemukan'),
+            new OA\Response(response: 422, description: 'Validasi entitas gagal'),
         ]
     )]
     public function destroy(): void {}

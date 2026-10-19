@@ -16,20 +16,61 @@ class UserSeeder extends Seeder
     {
         $password = Hash::make('password');
 
-        foreach (UserRole::cases() as $role) {
-            $slug = strtolower($role->value);
+        $users = [
+            [
+                'name' => 'Administrator Sistem',
+                'email' => 'administrator@polines.ac.id',
+                'role' => UserRole::ADMINISTRATOR,
+            ],
+            [
+                'name' => 'Operator Akademik',
+                'email' => 'operator@polines.ac.id',
+                'role' => UserRole::OPERATOR,
+            ],
+            [
+                'name' => 'Kuwat Santoso, S.T., M.Kom.',
+                'email' => 'kaprodi@polines.ac.id',
+                'role' => UserRole::KAPRODI,
+            ],
+            [
+                'name' => 'Dr. Amin Suharjono, S.T., M.T.',
+                'email' => 'dosen@polines.ac.id',
+                'role' => UserRole::DOSEN,
+            ],
+            [
+                'name' => 'Dr. Eni Dwi Wardihani, S.T., M.T.',
+                'email' => 'dosen2@polines.ac.id',
+                'role' => UserRole::DOSEN,
+            ],
+            [
+                'name' => 'Slamet Handoko, S.T., M.T.',
+                'email' => 'dosen3@polines.ac.id',
+                'role' => UserRole::DOSEN,
+            ],
+            [
+                'name' => 'Dr. Ir. Wahyudi, M.T. (Asesor Reviewer)',
+                'email' => 'reviewer@polines.ac.id',
+                'role' => UserRole::REVIEWER,
+            ],
+            [
+                'name' => 'Direktur Politeknik Negeri Semarang',
+                'email' => 'pimpinan@polines.ac.id',
+                'role' => UserRole::PIMPINAN,
+            ],
+        ];
 
+        foreach ($users as $userData) {
             $user = User::firstOrCreate(
-                ['email' => "{$slug}@polines.ac.id"],
+                ['email' => $userData['email']],
                 [
-                    'name' => ucfirst($slug).' User',
+                    'name' => $userData['name'],
                     'password' => $password,
-                    'role' => $role,
+                    'role' => $userData['role'],
                     'email_verified_at' => now(),
                 ]
             );
 
-            $user->assignRole($role->value);
+            $user->syncRoles([$userData['role']->value]);
         }
     }
 }

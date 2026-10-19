@@ -2,23 +2,39 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\MataKuliahAngkatanKelas;
-use App\Models\EnrollmentMataKuliah;
 use App\Models\AngkatanKelas;
+use App\Models\EnrollmentMataKuliah;
+use App\Models\MataKuliahAngkatanKelas;
+use Illuminate\Database\Seeder;
 
 class MataKuliahAngkatanKelasSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
-        $enrollmentMK = EnrollmentMataKuliah::first();
-        $angkatanKelas = AngkatanKelas::first();
+        $allEnrollments = EnrollmentMataKuliah::all();
+        $allAngkatanKelas = AngkatanKelas::all();
 
-        if ($enrollmentMK && $angkatanKelas) {
-            MataKuliahAngkatanKelas::create([
-                'enrollment_mata_kuliah_id' => $enrollmentMK->id,
-                'angkatan_kelas_id'         => $angkatanKelas->id,
-            ]);
+        if ($allEnrollments->isEmpty() || $allAngkatanKelas->isEmpty()) {
+            return;
+        }
+
+        foreach ($allEnrollments as $enrollment) {
+            // Hubungkan setiap mata kuliah yang ditawarkan ke angkatan kelas yang sesuai
+            foreach ($allAngkatanKelas as $ak) {
+                MataKuliahAngkatanKelas::firstOrCreate(
+                    [
+                        'enrollment_mata_kuliah_id' => $enrollment->id,
+                        'angkatan_kelas_id' => $ak->id,
+                    ],
+                    [
+                        'enrollment_mata_kuliah_id' => $enrollment->id,
+                        'angkatan_kelas_id' => $ak->id,
+                    ]
+                );
+            }
         }
     }
 }

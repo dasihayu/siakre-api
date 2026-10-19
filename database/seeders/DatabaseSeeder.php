@@ -17,30 +17,27 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RoleAndPermissionSeeder::class,
             UserSeeder::class,
-        ]);
-
-        $this->call([
             PerguruanTinggiSeeder::class,
             ProdiSeeder::class,
             UppsSeeder::class,
+            AnggotaUppsSeeder::class,
             KurikulumSeeder::class,
             CplSeeder::class,
             MataKuliahSeeder::class,
-            MahasiswaSeeder::class,
             MataKuliahCplSeeder::class,
-            AnggotaUppsSeeder::class,
             AngkatanSeeder::class,
             KelasSeeder::class,
             TahunAkademikSeeder::class,
-            KegiatanMahasiswaSeeder::class,
             AngkatanKelasSeeder::class,
+            MahasiswaSeeder::class,
             EnrollmentKelasSeeder::class,
             StatusMahasiswaSeeder::class,
-            EnrollmentMataKuliahSeeder::class,
-            MataKuliahAngkatanKelasSeeder::class,
+            KegiatanMahasiswaSeeder::class,
             PrestasiMahasiswaSeeder::class,
             EvidencePrestasiMahasiswaSeeder::class,
             JenisPrestasiSeeder::class,
+            EnrollmentMataKuliahSeeder::class,
+            MataKuliahAngkatanKelasSeeder::class,
             NilaiMahasiswaSeeder::class,
         ]);
     }
