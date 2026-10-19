@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
             JenisPrestasiSeeder::class,
             EnrollmentMataKuliahSeeder::class,
             MataKuliahAngkatanKelasSeeder::class,
+            NilaiMahasiswaSeeder::class,
         ]);
     }
 }
