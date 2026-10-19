@@ -30,7 +30,6 @@ jobs:
 
           echo "Installing production dependencies..."
           composer install \
-            --no-dev \
             --prefer-dist \
             --optimize-autoloader \
             --no-interaction \
