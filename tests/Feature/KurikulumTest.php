@@ -1,7 +1,8 @@
 <?php
 
-use App\Models\Prodi;
 use App\Models\Kurikulum;
+use App\Models\MataKuliah;
+use App\Models\Prodi;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -18,10 +19,10 @@ test('authenticated user can list kurikulum', function () {
     $prodi = Prodi::create(['kode_prodi' => 'PR01', 'nama_prodi' => 'Informatika', 'akreditasi' => 'Unggul']);
 
     Kurikulum::create([
-        'id_prodi'       => $prodi->id,
+        'id_prodi' => $prodi->id,
         'nama_kurikulum' => 'Kurikulum 2024',
         'berlaku_sampai' => 2028,
-        'sk_kurikulum'   => 'SK/2024/001',
+        'sk_kurikulum' => 'SK/2024/001',
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
@@ -43,10 +44,10 @@ test('authenticated user can create kurikulum', function () {
     $prodi = Prodi::create(['kode_prodi' => 'PR01', 'nama_prodi' => 'Informatika', 'akreditasi' => 'Unggul']);
 
     $payload = [
-        'id_prodi'       => $prodi->id,
+        'id_prodi' => $prodi->id,
         'nama_kurikulum' => 'Kurikulum Merdeka 2024',
         'berlaku_sampai' => 2028,
-        'sk_kurikulum'   => 'SK/2024/001',
+        'sk_kurikulum' => 'SK/2024/001',
     ];
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
@@ -73,10 +74,10 @@ test('authenticated user can view detail of kurikulum', function () {
     $prodi = Prodi::create(['kode_prodi' => 'PR01', 'nama_prodi' => 'Informatika', 'akreditasi' => 'Unggul']);
 
     $kurikulum = Kurikulum::create([
-        'id_prodi'       => $prodi->id,
+        'id_prodi' => $prodi->id,
         'nama_kurikulum' => 'Kurikulum 2024',
         'berlaku_sampai' => 2028,
-        'sk_kurikulum'   => 'SK/2024/001',
+        'sk_kurikulum' => 'SK/2024/001',
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
@@ -99,18 +100,18 @@ test('authenticated user can update kurikulum', function () {
     $prodi = Prodi::create(['kode_prodi' => 'PR01', 'nama_prodi' => 'Informatika', 'akreditasi' => 'Unggul']);
 
     $kurikulum = Kurikulum::create([
-        'id_prodi'       => $prodi->id,
+        'id_prodi' => $prodi->id,
         'nama_kurikulum' => 'Kurikulum Lama',
         'berlaku_sampai' => 2025,
-        'sk_kurikulum'   => 'SK/2020/001',
+        'sk_kurikulum' => 'SK/2020/001',
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
         ->putJson("/api/kurikulum/{$kurikulum->id}", [
-            'id_prodi'       => $prodi->id,
+            'id_prodi' => $prodi->id,
             'nama_kurikulum' => 'Kurikulum Baru',
             'berlaku_sampai' => 2030,
-            'sk_kurikulum'   => 'SK/2025/001',
+            'sk_kurikulum' => 'SK/2025/001',
         ]);
 
     $response->assertStatus(200)
@@ -132,10 +133,10 @@ test('authenticated user can delete kurikulum', function () {
     $prodi = Prodi::create(['kode_prodi' => 'PR01', 'nama_prodi' => 'Informatika', 'akreditasi' => 'Unggul']);
 
     $kurikulum = Kurikulum::create([
-        'id_prodi'       => $prodi->id,
+        'id_prodi' => $prodi->id,
         'nama_kurikulum' => 'Kurikulum Hapus',
         'berlaku_sampai' => 2028,
-        'sk_kurikulum'   => 'SK/2024/001',
+        'sk_kurikulum' => 'SK/2024/001',
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
@@ -150,4 +151,61 @@ test('authenticated user can delete kurikulum', function () {
     $this->assertDatabaseMissing('kurikulum', [
         'id' => $kurikulum->id,
     ]);
+});
+
+test('authenticated user can get mata kuliah per kurikulum', function () {
+    $user = User::factory()->create();
+    $token = auth('api')->login($user);
+
+    $prodi = Prodi::create(['kode_prodi' => 'PR01', 'nama_prodi' => 'Informatika', 'akreditasi' => 'Unggul']);
+
+    $kurikulum = Kurikulum::create([
+        'id_prodi' => $prodi->id,
+        'nama_kurikulum' => 'Kurikulum 2024',
+        'berlaku_sampai' => 2028,
+        'sk_kurikulum' => 'SK/2024/001',
+    ]);
+
+    $kurikulumLain = Kurikulum::create([
+        'id_prodi' => $prodi->id,
+        'nama_kurikulum' => 'Kurikulum 2020',
+        'berlaku_sampai' => 2024,
+        'sk_kurikulum' => 'SK/2020/001',
+    ]);
+
+    MataKuliah::create([
+        'id_kurikulum' => $kurikulum->id,
+        'kode_mata_kuliah' => 'MK01',
+        'nama_mata_kuliah' => 'Pemrograman Web',
+        'sks' => 3,
+    ]);
+
+    MataKuliah::create([
+        'id_kurikulum' => $kurikulum->id,
+        'kode_mata_kuliah' => 'MK02',
+        'nama_mata_kuliah' => 'Basis Data',
+        'sks' => 3,
+    ]);
+
+    MataKuliah::create([
+        'id_kurikulum' => $kurikulumLain->id,
+        'kode_mata_kuliah' => 'MK03',
+        'nama_mata_kuliah' => 'Struktur Data Lama',
+        'sks' => 2,
+    ]);
+
+    $response = $this->withHeader('Authorization', "Bearer {$token}")
+        ->getJson("/api/kurikulum/{$kurikulum->id}/mata-kuliah");
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'success' => true,
+            'message' => 'Berhasil mengambil data Mata Kuliah per Kurikulum',
+        ]);
+
+    expect($response->json('data'))->toHaveCount(2);
+
+    $response404 = $this->withHeader('Authorization', "Bearer {$token}")
+        ->getJson('/api/kurikulum/99999/mata-kuliah');
+    $response404->assertStatus(404);
 });
