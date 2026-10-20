@@ -37,4 +37,24 @@ class AngkatanKelas extends Model
     {
         return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
     }
+
+    public function enrollmentKelas()
+    {
+        return $this->hasMany(EnrollmentKelas::class, 'angkatan_kelas_id');
+    }
+
+    public function mataKuliahAngkatanKelas()
+    {
+        return $this->hasMany(MataKuliahAngkatanKelas::class, 'angkatan_kelas_id');
+    }
+
+    public function mahasiswa()
+    {
+        return $this->belongsToMany(
+            Mahasiswa::class,
+            'enrollment_mahasiswa_angkatan_kelas',
+            'angkatan_kelas_id',
+            'id_mahasiswa'
+        )->withPivot('id', 'prodi_id')->withTimestamps();
+    }
 }

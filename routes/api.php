@@ -6,14 +6,17 @@ use App\Http\Controllers\AngkatanKelasController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CplController;
 use App\Http\Controllers\EnrollmentKelasController;
+use App\Http\Controllers\EnrollmentMataKuliahController;
 use App\Http\Controllers\EvidencePrestasiMahasiswaController;
 use App\Http\Controllers\JenisPrestasiController;
 use App\Http\Controllers\KegiatanMahasiswaController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\KurikulumController;
 use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\MataKuliahAngkatanKelasController;
 use App\Http\Controllers\MataKuliahController;
 use App\Http\Controllers\MataKuliahCplController;
+use App\Http\Controllers\NilaiMahasiswaController;
 use App\Http\Controllers\PerguruanTinggiController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PrestasiMahasiswaController;
@@ -24,10 +27,6 @@ use App\Http\Controllers\TahunAkademikController;
 use App\Http\Controllers\UppsController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\EnrollmentMataKuliahController;
-use App\Http\Controllers\MataKuliahAngkatanKelasController;
-use App\Http\Controllers\NilaiMahasiswaController;
-
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -88,6 +87,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/kurikulum/{id}', [KurikulumController::class, 'show']);
     Route::put('/kurikulum/{id}', [KurikulumController::class, 'update']);
     Route::delete('/kurikulum/{id}', [KurikulumController::class, 'destroy']);
+    Route::get('/kurikulum/{id}/mata-kuliah', [KurikulumController::class, 'mataKuliah']);
 
     // --- CRUD Master CPL ---
     Route::get('/cpl', [CplController::class, 'index']);
@@ -134,6 +134,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/kelas/{id}', [KelasController::class, 'show']);
     Route::put('/kelas/{id}', [KelasController::class, 'update']);
     Route::delete('/kelas/{id}', [KelasController::class, 'destroy']);
+    Route::get('/kelas/{id}/mahasiswa', [KelasController::class, 'mahasiswa']);
+    Route::get('/kelas/{id}/mata-kuliah', [KelasController::class, 'mataKuliah']);
 
     // --- CRUD Master Tahun Akademik ---
     Route::get('/tahun-akademik', [TahunAkademikController::class, 'index']);
@@ -155,6 +157,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/angkatan-kelas/{id}', [AngkatanKelasController::class, 'show']);
     Route::put('/angkatan-kelas/{id}', [AngkatanKelasController::class, 'update']);
     Route::delete('/angkatan-kelas/{id}', [AngkatanKelasController::class, 'destroy']);
+    Route::get('/angkatan-kelas/{id}/mahasiswa', [AngkatanKelasController::class, 'mahasiswa']);
+    Route::get('/angkatan-kelas/{id}/mata-kuliah', [AngkatanKelasController::class, 'mataKuliah']);
 
     // --- CRUD Enrollment Mahasiswa Angkatan Kelas ---
     Route::get('/enrollment-kelas', [EnrollmentKelasController::class, 'index']);
@@ -183,7 +187,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/mata-kuliah-angkatan-kelas/{id}', [MataKuliahAngkatanKelasController::class, 'show']);
     Route::put('/mata-kuliah-angkatan-kelas/{id}', [MataKuliahAngkatanKelasController::class, 'update']);
     Route::delete('/mata-kuliah-angkatan-kelas/{id}', [MataKuliahAngkatanKelasController::class, 'destroy']);
-   
+
     // --- CRUD Prestasi Mahasiswa ---
     Route::get('/prestasi-mahasiswa', [PrestasiMahasiswaController::class, 'index']);
     Route::post('/prestasi-mahasiswa', [PrestasiMahasiswaController::class, 'store']);
