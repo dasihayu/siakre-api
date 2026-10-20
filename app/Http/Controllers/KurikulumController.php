@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Kurikulum;
-use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
+use App\Models\Kurikulum;
+use App\Models\MataKuliah;
+use Illuminate\Database\QueryException;
+use Illuminate\Http\Request;
 
 class KurikulumController extends Controller
 {
@@ -13,6 +15,7 @@ class KurikulumController extends Controller
     {
         // Pakai with('prodi') biar nama prodinya ikut tampil, bukan cuma ID-nya doang
         $data = Kurikulum::with('prodi')->get();
+
         return ApiResponse::success($data, 'Berhasil mengambil data Kurikulum');
     }
 
@@ -20,14 +23,14 @@ class KurikulumController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'id_prodi'       => 'required|exists:prodi,id',
+            'id_prodi' => 'required|exists:prodi,id',
             'nama_kurikulum' => 'required|string',
             'berlaku_sampai' => 'required|integer',
-            'sk_kurikulum'   => 'nullable|string',
+            'sk_kurikulum' => 'nullable|string',
         ]);
 
         $kurikulum = Kurikulum::create($request->all());
-        
+
         return ApiResponse::success($kurikulum, 'Data Kurikulum berhasil ditambahkan', 201);
     }
 
@@ -35,11 +38,11 @@ class KurikulumController extends Controller
     public function show(string $id)
     {
         $kurikulum = Kurikulum::with('prodi')->find($id);
-        
-        if (!$kurikulum) {
+
+        if (! $kurikulum) {
             return ApiResponse::error('Data tidak ditemukan', 404);
         }
-        
+
         return ApiResponse::success($kurikulum, 'Berhasil mengambil detail data Kurikulum');
     }
 
@@ -47,20 +50,20 @@ class KurikulumController extends Controller
     public function update(Request $request, string $id)
     {
         $kurikulum = Kurikulum::find($id);
-        
-        if (!$kurikulum) {
+
+        if (! $kurikulum) {
             return ApiResponse::error('Data tidak ditemukan', 404);
         }
 
         $request->validate([
-            'id_prodi'       => 'required|exists:prodi,id',
+            'id_prodi' => 'required|exists:prodi,id',
             'nama_kurikulum' => 'required|string',
             'berlaku_sampai' => 'required|integer',
-            'sk_kurikulum'   => 'nullable|string',
+            'sk_kurikulum' => 'nullable|string',
         ]);
 
         $kurikulum->update($request->all());
-        
+
         return ApiResponse::success($kurikulum, 'Data Kurikulum berhasil diupdate');
     }
 
@@ -68,23 +71,40 @@ class KurikulumController extends Controller
     public function destroy(string $id)
     {
         $kurikulum = Kurikulum::find($id);
-        
-        if (!$kurikulum) {
+
+        if (! $kurikulum) {
             return ApiResponse::error('Data tidak ditemukan', 404);
         }
 
         try {
             // Langsung eksekusi hapus. Biarkan database yang mengecek relasi ke CPL/Matkul
             $kurikulum->delete();
+
             return ApiResponse::success(null, 'Data berhasil dihapus');
-            
-        } catch (\Illuminate\Database\QueryException $e) {
+
+        } catch (QueryException $e) {
             // Jika database menolak karena data id_kurikulum masih dipakai di tabel Matkul / CPL
-            if ($e->getCode() == "23000") {
+            if ($e->getCode() == '23000') {
                 return ApiResponse::error('Kurikulum Memiliki Matkul/CPL', 400);
             }
-            
+
             return ApiResponse::error('Gagal menghapus data', 500);
         }
+    }
+
+    // Tampil daftar mata kuliah per kurikulum
+    public function mataKuliah(string $id)
+    {
+        $kurikulum = Kurikulum::find($id);
+
+        if (! $kurikulum) {
+            return ApiResponse::error('Data kurikulum tidak ditemukan', 404);
+        }
+
+        $data = MataKuliah::with(['kurikulum', 'cpl'])
+            ->where('id_kurikulum', $id)
+            ->get();
+
+        return ApiResponse::success($data, 'Berhasil mengambil data Mata Kuliah per Kurikulum');
     }
 }

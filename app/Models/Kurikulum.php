@@ -15,12 +15,17 @@ class Kurikulum extends Model
         'id_prodi',
         'nama_kurikulum',
         'berlaku_sampai',
-        'sk_kurikulum'
+        'sk_kurikulum',
     ];
 
     // Relasi balik (belongsTo) ke Prodi
     public function prodi()
     {
         return $this->belongsTo(Prodi::class, 'id_prodi');
+    }
+
+    public function mataKuliah()
+    {
+        return $this->hasMany(MataKuliah::class, 'id_kurikulum');
     }
 }
