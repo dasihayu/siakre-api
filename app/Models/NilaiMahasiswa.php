@@ -13,18 +13,10 @@ class NilaiMahasiswa extends Model
     protected $table = 'nilai_mahasiswa';
 
     protected $fillable = [
-        'enrollment_mahasiswa_angkatan_kelas_id',
         'mata_kuliah_angkatan_kelas_id',
-        'nilai_angka',
-        'nilai_huruf',
-        'bobot_nilai',
-        'status_kelulusan',
+        'link_nilai',
+        'link_evidence',
     ];
-
-    public function enrollmentKelas(): BelongsTo
-    {
-        return $this->belongsTo(EnrollmentKelas::class, 'enrollment_mahasiswa_angkatan_kelas_id');
-    }
 
     public function mataKuliahAngkatanKelas(): BelongsTo
     {

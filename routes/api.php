@@ -215,4 +215,6 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/nilai-mahasiswa/{id}', [NilaiMahasiswaController::class, 'show']);
     Route::put('/nilai-mahasiswa/{id}', [NilaiMahasiswaController::class, 'update']);
     Route::delete('/nilai-mahasiswa/{id}', [NilaiMahasiswaController::class, 'destroy']);
+    Route::patch('/nilai-mahasiswa/{id}/link-nilai', [NilaiMahasiswaController::class, 'updateLinkNilai']);
+    Route::patch('/nilai-mahasiswa/{id}/link-evidence', [NilaiMahasiswaController::class, 'updateLinkEvidence']);
 });
