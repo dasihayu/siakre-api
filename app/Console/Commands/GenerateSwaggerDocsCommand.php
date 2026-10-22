@@ -759,7 +759,7 @@ PHP;
                 'role' => [
                     'type' => 'string',
                     'example' => UserRole::DOSEN->value,
-                    'description' => 'Role pengguna (ADMINISTRATOR, OPERATOR, KAPRODI, DOSEN, REVIEWER, PIMPINAN)',
+                    'description' => 'Role pengguna (ADMINISTRATOR, DOSEN, KAPRODI, REVIEWER)',
                     'nullable' => false,
                 ],
             ];

@@ -18,8 +18,11 @@ class RoleAndPermissionSeeder extends Seeder
         // Reset cached roles and permissions
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // 22 Modul Entitas Sistem Akreditasi sesuai Dokumen Matriks Hak Akses
-        $modules = [
+        // Bersihkan role usang jika ada di database
+        Role::whereIn('name', ['OPERATOR', 'PIMPINAN'])->delete();
+
+        // 1. Modul Entitas Sistem Akreditasi K1
+        $k1Modules = [
             // Data Master Akademik
             'perguruan_tinggi',
             'prodi',
@@ -50,6 +53,9 @@ class RoleAndPermissionSeeder extends Seeder
             'enrollment_mata_kuliah',
             'mata_kuliah_angkatan_kelas',
 
+            // Integrasi Eksternal
+            'dosen',
+
             // Manajemen Hak Akses & Pengguna (Admin)
             'user',
             'role',
@@ -59,11 +65,48 @@ class RoleAndPermissionSeeder extends Seeder
         // Actions CRUD
         $actions = ['create', 'read', 'update', 'delete'];
 
-        // Create Permissions per Modul (Format: {module}.{action}, misal: perguruan_tinggi.read)
-        foreach ($modules as $module) {
+        // Create Permissions per Modul K1 (Format: {module}.{action}, misal: perguruan_tinggi.read)
+        foreach ($k1Modules as $module) {
             foreach ($actions as $action) {
                 Permission::findOrCreate("{$module}.{$action}", 'api');
             }
+        }
+
+        // 2. Modul & Permission Integrasi Kelompok 2 (SDM, Tridharma, & Kerja Sama)
+        $k2Modules = [
+            'dosen',
+            'kegiatan',
+            'luaran',
+            'kerjasama',
+            'evidence',
+            'penelitian',
+            'pengabdian',
+            'sertifikasi',
+            'tendik',
+            'mitra',
+            'atribut',
+        ];
+
+        foreach ($k2Modules as $module) {
+            foreach ($actions as $action) {
+                Permission::findOrCreate("{$module}.{$action}", 'api');
+            }
+            Permission::findOrCreate("{$module}.*", 'api');
+        }
+
+        $k2SpecialPermissions = [
+            '*',
+            'evidence.validate',
+            'assessment.read',
+            'assessment.run',
+            'dashboard.read',
+            'kriteria.read',
+            'led.read',
+            'lkps.read',
+        ];
+
+        foreach ($k2SpecialPermissions as $perm) {
+            Permission::findOrCreate($perm, 'api');
         }
 
         // Helper closures untuk membangun daftar permissions
@@ -84,59 +127,20 @@ class RoleAndPermissionSeeder extends Seeder
             "{$module}.update",
         ];
 
-        // 1. ADMINISTRATOR: Memegang kendali penuh (CRUD) ke seluruh sistem
+        // 1. ADMINISTRATOR: Memegang kendali penuh (CRUD) ke seluruh sistem K1 & K2
         $adminRole = Role::findOrCreate(UserRole::ADMINISTRATOR->value, 'api');
         $adminRole->syncPermissions(Permission::all());
 
-        // 2. OPERATOR: Administrasi data mahasiswa, kelas, enrollment (Bukan struktur Kurikulum/CPL)
-        $operatorModulesCrud = [
-            'kelas',
-            'upps',
-            'anggota_upps',
-            'tahun_akademik',
-            'angkatan',
-            'mahasiswa',
-            'status_mahasiswa',
-            'kegiatan_mahasiswa',
-            'prestasi_mahasiswa',
-            'evidence_prestasi_mahasiswa',
-            'jenis_prestasi',
-            'angkatan_kelas',
-            'enrollment_kelas',
-            'enrollment_mata_kuliah',
-            'mata_kuliah_angkatan_kelas',
-        ];
-
-        $operatorModulesRead = [
-            'perguruan_tinggi',
-            'prodi',
-            'mata_kuliah',
-            'kurikulum',
-            'cpl',
-            'mata_kuliah_cpl',
-            'nilai_mahasiswa',
-        ];
-
-        $operatorPermissions = [];
-        foreach ($operatorModulesCrud as $m) {
-            $operatorPermissions = array_merge($operatorPermissions, $crud($m));
-        }
-        foreach ($operatorModulesRead as $m) {
-            $operatorPermissions = array_merge($operatorPermissions, $readOnly($m));
-        }
-
-        $operatorRole = Role::findOrCreate(UserRole::OPERATOR->value, 'api');
-        $operatorRole->syncPermissions($operatorPermissions);
-
-        // 3. KAPRODI: Merancang standar akademik (CRUD Kurikulum, CPL, Mata Kuliah, Pivot Matkul-CPL)
-        $kaprodiModulesCrud = [
+        // 2. KAPRODI:
+        // K1: Merancang standar akademik (CRUD Kurikulum, CPL, Mata Kuliah, Pivot Matkul-CPL; Read-Only lainnya)
+        $kaprodiK1ModulesCrud = [
             'mata_kuliah',
             'kurikulum',
             'cpl',
             'mata_kuliah_cpl',
         ];
 
-        $kaprodiModulesRead = [
+        $kaprodiK1ModulesRead = [
             'perguruan_tinggi',
             'prodi',
             'kelas',
@@ -155,21 +159,43 @@ class RoleAndPermissionSeeder extends Seeder
             'enrollment_kelas',
             'enrollment_mata_kuliah',
             'mata_kuliah_angkatan_kelas',
+            'dosen',
+        ];
+
+        // K2: Sesuai Matriks SSO K2 (Tabel 3 No 3)
+        $kaprodiK2Permissions = [
+            'dosen.read',
+            'kriteria.read',
+            'penelitian.read',
+            'pengabdian.read',
+            'kegiatan.read',
+            'luaran.read',
+            'kerjasama.read',
+            'sertifikasi.read',
+            'evidence.read',
+            'evidence.validate',
+            'assessment.read',
+            'assessment.run',
+            'dashboard.read',
+            'led.read',
+            'lkps.read',
         ];
 
         $kaprodiPermissions = [];
-        foreach ($kaprodiModulesCrud as $m) {
+        foreach ($kaprodiK1ModulesCrud as $m) {
             $kaprodiPermissions = array_merge($kaprodiPermissions, $crud($m));
         }
-        foreach ($kaprodiModulesRead as $m) {
+        foreach ($kaprodiK1ModulesRead as $m) {
             $kaprodiPermissions = array_merge($kaprodiPermissions, $readOnly($m));
         }
+        $kaprodiPermissions = array_values(array_unique(array_merge($kaprodiPermissions, $kaprodiK2Permissions)));
 
         $kaprodiRole = Role::findOrCreate(UserRole::KAPRODI->value, 'api');
         $kaprodiRole->syncPermissions($kaprodiPermissions);
 
-        // 4. DOSEN: CRU pada Nilai Mahasiswa, Read-Only pada entitas lainnya
-        $dosenModulesRead = [
+        // 3. DOSEN:
+        // K1: CRU pada Nilai Mahasiswa, Read-Only pada entitas lainnya
+        $dosenK1ModulesRead = [
             'perguruan_tinggi',
             'prodi',
             'kelas',
@@ -191,18 +217,45 @@ class RoleAndPermissionSeeder extends Seeder
             'enrollment_kelas',
             'enrollment_mata_kuliah',
             'mata_kuliah_angkatan_kelas',
+            'dosen',
+        ];
+
+        // K2: Sesuai Matriks SSO K2 (Tabel 3 No 4)
+        $dosenK2Permissions = [
+            'dosen.read',
+            'penelitian.create',
+            'penelitian.read',
+            'penelitian.update',
+            'pengabdian.create',
+            'pengabdian.read',
+            'pengabdian.update',
+            'kegiatan.create',
+            'kegiatan.read',
+            'kegiatan.update',
+            'luaran.create',
+            'luaran.read',
+            'luaran.update',
+            'sertifikasi.create',
+            'sertifikasi.read',
+            'sertifikasi.update',
+            'evidence.create',
+            'evidence.read',
+            'evidence.update',
+            'dashboard.read',
         ];
 
         $dosenPermissions = $cru('nilai_mahasiswa');
-        foreach ($dosenModulesRead as $m) {
+        foreach ($dosenK1ModulesRead as $m) {
             $dosenPermissions = array_merge($dosenPermissions, $readOnly($m));
         }
+        $dosenPermissions = array_values(array_unique(array_merge($dosenPermissions, $dosenK2Permissions)));
 
         $dosenRole = Role::findOrCreate(UserRole::DOSEN->value, 'api');
         $dosenRole->syncPermissions($dosenPermissions);
 
-        // 5. REVIEWER: Akses murni Read-Only ke semua 22 modul sistem
-        $reviewerModules = [
+        // 4. REVIEWER (Diakui sebagai ASESOR di K2):
+        // K1: Akses murni Read-Only ke semua master data & data akademik K1
+        $reviewerK1Modules = [
             'perguruan_tinggi',
             'prodi',
             'kelas',
@@ -225,48 +278,32 @@ class RoleAndPermissionSeeder extends Seeder
             'enrollment_kelas',
             'enrollment_mata_kuliah',
             'mata_kuliah_angkatan_kelas',
+            'dosen',
+        ];
+
+        // K2: Sesuai Matriks SSO K2 (Tabel 3 No 5)
+        $reviewerK2Permissions = [
+            'dosen.read',
+            'kriteria.read',
+            'kegiatan.read',
+            'luaran.read',
+            'kerjasama.read',
+            'evidence.read',
+            'evidence.validate',
+            'assessment.read',
+            'assessment.run',
+            'dashboard.read',
+            'led.read',
+            'lkps.read',
         ];
 
         $reviewerPermissions = [];
-        foreach ($reviewerModules as $m) {
+        foreach ($reviewerK1Modules as $m) {
             $reviewerPermissions = array_merge($reviewerPermissions, $readOnly($m));
         }
+        $reviewerPermissions = array_values(array_unique(array_merge($reviewerPermissions, $reviewerK2Permissions)));
 
         $reviewerRole = Role::findOrCreate(UserRole::REVIEWER->value, 'api');
         $reviewerRole->syncPermissions($reviewerPermissions);
-
-        // 6. PIMPINAN: Read-Only global kecuali Pivot Mata Kuliah CPL (-)
-        $pimpinanModules = [
-            'perguruan_tinggi',
-            'prodi',
-            'kelas',
-            'upps',
-            'anggota_upps',
-            'mata_kuliah',
-            'tahun_akademik',
-            'angkatan',
-            'kurikulum',
-            'cpl',
-            // 'mata_kuliah_cpl' (-) Tidak punya akses sama sekali
-            'mahasiswa',
-            'status_mahasiswa',
-            'kegiatan_mahasiswa',
-            'nilai_mahasiswa',
-            'prestasi_mahasiswa',
-            'evidence_prestasi_mahasiswa',
-            'jenis_prestasi',
-            'angkatan_kelas',
-            'enrollment_kelas',
-            'enrollment_mata_kuliah',
-            'mata_kuliah_angkatan_kelas',
-        ];
-
-        $pimpinanPermissions = [];
-        foreach ($pimpinanModules as $m) {
-            $pimpinanPermissions = array_merge($pimpinanPermissions, $readOnly($m));
-        }
-
-        $pimpinanRole = Role::findOrCreate(UserRole::PIMPINAN->value, 'api');
-        $pimpinanRole->syncPermissions($pimpinanPermissions);
     }
 }
