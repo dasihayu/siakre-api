@@ -5,6 +5,7 @@ use App\Http\Controllers\AngkatanController;
 use App\Http\Controllers\AngkatanKelasController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CplController;
+use App\Http\Controllers\DosenController;
 use App\Http\Controllers\EnrollmentKelasController;
 use App\Http\Controllers\EnrollmentMataKuliahController;
 use App\Http\Controllers\EvidencePrestasiMahasiswaController;
@@ -173,6 +174,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/status-mahasiswa/{id}', [StatusMahasiswaController::class, 'show']);
     Route::put('/status-mahasiswa/{id}', [StatusMahasiswaController::class, 'update']);
     Route::delete('/status-mahasiswa/{id}', [StatusMahasiswaController::class, 'destroy']);
+
+    // --- Integrasi Dosen (Eksternal Tridharma) ---
+    Route::get('/dosen', [DosenController::class, 'index']);
 
     // --- CRUD Enrollment Mata Kuliah ---
     Route::get('/enrollment-mata-kuliah', [EnrollmentMataKuliahController::class, 'index']);
