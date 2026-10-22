@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'tridharma' => [
+        'url' => env('TRIDHARMA_API_URL', 'https://tridharma.fayra.my.id'),
+    ],
+
 ];

@@ -36,6 +36,8 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims(): array
     {
         return [
+            'email' => $this->email,
+            'nama' => $this->name,
             'role' => $this->role?->value,
             'permissions' => $this->permissions_array,
         ];
@@ -48,6 +50,15 @@ class User extends Authenticatable implements JWTSubject
      */
     public function getPermissionsArrayAttribute(): array
     {
+        $directPermissions = $this->getDirectPermissions()->pluck('name')->toArray();
+        if (! empty($directPermissions)) {
+            return $directPermissions;
+        }
+
+        if ($this->hasRole(UserRole::ADMINISTRATOR->value) || $this->role === UserRole::ADMINISTRATOR) {
+            return ['*'];
+        }
+
         $permissions = $this->getAllPermissions()->pluck('name')->toArray();
 
         if (! empty($permissions)) {
@@ -72,6 +83,21 @@ class User extends Authenticatable implements JWTSubject
                 'mata_kuliah_cpl.read',
                 'mata_kuliah_cpl.update',
                 'mata_kuliah_cpl.delete',
+                'dosen.read',
+                'kriteria.read',
+                'penelitian.read',
+                'pengabdian.read',
+                'kegiatan.read',
+                'luaran.read',
+                'kerjasama.read',
+                'sertifikasi.read',
+                'evidence.read',
+                'evidence.validate',
+                'assessment.read',
+                'assessment.run',
+                'dashboard.read',
+                'led.read',
+                'lkps.read',
             ],
             UserRole::DOSEN => [
                 'nilai_mahasiswa.create',
@@ -81,6 +107,62 @@ class User extends Authenticatable implements JWTSubject
                 'cpl.read',
                 'mata_kuliah.read',
                 'mahasiswa.read',
+                'dosen.read',
+                'penelitian.create',
+                'penelitian.read',
+                'penelitian.update',
+                'pengabdian.create',
+                'pengabdian.read',
+                'pengabdian.update',
+                'kegiatan.create',
+                'kegiatan.read',
+                'kegiatan.update',
+                'luaran.create',
+                'luaran.read',
+                'luaran.update',
+                'sertifikasi.create',
+                'sertifikasi.read',
+                'sertifikasi.update',
+                'evidence.create',
+                'evidence.read',
+                'evidence.update',
+                'dashboard.read',
+            ],
+            UserRole::REVIEWER => [
+                'perguruan_tinggi.read',
+                'prodi.read',
+                'kelas.read',
+                'upps.read',
+                'anggota_upps.read',
+                'mata_kuliah.read',
+                'tahun_akademik.read',
+                'angkatan.read',
+                'kurikulum.read',
+                'cpl.read',
+                'mata_kuliah_cpl.read',
+                'mahasiswa.read',
+                'status_mahasiswa.read',
+                'kegiatan_mahasiswa.read',
+                'nilai_mahasiswa.read',
+                'prestasi_mahasiswa.read',
+                'evidence_prestasi_mahasiswa.read',
+                'jenis_prestasi.read',
+                'angkatan_kelas.read',
+                'enrollment_kelas.read',
+                'enrollment_mata_kuliah.read',
+                'mata_kuliah_angkatan_kelas.read',
+                'dosen.read',
+                'kriteria.read',
+                'kegiatan.read',
+                'luaran.read',
+                'kerjasama.read',
+                'evidence.read',
+                'evidence.validate',
+                'assessment.read',
+                'assessment.run',
+                'dashboard.read',
+                'led.read',
+                'lkps.read',
             ],
             UserRole::ADMINISTRATOR => ['*'],
             default => [],

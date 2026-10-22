@@ -5,6 +5,7 @@ use App\Http\Controllers\AngkatanController;
 use App\Http\Controllers\AngkatanKelasController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CplController;
+use App\Http\Controllers\DosenController;
 use App\Http\Controllers\EnrollmentKelasController;
 use App\Http\Controllers\EnrollmentMataKuliahController;
 use App\Http\Controllers\EvidencePrestasiMahasiswaController;
@@ -174,6 +175,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('/status-mahasiswa/{id}', [StatusMahasiswaController::class, 'update']);
     Route::delete('/status-mahasiswa/{id}', [StatusMahasiswaController::class, 'destroy']);
 
+    // --- Integrasi Dosen (Eksternal Tridharma) ---
+    Route::get('/dosen', [DosenController::class, 'index']);
+
     // --- CRUD Enrollment Mata Kuliah ---
     Route::get('/enrollment-mata-kuliah', [EnrollmentMataKuliahController::class, 'index']);
     Route::post('/enrollment-mata-kuliah', [EnrollmentMataKuliahController::class, 'store']);
@@ -215,4 +219,6 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/nilai-mahasiswa/{id}', [NilaiMahasiswaController::class, 'show']);
     Route::put('/nilai-mahasiswa/{id}', [NilaiMahasiswaController::class, 'update']);
     Route::delete('/nilai-mahasiswa/{id}', [NilaiMahasiswaController::class, 'destroy']);
+    Route::patch('/nilai-mahasiswa/{id}/link-nilai', [NilaiMahasiswaController::class, 'updateLinkNilai']);
+    Route::patch('/nilai-mahasiswa/{id}/link-evidence', [NilaiMahasiswaController::class, 'updateLinkEvidence']);
 });

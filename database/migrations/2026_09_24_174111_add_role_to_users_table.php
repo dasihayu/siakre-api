@@ -13,12 +13,10 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->enum('role', [
-                'KAPRODI',
-                'DOSEN',
                 'ADMINISTRATOR',
-                'OPERATOR',
+                'DOSEN',
+                'KAPRODI',
                 'REVIEWER',
-                'PIMPINAN',
             ])->after('email');
         });
     }
