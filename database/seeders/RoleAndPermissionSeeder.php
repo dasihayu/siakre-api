@@ -62,17 +62,7 @@ class RoleAndPermissionSeeder extends Seeder
             'permission',
         ];
 
-        // Actions CRUD
-        $actions = ['create', 'read', 'update', 'delete'];
-
-        // Create Permissions per Modul K1 (Format: {module}.{action}, misal: perguruan_tinggi.read)
-        foreach ($k1Modules as $module) {
-            foreach ($actions as $action) {
-                Permission::findOrCreate("{$module}.{$action}", 'api');
-            }
-        }
-
-        // 2. Modul & Permission Integrasi Kelompok 2 (SDM, Tridharma, & Kerja Sama)
+        // 2. Modul Integrasi Kelompok 2 (SDM, Tridharma, & Kerja Sama)
         $k2Modules = [
             'dosen',
             'kegiatan',
@@ -87,13 +77,31 @@ class RoleAndPermissionSeeder extends Seeder
             'atribut',
         ];
 
-        foreach ($k2Modules as $module) {
+        // Actions CRUD
+        $actions = ['create', 'read', 'update', 'delete'];
+
+        // Gabungkan seluruh modul K1 & K2 secara unik tanpa duplikasi
+        $allCrudModules = array_values(array_unique(array_merge($k1Modules, $k2Modules)));
+
+        // Create Permissions per Modul
+        foreach ($allCrudModules as $module) {
             foreach ($actions as $action) {
-                Permission::findOrCreate("{$module}.{$action}", 'api');
+                Permission::firstOrCreate([
+                    'name' => "{$module}.{$action}",
+                    'guard_name' => 'api',
+                ]);
             }
-            Permission::findOrCreate("{$module}.*", 'api');
         }
 
+        // Wildcard permissions untuk integrasi Kelompok 2 (misal: dosen.*)
+        foreach ($k2Modules as $module) {
+            Permission::firstOrCreate([
+                'name' => "{$module}.*",
+                'guard_name' => 'api',
+            ]);
+        }
+
+        // Special permissions Kelompok 2
         $k2SpecialPermissions = [
             '*',
             'evidence.validate',
@@ -106,8 +114,14 @@ class RoleAndPermissionSeeder extends Seeder
         ];
 
         foreach ($k2SpecialPermissions as $perm) {
-            Permission::findOrCreate($perm, 'api');
+            Permission::firstOrCreate([
+                'name' => $perm,
+                'guard_name' => 'api',
+            ]);
         }
+
+        // Reset cache Spatie agar permission baru terbaca
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Helper closures untuk membangun daftar permissions
         $crud = fn (string $module) => [
@@ -128,7 +142,7 @@ class RoleAndPermissionSeeder extends Seeder
         ];
 
         // 1. ADMINISTRATOR: Memegang kendali penuh (CRUD) ke seluruh sistem K1 & K2
-        $adminRole = Role::findOrCreate(UserRole::ADMINISTRATOR->value, 'api');
+        $adminRole = Role::firstOrCreate(['name' => UserRole::ADMINISTRATOR->value, 'guard_name' => 'api']);
         $adminRole->syncPermissions(Permission::all());
 
         // 2. KAPRODI:
@@ -190,7 +204,7 @@ class RoleAndPermissionSeeder extends Seeder
         }
         $kaprodiPermissions = array_values(array_unique(array_merge($kaprodiPermissions, $kaprodiK2Permissions)));
 
-        $kaprodiRole = Role::findOrCreate(UserRole::KAPRODI->value, 'api');
+        $kaprodiRole = Role::firstOrCreate(['name' => UserRole::KAPRODI->value, 'guard_name' => 'api']);
         $kaprodiRole->syncPermissions($kaprodiPermissions);
 
         // 3. DOSEN:
@@ -250,7 +264,7 @@ class RoleAndPermissionSeeder extends Seeder
         }
         $dosenPermissions = array_values(array_unique(array_merge($dosenPermissions, $dosenK2Permissions)));
 
-        $dosenRole = Role::findOrCreate(UserRole::DOSEN->value, 'api');
+        $dosenRole = Role::firstOrCreate(['name' => UserRole::DOSEN->value, 'guard_name' => 'api']);
         $dosenRole->syncPermissions($dosenPermissions);
 
         // 4. REVIEWER (Diakui sebagai ASESOR di K2):
@@ -303,7 +317,10 @@ class RoleAndPermissionSeeder extends Seeder
         }
         $reviewerPermissions = array_values(array_unique(array_merge($reviewerPermissions, $reviewerK2Permissions)));
 
-        $reviewerRole = Role::findOrCreate(UserRole::REVIEWER->value, 'api');
+        $reviewerRole = Role::firstOrCreate(['name' => UserRole::REVIEWER->value, 'guard_name' => 'api']);
         $reviewerRole->syncPermissions($reviewerPermissions);
+
+        // Reset cache permissions lagi di akhir
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
     }
 }
