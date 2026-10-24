@@ -216,9 +216,12 @@ Route::middleware(['auth:api'])->group(function () {
     // --- CRUD Data Nilai Mahasiswa ---
     Route::get('/nilai-mahasiswa', [NilaiMahasiswaController::class, 'index']);
     Route::post('/nilai-mahasiswa', [NilaiMahasiswaController::class, 'store']);
+    Route::post('/nilai-mahasiswa/batch', [NilaiMahasiswaController::class, 'batchStore']);
     Route::get('/nilai-mahasiswa/{id}', [NilaiMahasiswaController::class, 'show']);
     Route::put('/nilai-mahasiswa/{id}', [NilaiMahasiswaController::class, 'update']);
     Route::delete('/nilai-mahasiswa/{id}', [NilaiMahasiswaController::class, 'destroy']);
     Route::patch('/nilai-mahasiswa/{id}/link-nilai', [NilaiMahasiswaController::class, 'updateLinkNilai']);
     Route::patch('/nilai-mahasiswa/{id}/link-evidence', [NilaiMahasiswaController::class, 'updateLinkEvidence']);
+    Route::get('/mahasiswa/{id}/khs', [NilaiMahasiswaController::class, 'khs']);
+    Route::get('/mahasiswa/{id}/transkrip', [NilaiMahasiswaController::class, 'transkrip']);
 });

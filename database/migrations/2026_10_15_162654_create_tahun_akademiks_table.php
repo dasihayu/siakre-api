@@ -10,9 +10,13 @@ return new class extends Migration
     {
         Schema::create('tahun_akademik', function (Blueprint $table) {
             $table->id();
-            $table->integer('tahun');
+            $table->string('tahun', 20);
+            $table->string('semester', 20)->default('Ganjil');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
-        }); 
+
+            $table->unique(['tahun', 'semester'], 'tahun_akademik_tahun_semester_unique');
+        });
     }
 
     public function down(): void
