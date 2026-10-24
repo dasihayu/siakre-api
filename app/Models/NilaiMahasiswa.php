@@ -15,7 +15,7 @@ class NilaiMahasiswa extends Model
     protected $fillable = [
         'mata_kuliah_angkatan_kelas_id',
         'mahasiswa_id',
-        'semester',
+        'tahun_akademik_id',
         'nilai_angka',
         'nilai_huruf',
         'bobot',
@@ -24,9 +24,13 @@ class NilaiMahasiswa extends Model
     ];
 
     protected $casts = [
-        'semester' => 'integer',
+        'tahun_akademik_id' => 'integer',
         'nilai_angka' => 'float',
         'bobot' => 'float',
+    ];
+
+    protected $appends = [
+        'semester',
     ];
 
     public function mataKuliahAngkatanKelas(): BelongsTo
@@ -37,6 +41,16 @@ class NilaiMahasiswa extends Model
     public function mahasiswa(): BelongsTo
     {
         return $this->belongsTo(Mahasiswa::class, 'mahasiswa_id');
+    }
+
+    public function tahunAkademik(): BelongsTo
+    {
+        return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
+    }
+
+    public function getSemesterAttribute(): ?string
+    {
+        return $this->tahunAkademik?->semester;
     }
 
     /**

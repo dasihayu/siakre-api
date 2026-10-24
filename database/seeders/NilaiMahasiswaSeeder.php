@@ -6,6 +6,7 @@ use App\Models\EnrollmentKelas;
 use App\Models\Mahasiswa;
 use App\Models\MataKuliahAngkatanKelas;
 use App\Models\NilaiMahasiswa;
+use App\Models\TahunAkademik;
 use Illuminate\Database\Seeder;
 
 class NilaiMahasiswaSeeder extends Seeder
@@ -15,12 +16,15 @@ class NilaiMahasiswaSeeder extends Seeder
      */
     public function run(): void
     {
-        $courses = MataKuliahAngkatanKelas::all();
+        $courses = MataKuliahAngkatanKelas::with('enrollmentMataKuliah')->get();
         $allMahasiswa = Mahasiswa::all();
 
         if ($courses->isEmpty() || $allMahasiswa->isEmpty()) {
             return;
         }
+
+        $defaultTahunAkademikId = TahunAkademik::where('is_active', true)->first()?->id
+            ?? TahunAkademik::first()?->id;
 
         foreach ($courses as $course) {
             $studentIds = EnrollmentKelas::where('angkatan_kelas_id', $course->angkatan_kelas_id)
@@ -29,6 +33,8 @@ class NilaiMahasiswaSeeder extends Seeder
             if ($studentIds->isEmpty()) {
                 $studentIds = $allMahasiswa->take(3)->pluck('id');
             }
+
+            $tahunAkademikId = $course->enrollmentMataKuliah?->tahun_akademik_id ?? $defaultTahunAkademikId;
 
             foreach ($studentIds as $studentId) {
                 $nilaiAngka = fake()->randomFloat(2, 65, 95);
@@ -40,7 +46,7 @@ class NilaiMahasiswaSeeder extends Seeder
                         'mahasiswa_id' => $studentId,
                     ],
                     [
-                        'semester' => 1,
+                        'tahun_akademik_id' => $tahunAkademikId,
                         'nilai_angka' => $nilaiAngka,
                         'nilai_huruf' => $calc['nilai_huruf'],
                         'bobot' => $calc['bobot'],

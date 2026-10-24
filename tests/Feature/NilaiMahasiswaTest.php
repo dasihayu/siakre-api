@@ -27,7 +27,7 @@ function createMahasiswa(string $nim = '43325001'): Mahasiswa
 {
     return Mahasiswa::create([
         'nim' => $nim,
-        'nama_mahasiswa' => 'Mahasiswa Test ' . $nim,
+        'nama_mahasiswa' => 'Mahasiswa Test '.$nim,
         'tahun_masuk' => 2024,
         'jenis_pendaftaran' => 'Reguler',
     ]);
@@ -55,7 +55,7 @@ function createMataKuliahAngkatanKelas(): MataKuliahAngkatanKelas
         'sks' => 3,
     ]);
 
-    $ta = TahunAkademik::create(['tahun' => 2026]);
+    $ta = TahunAkademik::create(['tahun' => 2026, 'semester' => 'Ganjil', 'is_active' => true]);
     $kelas = Kelas::create(['kelas' => 'TRK-3A']);
     $angkatan = Angkatan::create(['angkatan' => 2026]);
 
@@ -85,11 +85,12 @@ test('can list all nilai mahasiswa', function () {
     $token = getAuthToken();
     $mkAk = createMataKuliahAngkatanKelas();
     $mhs = createMahasiswa();
+    $ta = $mkAk->enrollmentMataKuliah->tahunAkademik;
 
     NilaiMahasiswa::create([
         'mata_kuliah_angkatan_kelas_id' => $mkAk->id,
         'mahasiswa_id' => $mhs->id,
-        'semester' => 1,
+        'tahun_akademik_id' => $ta->id,
         'nilai_angka' => 85.50,
         'nilai_huruf' => 'A',
         'bobot' => 4.00,
@@ -115,6 +116,7 @@ test('can list all nilai mahasiswa', function () {
                     'id',
                     'mata_kuliah_angkatan_kelas_id',
                     'mahasiswa_id',
+                    'tahun_akademik_id',
                     'semester',
                     'nilai_angka',
                     'nilai_huruf',
@@ -132,11 +134,12 @@ test('can create a new nilai mahasiswa with auto calculation for nilai_huruf and
     $token = getAuthToken();
     $mkAk = createMataKuliahAngkatanKelas();
     $mhs = createMahasiswa();
+    $ta = $mkAk->enrollmentMataKuliah->tahunAkademik;
 
     $payload = [
         'mata_kuliah_angkatan_kelas_id' => $mkAk->id,
         'mahasiswa_id' => $mhs->id,
-        'semester' => 2,
+        'tahun_akademik_id' => $ta->id,
         'nilai_angka' => 85.50,
         'link_nilai' => 'https://docs.google.com/spreadsheets/d/sample-nilai',
         'link_evidence' => 'https://drive.google.com/drive/folders/sample-evidence',
@@ -153,7 +156,8 @@ test('can create a new nilai mahasiswa with auto calculation for nilai_huruf and
             'data' => [
                 'mata_kuliah_angkatan_kelas_id' => $mkAk->id,
                 'mahasiswa_id' => $mhs->id,
-                'semester' => 2,
+                'tahun_akademik_id' => $ta->id,
+                'semester' => 'Ganjil',
                 'nilai_angka' => 85.50,
                 'nilai_huruf' => 'A',
                 'bobot' => 4.00,
@@ -165,7 +169,7 @@ test('can create a new nilai mahasiswa with auto calculation for nilai_huruf and
     $this->assertDatabaseHas('nilai_mahasiswa', [
         'mata_kuliah_angkatan_kelas_id' => $mkAk->id,
         'mahasiswa_id' => $mhs->id,
-        'semester' => 2,
+        'tahun_akademik_id' => $ta->id,
         'nilai_huruf' => 'A',
     ]);
 });
@@ -174,11 +178,12 @@ test('can show single nilai mahasiswa detail', function () {
     $token = getAuthToken();
     $mkAk = createMataKuliahAngkatanKelas();
     $mhs = createMahasiswa();
+    $ta = $mkAk->enrollmentMataKuliah->tahunAkademik;
 
     $nilai = NilaiMahasiswa::create([
         'mata_kuliah_angkatan_kelas_id' => $mkAk->id,
         'mahasiswa_id' => $mhs->id,
-        'semester' => 1,
+        'tahun_akademik_id' => $ta->id,
         'nilai_angka' => 78.00,
         'nilai_huruf' => 'AB',
         'bobot' => 3.50,
@@ -198,6 +203,8 @@ test('can show single nilai mahasiswa detail', function () {
                 'id' => $nilai->id,
                 'mata_kuliah_angkatan_kelas_id' => $mkAk->id,
                 'mahasiswa_id' => $mhs->id,
+                'tahun_akademik_id' => $ta->id,
+                'semester' => 'Ganjil',
                 'nilai_angka' => 78.00,
                 'nilai_huruf' => 'AB',
             ],
@@ -208,11 +215,12 @@ test('can update existing nilai mahasiswa', function () {
     $token = getAuthToken();
     $mkAk = createMataKuliahAngkatanKelas();
     $mhs = createMahasiswa();
+    $ta = $mkAk->enrollmentMataKuliah->tahunAkademik;
 
     $nilai = NilaiMahasiswa::create([
         'mata_kuliah_angkatan_kelas_id' => $mkAk->id,
         'mahasiswa_id' => $mhs->id,
-        'semester' => 1,
+        'tahun_akademik_id' => $ta->id,
         'nilai_angka' => 70.00,
         'nilai_huruf' => 'B',
         'bobot' => 3.00,
@@ -250,11 +258,12 @@ test('can delete nilai mahasiswa', function () {
     $token = getAuthToken();
     $mkAk = createMataKuliahAngkatanKelas();
     $mhs = createMahasiswa();
+    $ta = $mkAk->enrollmentMataKuliah->tahunAkademik;
 
     $nilai = NilaiMahasiswa::create([
         'mata_kuliah_angkatan_kelas_id' => $mkAk->id,
         'mahasiswa_id' => $mhs->id,
-        'semester' => 1,
+        'tahun_akademik_id' => $ta->id,
         'nilai_angka' => 80.00,
     ]);
 
@@ -277,11 +286,12 @@ test('can update link_nilai via separate endpoint', function () {
     $token = getAuthToken();
     $mkAk = createMataKuliahAngkatanKelas();
     $mhs = createMahasiswa();
+    $ta = $mkAk->enrollmentMataKuliah->tahunAkademik;
 
     $nilai = NilaiMahasiswa::create([
         'mata_kuliah_angkatan_kelas_id' => $mkAk->id,
         'mahasiswa_id' => $mhs->id,
-        'semester' => 1,
+        'tahun_akademik_id' => $ta->id,
         'link_nilai' => null,
         'link_evidence' => 'https://drive.google.com/drive/folders/existing-evidence',
     ]);
@@ -314,11 +324,12 @@ test('can update link_evidence via separate endpoint', function () {
     $token = getAuthToken();
     $mkAk = createMataKuliahAngkatanKelas();
     $mhs = createMahasiswa();
+    $ta = $mkAk->enrollmentMataKuliah->tahunAkademik;
 
     $nilai = NilaiMahasiswa::create([
         'mata_kuliah_angkatan_kelas_id' => $mkAk->id,
         'mahasiswa_id' => $mhs->id,
-        'semester' => 1,
+        'tahun_akademik_id' => $ta->id,
         'link_nilai' => 'https://docs.google.com/spreadsheets/d/existing-nilai',
         'link_evidence' => null,
     ]);
@@ -352,10 +363,11 @@ test('can batch store nilai for multiple students in a class', function () {
     $mkAk = createMataKuliahAngkatanKelas();
     $mhs1 = createMahasiswa('43325010');
     $mhs2 = createMahasiswa('43325011');
+    $ta = $mkAk->enrollmentMataKuliah->tahunAkademik;
 
     $payload = [
         'mata_kuliah_angkatan_kelas_id' => $mkAk->id,
-        'semester' => 1,
+        'tahun_akademik_id' => $ta->id,
         'nilai' => [
             [
                 'mahasiswa_id' => $mhs1->id,
@@ -381,12 +393,14 @@ test('can batch store nilai for multiple students in a class', function () {
     $this->assertDatabaseHas('nilai_mahasiswa', [
         'mata_kuliah_angkatan_kelas_id' => $mkAk->id,
         'mahasiswa_id' => $mhs1->id,
+        'tahun_akademik_id' => $ta->id,
         'nilai_huruf' => 'A',
     ]);
 
     $this->assertDatabaseHas('nilai_mahasiswa', [
         'mata_kuliah_angkatan_kelas_id' => $mkAk->id,
         'mahasiswa_id' => $mhs2->id,
+        'tahun_akademik_id' => $ta->id,
         'nilai_huruf' => 'AB',
     ]);
 });
@@ -395,18 +409,19 @@ test('can retrieve khs and ips for a student in a semester', function () {
     $token = getAuthToken();
     $mkAk = createMataKuliahAngkatanKelas();
     $mhs = createMahasiswa('43325099');
+    $ta = $mkAk->enrollmentMataKuliah->tahunAkademik;
 
     NilaiMahasiswa::create([
         'mata_kuliah_angkatan_kelas_id' => $mkAk->id,
         'mahasiswa_id' => $mhs->id,
-        'semester' => 1,
+        'tahun_akademik_id' => $ta->id,
         'nilai_angka' => 85.00,
         'nilai_huruf' => 'A',
         'bobot' => 4.00,
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
-        ->getJson("/api/mahasiswa/{$mhs->id}/khs?semester=1");
+        ->getJson("/api/mahasiswa/{$mhs->id}/khs?semester=Ganjil");
 
     $response->assertStatus(200)
         ->assertJson([
@@ -418,7 +433,7 @@ test('can retrieve khs and ips for a student in a semester', function () {
                     'id' => $mhs->id,
                     'nim' => $mhs->nim,
                 ],
-                'semester' => 1,
+                'semester' => 'Ganjil',
                 'total_sks' => 3,
                 'ips' => 4.00,
             ],
@@ -429,11 +444,12 @@ test('can retrieve cumulative transcript and ipk for a student', function () {
     $token = getAuthToken();
     $mkAk = createMataKuliahAngkatanKelas();
     $mhs = createMahasiswa('43325088');
+    $ta = $mkAk->enrollmentMataKuliah->tahunAkademik;
 
     NilaiMahasiswa::create([
         'mata_kuliah_angkatan_kelas_id' => $mkAk->id,
         'mahasiswa_id' => $mhs->id,
-        'semester' => 1,
+        'tahun_akademik_id' => $ta->id,
         'nilai_angka' => 85.00,
         'nilai_huruf' => 'A',
         'bobot' => 4.00,
@@ -462,11 +478,12 @@ test('validates link_nilai on separate update endpoint', function () {
     $token = getAuthToken();
     $mkAk = createMataKuliahAngkatanKelas();
     $mhs = createMahasiswa();
+    $ta = $mkAk->enrollmentMataKuliah->tahunAkademik;
 
     $nilai = NilaiMahasiswa::create([
         'mata_kuliah_angkatan_kelas_id' => $mkAk->id,
         'mahasiswa_id' => $mhs->id,
-        'semester' => 1,
+        'tahun_akademik_id' => $ta->id,
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
@@ -480,11 +497,12 @@ test('validates link_evidence on separate update endpoint', function () {
     $token = getAuthToken();
     $mkAk = createMataKuliahAngkatanKelas();
     $mhs = createMahasiswa();
+    $ta = $mkAk->enrollmentMataKuliah->tahunAkademik;
 
     $nilai = NilaiMahasiswa::create([
         'mata_kuliah_angkatan_kelas_id' => $mkAk->id,
         'mahasiswa_id' => $mhs->id,
-        'semester' => 1,
+        'tahun_akademik_id' => $ta->id,
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")

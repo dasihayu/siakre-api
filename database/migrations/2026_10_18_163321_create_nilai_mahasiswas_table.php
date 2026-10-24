@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('mata_kuliah_angkatan_kelas_id')->constrained('mata_kuliah_angkatan_kelas')->onDelete('cascade');
             $table->foreignId('mahasiswa_id')->constrained('data_mahasiswa')->onDelete('cascade');
-            $table->unsignedTinyInteger('semester')->default(1);
+            $table->foreignId('tahun_akademik_id')->constrained('tahun_akademik')->onDelete('cascade');
             $table->decimal('nilai_angka', 5, 2)->nullable();
             $table->string('nilai_huruf', 5)->nullable();
             $table->decimal('bobot', 3, 2)->nullable();
