@@ -13,16 +13,20 @@ class TahunAkademikSeeder extends Seeder
     public function run(): void
     {
         $data = [
-            ['tahun' => '2021', 'semester' => 'Ganjil', 'is_active' => false],
-            ['tahun' => '2022', 'semester' => 'Genap', 'is_active' => false],
-            ['tahun' => '2023', 'semester' => 'Ganjil', 'is_active' => false],
-            ['tahun' => '2024', 'semester' => 'Genap', 'is_active' => false],
-            ['tahun' => '2025', 'semester' => 'Ganjil', 'is_active' => true],
-            ['tahun' => '2026', 'semester' => 'Genap', 'is_active' => true],
+            ['tahun' => '2022/2023', 'semester' => 'Ganjil', 'is_active' => false],
+            ['tahun' => '2022/2023', 'semester' => 'Genap', 'is_active' => false],
+            ['tahun' => '2023/2024', 'semester' => 'Ganjil', 'is_active' => false],
+            ['tahun' => '2023/2024', 'semester' => 'Genap', 'is_active' => false],
+            ['tahun' => '2024/2025', 'semester' => 'Ganjil', 'is_active' => false],
+            ['tahun' => '2024/2025', 'semester' => 'Genap', 'is_active' => false],
+            ['tahun' => '2025/2026', 'semester' => 'Ganjil', 'is_active' => false],
+            ['tahun' => '2025/2026', 'semester' => 'Genap', 'is_active' => false],
+            ['tahun' => '2026/2027', 'semester' => 'Ganjil', 'is_active' => true],
+            ['tahun' => '2026/2027', 'semester' => 'Genap', 'is_active' => false],
         ];
 
         foreach ($data as $item) {
-            TahunAkademik::firstOrCreate(
+            TahunAkademik::updateOrCreate(
                 ['tahun' => $item['tahun'], 'semester' => $item['semester']],
                 $item
             );

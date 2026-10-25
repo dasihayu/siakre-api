@@ -13,8 +13,6 @@ class AngkatanSeeder extends Seeder
     public function run(): void
     {
         $data = [
-            ['angkatan' => 2021],
-            ['angkatan' => 2022],
             ['angkatan' => 2023],
             ['angkatan' => 2024],
             ['angkatan' => 2025],
@@ -22,7 +20,7 @@ class AngkatanSeeder extends Seeder
         ];
 
         foreach ($data as $item) {
-            Angkatan::firstOrCreate(['angkatan' => $item['angkatan']], $item);
+            Angkatan::updateOrCreate(['angkatan' => $item['angkatan']], $item);
         }
     }
 }
