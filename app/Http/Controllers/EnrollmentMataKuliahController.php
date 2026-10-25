@@ -14,15 +14,7 @@ class EnrollmentMataKuliahController extends Controller
         $query = EnrollmentMataKuliah::with(['tahunAkademik', 'mataKuliah']);
 
         if ($request->filled('mata_kuliah_id')) {
-            $mkId = $request->query('mata_kuliah_id');
-            $query->where('mata_kuliah_id', $mkId);
-
-            if (! $request->filled('tahun_akademik_id')) {
-                $targetTaId = self::resolveActiveTahunAkademikIdForCourse($mkId);
-                if ($targetTaId) {
-                    $query->where('tahun_akademik_id', $targetTaId);
-                }
-            }
+            $query->where('mata_kuliah_id', $request->query('mata_kuliah_id'));
         }
 
         if ($request->filled('tahun_akademik_id')) {

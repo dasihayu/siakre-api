@@ -22,17 +22,10 @@ class MataKuliahAngkatanKelasController extends Controller
 
         if ($request->filled('mata_kuliah_id')) {
             $mkId = $request->query('mata_kuliah_id');
-            $targetTaId = $request->filled('tahun_akademik_id')
-                ? (int) $request->query('tahun_akademik_id')
-                : EnrollmentMataKuliahController::resolveActiveTahunAkademikIdForCourse($mkId);
+            $query->whereHas('enrollmentMataKuliah', fn ($q) => $q->where('mata_kuliah_id', $mkId));
+        }
 
-            $query->whereHas('enrollmentMataKuliah', function ($q) use ($mkId, $targetTaId) {
-                $q->where('mata_kuliah_id', $mkId);
-                if ($targetTaId) {
-                    $q->where('tahun_akademik_id', $targetTaId);
-                }
-            });
-        } elseif ($request->filled('tahun_akademik_id')) {
+        if ($request->filled('tahun_akademik_id')) {
             $taId = (int) $request->query('tahun_akademik_id');
             $query->whereHas('angkatanKelas', fn ($q) => $q->where('tahun_akademik_id', $taId));
         }
