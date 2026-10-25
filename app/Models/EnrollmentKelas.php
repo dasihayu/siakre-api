@@ -32,4 +32,9 @@ class EnrollmentKelas extends Model
     {
         return $this->belongsTo(Prodi::class, 'prodi_id');
     }
+
+    public function statusMahasiswa()
+    {
+        return $this->hasOne(StatusMahasiswa::class, 'id_enrollment_mahasiswa_angkatan_kelas');
+    }
 }

@@ -10,9 +10,31 @@ use Illuminate\Http\Request;
 
 class AngkatanKelasController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = AngkatanKelas::with(['kelas', 'angkatan', 'prodi', 'tahunAkademik'])->get();
+        $query = AngkatanKelas::with(['kelas', 'angkatan', 'prodi', 'tahunAkademik'])
+            ->withCount([
+                'enrollmentKelas as jumlah_mahasiswa',
+                'mataKuliahAngkatanKelas as jumlah_mata_kuliah',
+            ]);
+
+        if ($request->filled('tahun_akademik_id')) {
+            $query->where('tahun_akademik_id', $request->query('tahun_akademik_id'));
+        }
+
+        if ($request->filled('kelas_id')) {
+            $query->where('kelas_id', $request->query('kelas_id'));
+        }
+
+        if ($request->filled('angkatan_id')) {
+            $query->where('angkatan_id', $request->query('angkatan_id'));
+        }
+
+        if ($request->filled('prodi_id')) {
+            $query->where('prodi_id', $request->query('prodi_id'));
+        }
+
+        $data = $query->get();
 
         return ApiResponse::success($data, 'Berhasil mengambil data Angkatan Kelas');
     }

@@ -8,9 +8,28 @@ use Illuminate\Http\Request;
 
 class EnrollmentKelasController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = EnrollmentKelas::with(['mahasiswa', 'angkatanKelas', 'prodi'])->get();
+        $query = EnrollmentKelas::with([
+            'mahasiswa:id,nim,nama_mahasiswa,tahun_masuk,jenis_pendaftaran,tanggal_kelulusan,masa_studi_bulan',
+            'angkatanKelas:id,kelas_id,angkatan_id,prodi_id,tahun_akademik_id',
+            'prodi:id,kode_prodi,nama_prodi',
+        ]);
+
+        if ($request->filled('angkatan_kelas_id')) {
+            $query->where('angkatan_kelas_id', $request->query('angkatan_kelas_id'));
+        }
+
+        if ($request->filled('id_mahasiswa')) {
+            $query->where('id_mahasiswa', $request->query('id_mahasiswa'));
+        }
+
+        if ($request->filled('tahun_akademik_id')) {
+            $taId = $request->query('tahun_akademik_id');
+            $query->whereHas('angkatanKelas', fn ($q) => $q->where('tahun_akademik_id', $taId));
+        }
+
+        $data = $query->get();
 
         return ApiResponse::success($data, 'Berhasil mengambil data Enrollment Mahasiswa');
     }

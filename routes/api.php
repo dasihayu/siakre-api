@@ -142,6 +142,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/tahun-akademik', [TahunAkademikController::class, 'index']);
     Route::post('/tahun-akademik', [TahunAkademikController::class, 'store']);
     Route::get('/tahun-akademik/{id}', [TahunAkademikController::class, 'show']);
+    Route::get('/tahun-akademik/{id}/kelas', [TahunAkademikController::class, 'kelas']);
     Route::put('/tahun-akademik/{id}', [TahunAkademikController::class, 'update']);
     Route::delete('/tahun-akademik/{id}', [TahunAkademikController::class, 'destroy']);
 
