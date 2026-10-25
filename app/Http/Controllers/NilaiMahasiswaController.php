@@ -26,22 +26,25 @@ class NilaiMahasiswaController extends Controller
     public function index(Request $request)
     {
         $query = NilaiMahasiswa::with([
-            'mataKuliahAngkatanKelas.enrollmentMataKuliah.mataKuliah',
-            'mataKuliahAngkatanKelas.enrollmentMataKuliah.tahunAkademik',
-            'mataKuliahAngkatanKelas.angkatanKelas.kelas',
-            'mahasiswa',
-            'tahunAkademik',
+            'mataKuliahAngkatanKelas:id,enrollment_mata_kuliah_id,angkatan_kelas_id',
+            'mataKuliahAngkatanKelas.enrollmentMataKuliah:id,mata_kuliah_id,tahun_akademik_id,dosen_id,evidence',
+            'mataKuliahAngkatanKelas.enrollmentMataKuliah.mataKuliah:id,id_kurikulum,kode_mata_kuliah,nama_mata_kuliah,sks',
+            'mataKuliahAngkatanKelas.enrollmentMataKuliah.tahunAkademik:id,tahun,semester,is_active',
+            'mataKuliahAngkatanKelas.angkatanKelas:id,kelas_id,angkatan_id,prodi_id,tahun_akademik_id',
+            'mataKuliahAngkatanKelas.angkatanKelas.kelas:id,kelas',
+            'mahasiswa:id,nim,nama_mahasiswa,tahun_masuk,jenis_pendaftaran,tanggal_kelulusan,masa_studi_bulan',
+            'tahunAkademik:id,tahun,semester,is_active',
         ]);
 
-        if ($request->has('mata_kuliah_angkatan_kelas_id')) {
+        if ($request->filled('mata_kuliah_angkatan_kelas_id')) {
             $query->where('mata_kuliah_angkatan_kelas_id', $request->query('mata_kuliah_angkatan_kelas_id'));
         }
 
-        if ($request->has('mahasiswa_id')) {
+        if ($request->filled('mahasiswa_id')) {
             $query->where('mahasiswa_id', $request->query('mahasiswa_id'));
         }
 
-        if ($request->has('tahun_akademik_id')) {
+        if ($request->filled('tahun_akademik_id')) {
             $query->where('tahun_akademik_id', $request->query('tahun_akademik_id'));
         }
 
@@ -52,7 +55,21 @@ class NilaiMahasiswaController extends Controller
             });
         }
 
-        if ($request->has('semester')) {
+        if ($request->filled('angkatan_kelas_id')) {
+            $angkatanKelasId = $request->query('angkatan_kelas_id');
+            $query->whereHas('mataKuliahAngkatanKelas', function ($q) use ($angkatanKelasId) {
+                $q->where('angkatan_kelas_id', $angkatanKelasId);
+            });
+        }
+
+        if ($request->filled('kelas_id')) {
+            $kelasId = $request->query('kelas_id');
+            $query->whereHas('mataKuliahAngkatanKelas.angkatanKelas', function ($q) use ($kelasId) {
+                $q->where('kelas_id', $kelasId);
+            });
+        }
+
+        if ($request->filled('semester')) {
             $semester = $request->query('semester');
             $semesterVal = match (strtolower((string) $semester)) {
                 '1', '3', '5', '7', 'ganjil', 'gasal' => 'Ganjil',
@@ -65,7 +82,39 @@ class NilaiMahasiswaController extends Controller
             });
         }
 
-        $nilai = $query->get();
+        if ($request->filled('search')) {
+            $keyword = trim((string) $request->query('search'));
+            $nimDigits = preg_replace('/\D+/', '', $keyword);
+
+            $query->where(function ($q) use ($keyword, $nimDigits) {
+                $q->whereHas('mahasiswa', function ($mq) use ($keyword, $nimDigits) {
+                    $mq->where('nama_mahasiswa', 'like', "%{$keyword}%");
+                    if ($nimDigits !== '') {
+                        $mq->orWhere('nim', 'like', "%{$nimDigits}%");
+                    }
+                })->orWhereHas('mataKuliahAngkatanKelas.enrollmentMataKuliah.mataKuliah', function ($mkq) use ($keyword) {
+                    $mkq->where('nama_mata_kuliah', 'like', "%{$keyword}%")
+                        ->orWhere('kode_mata_kuliah', 'like', "%{$keyword}%");
+                });
+            });
+        }
+
+        $hasScopedFilter = $request->filled('mata_kuliah_angkatan_kelas_id')
+            || $request->filled('mahasiswa_id')
+            || $request->filled('mata_kuliah_id')
+            || $request->filled('angkatan_kelas_id');
+
+        if ($request->filled('per_page')) {
+            $perPage = min(500, max(1, (int) $request->query('per_page', 25)));
+
+            return ApiResponse::success($query->paginate($perPage), 'Daftar nilai mahasiswa berhasil diambil');
+        }
+
+        if (! $hasScopedFilter) {
+            return ApiResponse::success($query->paginate(25), 'Daftar nilai mahasiswa berhasil diambil');
+        }
+
+        $nilai = $query->limit(500)->get();
 
         return ApiResponse::success($nilai, 'Daftar nilai mahasiswa berhasil diambil');
     }

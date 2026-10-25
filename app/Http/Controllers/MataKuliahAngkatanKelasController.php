@@ -2,15 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ApiResponse;
 use App\Models\MataKuliahAngkatanKelas;
 use Illuminate\Http\Request;
-use App\Helpers\ApiResponse;
 
 class MataKuliahAngkatanKelasController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = MataKuliahAngkatanKelas::with(['enrollmentMataKuliah', 'angkatanKelas'])->get();
+        $query = MataKuliahAngkatanKelas::with(['enrollmentMataKuliah', 'angkatanKelas']);
+
+        if ($request->filled('angkatan_kelas_id')) {
+            $query->where('angkatan_kelas_id', $request->query('angkatan_kelas_id'));
+        }
+
+        if ($request->filled('enrollment_mata_kuliah_id')) {
+            $query->where('enrollment_mata_kuliah_id', $request->query('enrollment_mata_kuliah_id'));
+        }
+
+        if ($request->filled('mata_kuliah_id')) {
+            $mkId = $request->query('mata_kuliah_id');
+            $query->whereHas('enrollmentMataKuliah', fn ($q) => $q->where('mata_kuliah_id', $mkId));
+        }
+
+        $data = $query->get();
+
         return ApiResponse::success($data, 'Berhasil mengambil data Mata Kuliah Angkatan Kelas');
     }
 
@@ -18,39 +34,47 @@ class MataKuliahAngkatanKelasController extends Controller
     {
         $request->validate([
             'enrollment_mata_kuliah_id' => 'required|exists:enrollment_mata_kuliah,id',
-            'angkatan_kelas_id'         => 'required|exists:angkatan_kelas,id',
+            'angkatan_kelas_id' => 'required|exists:angkatan_kelas,id',
         ]);
 
         $data = MataKuliahAngkatanKelas::create($request->all());
+
         return ApiResponse::success($data, 'Berhasil menambahkan data', 201);
     }
 
     public function show(string $id)
     {
         $data = MataKuliahAngkatanKelas::with(['enrollmentMataKuliah', 'angkatanKelas'])->find($id);
+
         return $data ? ApiResponse::success($data, 'Berhasil mengambil detail data') : ApiResponse::error('Data tidak ditemukan', 404);
     }
 
     public function update(Request $request, string $id)
     {
         $data = MataKuliahAngkatanKelas::find($id);
-        if (!$data) return ApiResponse::error('Data tidak ditemukan', 404);
+        if (! $data) {
+            return ApiResponse::error('Data tidak ditemukan', 404);
+        }
 
         $request->validate([
             'enrollment_mata_kuliah_id' => 'required|exists:enrollment_mata_kuliah,id',
-            'angkatan_kelas_id'         => 'required|exists:angkatan_kelas,id',
+            'angkatan_kelas_id' => 'required|exists:angkatan_kelas,id',
         ]);
 
         $data->update($request->all());
+
         return ApiResponse::success($data, 'Berhasil mengupdate data');
     }
 
     public function destroy(string $id)
     {
         $data = MataKuliahAngkatanKelas::find($id);
-        if (!$data) return ApiResponse::error('Data tidak ditemukan', 404);
-        
+        if (! $data) {
+            return ApiResponse::error('Data tidak ditemukan', 404);
+        }
+
         $data->delete();
+
         return ApiResponse::success(null, 'Berhasil menghapus data');
     }
 }
