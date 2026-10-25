@@ -60,7 +60,9 @@ class MahasiswaSeeder extends Seeder
 
         $jalurOptions = ['SNBP', 'SNBT', 'Mandiri', 'Reguler'];
 
-        // Angkatan: 2026 (26), 2025 (25), 2024 (24), 2023 (23)
+        // Angkatan 2019..2026:
+        // - 2023..2026: Mahasiswa aktif pada TA 2026/2027 (Tingkat 4..Tingkat 1)
+        // - 2019..2022: Mahasiswa yang mengisi kelas pada TA 2022/2023 s/d 2025/2026 dan telah lulus
         // Kelas: 0 = A, 1 = B, 2 = C
         // Absen: 01 s.d. 25
         $angkatans = [
@@ -68,12 +70,20 @@ class MahasiswaSeeder extends Seeder
             2025 => 25,
             2024 => 24,
             2023 => 23,
+            2022 => 22,
+            2021 => 21,
+            2020 => 20,
+            2019 => 19,
         ];
 
         $records = [];
         $counter = 0;
 
         foreach ($angkatans as $tahunMasuk => $aa) {
+            $tanggalKelulusan = $tahunMasuk <= 2022
+                ? sprintf('%d-08-25', $tahunMasuk + 4)
+                : null;
+
             for ($b = 0; $b <= 2; $b++) {
                 for ($cc = 1; $cc <= 25; $cc++) {
                     $nim = (int) sprintf('433%02d%d%02d', $aa, $b, $cc);
@@ -94,7 +104,7 @@ class MahasiswaSeeder extends Seeder
                         'nama_mahasiswa' => $nama,
                         'tahun_masuk' => $tahunMasuk,
                         'jenis_pendaftaran' => $jalur,
-                        'tanggal_kelulusan' => null,
+                        'tanggal_kelulusan' => $tanggalKelulusan,
                         'masa_studi_bulan' => 48,
                         'created_at' => $now,
                         'updated_at' => $now,
@@ -105,7 +115,7 @@ class MahasiswaSeeder extends Seeder
             }
         }
 
-        foreach (array_chunk($records, 100) as $chunk) {
+        foreach (array_chunk($records, 150) as $chunk) {
             Mahasiswa::upsert(
                 $chunk,
                 ['nim'],

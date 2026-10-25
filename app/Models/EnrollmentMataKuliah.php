@@ -28,4 +28,9 @@ class EnrollmentMataKuliah extends Model
     {
         return $this->belongsTo(MataKuliah::class, 'mata_kuliah_id');
     }
+
+    public function dosen()
+    {
+        return $this->belongsTo(User::class, 'dosen_id');
+    }
 }

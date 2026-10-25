@@ -16,6 +16,7 @@ class NilaiMahasiswaSeeder extends Seeder
      * - Angkatan 2025 (Tingkat 2 Semester 1): 2 (hanya Tingkat 1 Sem 1 & Tingkat 1 Sem 2)
      * - Angkatan 2024 (Tingkat 3 Semester 1): 4 (Tingkat 1 Sem 1-2 & Tingkat 2 Sem 1-2)
      * - Angkatan 2023 (Tingkat 4 Semester 1): 6 (Tingkat 1 Sem 1-2, Tingkat 2 Sem 1-2, Tingkat 3 Sem 1-2)
+     * - Angkatan 2019..2022 (Alumni): 8 (seluruh semester telah selesai)
      *
      * @return array<int, int>
      */
@@ -26,6 +27,10 @@ class NilaiMahasiswaSeeder extends Seeder
             2025 => 2,
             2024 => 4,
             2023 => 6,
+            2022 => 8,
+            2021 => 8,
+            2020 => 8,
+            2019 => 8,
         ];
     }
 
@@ -47,6 +52,8 @@ class NilaiMahasiswaSeeder extends Seeder
         }
 
         $maxGradedSemByAngkatan = self::getMaxGradedSemesterByAngkatan();
+        NilaiMahasiswa::query()->delete();
+
         $now = now();
         $records = [];
 
@@ -91,12 +98,8 @@ class NilaiMahasiswaSeeder extends Seeder
             }
         }
 
-        foreach (array_chunk($records, 500) as $chunk) {
-            NilaiMahasiswa::upsert(
-                $chunk,
-                ['mata_kuliah_angkatan_kelas_id', 'mahasiswa_id'],
-                ['tahun_akademik_id', 'nilai_angka', 'nilai_huruf', 'bobot', 'updated_at']
-            );
+        foreach (array_chunk($records, 1000) as $chunk) {
+            NilaiMahasiswa::insert($chunk);
         }
     }
 }

@@ -39,4 +39,9 @@ class Mahasiswa extends Model
     {
         return $this->hasMany(NilaiMahasiswa::class, 'mahasiswa_id');
     }
+
+    public function prestasiMahasiswa(): HasMany
+    {
+        return $this->hasMany(PrestasiMahasiswa::class, 'id_mahasiswa');
+    }
 }

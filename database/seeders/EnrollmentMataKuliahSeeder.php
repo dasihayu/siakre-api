@@ -24,6 +24,14 @@ class EnrollmentMataKuliahSeeder extends Seeder
     }
 
     /**
+     * Hitung tingkat kelas (1..4) dari nomor semester kurikulum (1..8).
+     */
+    public static function extractTingkatFromSemester(int $sem): int
+    {
+        return max(1, min(4, intdiv($sem + 1, 2)));
+    }
+
+    /**
      * Hitung tahun akademik (misal '2025/2026') dan semester ('Ganjil'/'Genap')
      * saat suatu angkatan menempuh semester kurikulum ke-$sem (1..8).
      *
@@ -41,23 +49,10 @@ class EnrollmentMataKuliahSeeder extends Seeder
     }
 
     /**
-     * Batas semester kurikulum maksimal yang telah/sedang ditempuh tiap angkatan
-     * pada posisi saat ini (Tahun Akademik aktif: 2026/2027 Ganjil).
-     *
-     * @return array<int, int>
-     */
-    public static function getMaxEnrolledSemesterByAngkatan(): array
-    {
-        return [
-            2026 => 1, // Tingkat 1 Semester 1
-            2025 => 3, // Tingkat 2 Semester 1 (Sem 3)
-            2024 => 5, // Tingkat 3 Semester 1 (Sem 5)
-            2023 => 8, // Tingkat 4 Semester 1 (Sem 7 & penawaran Sem 8)
-        ];
-    }
-
-    /**
      * Run the database seeds.
+     *
+     * Setiap Tahun Akademik Ganjil menawarkan mata kuliah Semester 1, 3, 5, 7 (untuk Tingkat 1..4),
+     * dan setiap Tahun Akademik Genap menawarkan mata kuliah Semester 2, 4, 6, 8 (untuk Tingkat 1..4).
      */
     public function run(): void
     {
@@ -70,24 +65,15 @@ class EnrollmentMataKuliahSeeder extends Seeder
             return;
         }
 
-        $taMap = $allTa->keyBy(fn (TahunAkademik $ta) => "{$ta->tahun}|{$ta->semester}");
-        $maxSemByAngkatan = self::getMaxEnrolledSemesterByAngkatan();
-
         foreach ($allMatkul as $index => $mk) {
             $sem = self::extractSemesterFromKode($mk->kode_mata_kuliah);
+            $expectedJenisSemester = ($sem % 2 === 1) ? 'Ganjil' : 'Genap';
             $dosen = $dosens->isNotEmpty()
                 ? $dosens[$index % $dosens->count()]
                 : $defaultDosen;
 
-            foreach ($maxSemByAngkatan as $angkatan => $maxSem) {
-                if ($sem > $maxSem) {
-                    continue;
-                }
-
-                $taInfo = self::resolveTahunAkademikForCohort($angkatan, $sem);
-                $ta = $taMap->get("{$taInfo['tahun']}|{$taInfo['semester']}");
-
-                if (! $ta) {
+            foreach ($allTa as $ta) {
+                if ($ta->semester !== $expectedJenisSemester) {
                     continue;
                 }
 

@@ -22,6 +22,10 @@ class TahunAkademik extends Model
         'is_active' => 'boolean',
     ];
 
+    protected $appends = [
+        'nama_tahun_akademik',
+    ];
+
     public function nilaiMahasiswa(): HasMany
     {
         return $this->hasMany(NilaiMahasiswa::class, 'tahun_akademik_id');
