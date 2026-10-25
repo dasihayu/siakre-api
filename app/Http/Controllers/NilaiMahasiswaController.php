@@ -8,6 +8,7 @@ use App\Models\Mahasiswa;
 use App\Models\MataKuliahAngkatanKelas;
 use App\Models\NilaiMahasiswa;
 use App\Models\TahunAkademik;
+use App\Services\AkademikCalculatorService;
 use App\Services\SpreadsheetService;
 use Exception;
 use Illuminate\Http\Request;
@@ -18,6 +19,7 @@ class NilaiMahasiswaController extends Controller
     public function __construct(
         protected SpreadsheetService $spreadsheetService
     ) {}
+
     /**
      * Menampilkan seluruh data nilai mahasiswa (bisa difilter per kelas, mahasiswa, atau semester).
      */
@@ -300,7 +302,7 @@ class NilaiMahasiswaController extends Controller
         try {
             $rows = $this->spreadsheetService->parse($file);
         } catch (Exception $e) {
-            return ApiResponse::error('Gagal membaca file: ' . $e->getMessage(), 422);
+            return ApiResponse::error('Gagal membaca file: '.$e->getMessage(), 422);
         }
 
         if (empty($rows)) {
@@ -327,12 +329,14 @@ class NilaiMahasiswaController extends Controller
 
                 if ($nim === '') {
                     $errors[] = "Baris {$rowNum}: Kolom NIM wajib diisi.";
+
                     continue;
                 }
 
                 $mahasiswa = Mahasiswa::where('nim', $nim)->first();
                 if (! $mahasiswa) {
                     $errors[] = "Baris {$rowNum}: Mahasiswa dengan NIM '{$nim}' tidak terdaftar di sistem.";
+
                     continue;
                 }
 
@@ -356,13 +360,14 @@ class NilaiMahasiswaController extends Controller
                             });
 
                         if ($fallbackTahunAkademikId) {
-                            $mkQuery->whereHas('enrollmentMataKuliah', fn($q) => $q->where('tahun_akademik_id', $fallbackTahunAkademikId));
+                            $mkQuery->whereHas('enrollmentMataKuliah', fn ($q) => $q->where('tahun_akademik_id', $fallbackTahunAkademikId));
                         }
 
                         $mkAk = $mkQuery->first();
 
                         if (! $mkAk) {
                             $errors[] = "Baris {$rowNum}: Tidak ditemukan kelas '{$namaKelas}' untuk mata kuliah '{$kodeMk}'.";
+
                             continue;
                         }
                     }
@@ -374,6 +379,7 @@ class NilaiMahasiswaController extends Controller
 
                 if (! $mkAk) {
                     $errors[] = "Baris {$rowNum}: Kelas dan mata kuliah tidak dapat diidentifikasi (isi kolom 'kode_mata_kuliah' & 'kelas', atau tentukan kelas pada form).";
+
                     continue;
                 }
 
@@ -401,10 +407,12 @@ class NilaiMahasiswaController extends Controller
                 if (isset($processedInBatch[$batchKey])) {
                     if ($duplicateAction === 'fail') {
                         $errors[] = "Baris {$rowNum}: Terdapat duplikasi data untuk NIM '{$nim}' pada mata kuliah & kelas yang sama dalam file.";
+
                         continue;
                     } elseif ($duplicateAction === 'skip') {
                         $skippedCount++;
                         $warnings[] = "Baris {$rowNum}: Duplikasi NIM '{$nim}' dalam file, baris kedua dilewati.";
+
                         continue;
                     } else {
                         $warnings[] = "Baris {$rowNum}: Duplikasi NIM '{$nim}' dalam file, data diperbarui dengan baris terbaru.";
@@ -419,10 +427,12 @@ class NilaiMahasiswaController extends Controller
                 if ($existingNilai) {
                     if ($duplicateAction === 'fail') {
                         $errors[] = "Baris {$rowNum}: Nilai untuk NIM '{$nim}' sudah ada di database.";
+
                         continue;
                     } elseif ($duplicateAction === 'skip') {
                         $skippedCount++;
                         $warnings[] = "Baris {$rowNum}: Nilai NIM '{$nim}' sudah terdaftar sebelumnya di database, dilewati.";
+
                         continue;
                     } else {
                         $existingNilai->update([
@@ -434,6 +444,7 @@ class NilaiMahasiswaController extends Controller
                             'link_evidence' => $linkEvidence ?: $existingNilai->link_evidence,
                         ]);
                         $updatedCount++;
+
                         continue;
                     }
                 }
@@ -474,7 +485,7 @@ class NilaiMahasiswaController extends Controller
         } catch (Exception $e) {
             DB::rollBack();
 
-            return ApiResponse::error('Terjadi kesalahan saat memproses data import: ' . $e->getMessage(), 500);
+            return ApiResponse::error('Terjadi kesalahan saat memproses data import: '.$e->getMessage(), 500);
         }
     }
 
@@ -594,6 +605,7 @@ class NilaiMahasiswaController extends Controller
 
     /**
      * Menampilkan Kartu Hasil Studi (KHS) mahasiswa per semester.
+     * Menggunakan rumus baku: IP = SUM(SKS_i * Bobot_i) / SUM(SKS_i).
      */
     public function khs(Request $request, string $id)
     {
@@ -630,16 +642,13 @@ class NilaiMahasiswaController extends Controller
 
         $nilaiList = $query->get();
 
-        $totalSks = 0;
-        $totalBobotSks = 0;
+        $calc = AkademikCalculatorService::hitungIP($nilaiList);
 
-        $items = $nilaiList->map(function ($item) use (&$totalSks, &$totalBobotSks) {
+        $items = $nilaiList->map(function ($item) {
             $mk = $item->mataKuliahAngkatanKelas?->enrollmentMataKuliah?->mataKuliah;
             $sks = $mk?->sks ?? 0;
             $bobot = $item->bobot ?? 0;
-
-            $totalSks += $sks;
-            $totalBobotSks += ($sks * $bobot);
+            $kredit = round($sks * $bobot, 2);
 
             return [
                 'id' => $item->id,
@@ -651,13 +660,12 @@ class NilaiMahasiswaController extends Controller
                 'sks' => $sks,
                 'nilai_angka' => $item->nilai_angka,
                 'nilai_huruf' => $item->nilai_huruf,
-                'bobot' => $item->bobot,
+                'bobot' => $bobot,
+                'kredit' => $kredit,
                 'link_nilai' => $item->link_nilai,
                 'link_evidence' => $item->link_evidence,
             ];
         });
-
-        $ips = $totalSks > 0 ? round($totalBobotSks / $totalSks, 2) : 0;
 
         return ApiResponse::success([
             'mahasiswa' => [
@@ -667,16 +675,61 @@ class NilaiMahasiswaController extends Controller
             ],
             'tahun_akademik_id' => $tahunAkademikId ? (int) $tahunAkademikId : null,
             'semester' => $semester ?? 'Semua',
-            'total_sks' => $totalSks,
-            'ips' => $ips,
+            'total_sks' => $calc['total_sks'],
+            'total_kredit' => $calc['total_kredit'],
+            'ip' => $calc['ip'],
+            'ips' => $calc['ip'],
             'daftar_nilai' => $items,
         ], 'Kartu Hasil Studi (KHS) berhasil diambil');
     }
 
     /**
      * Menampilkan Transkrip Nilai Kumulatif mahasiswa.
+     * Menggunakan rumus baku: IPK = SUM(SKS_i * Bobot_i) / SUM(SKS_i).
+     * Mendukung evaluasi mata kuliah mengulang (rule_mengulang: 'terbaik' / 'terbaru' / 'semua').
      */
-    public function transkrip(string $id)
+    public function transkrip(Request $request, string $id)
+    {
+        $mahasiswa = Mahasiswa::find($id);
+
+        if (! $mahasiswa) {
+            return ApiResponse::error('Data mahasiswa tidak ditemukan', 404);
+        }
+
+        $ruleMengulang = $request->query('rule_mengulang', 'terbaik');
+
+        $nilaiList = NilaiMahasiswa::with([
+            'mataKuliahAngkatanKelas.enrollmentMataKuliah.mataKuliah',
+            'mataKuliahAngkatanKelas.enrollmentMataKuliah.tahunAkademik',
+            'tahunAkademik',
+        ])
+            ->where('mahasiswa_id', $id)
+            ->get()
+            ->sortBy([
+                ['tahunAkademik.tahun', 'asc'],
+                ['tahunAkademik.semester', 'asc'],
+            ]);
+
+        $ipkResult = AkademikCalculatorService::hitungIPK($nilaiList, $ruleMengulang);
+
+        return ApiResponse::success([
+            'mahasiswa' => [
+                'id' => $mahasiswa->id,
+                'nim' => $mahasiswa->nim,
+                'nama' => $mahasiswa->nama_mahasiswa,
+            ],
+            'total_sks' => $ipkResult['total_sks'],
+            'total_kredit' => $ipkResult['total_kredit'],
+            'ipk' => $ipkResult['ipk'],
+            'rule_mengulang' => $ruleMengulang,
+            'daftar_nilai' => $ipkResult['items'],
+        ], 'Transkrip nilai mahasiswa berhasil diambil');
+    }
+
+    /**
+     * Menampilkan ringkasan perkembangan akademik per semester (IP tiap semester dan IPK kumulatif).
+     */
+    public function ringkasanAkademik(string $id)
     {
         $mahasiswa = Mahasiswa::find($id);
 
@@ -696,44 +749,58 @@ class NilaiMahasiswaController extends Controller
                 ['tahunAkademik.semester', 'asc'],
             ]);
 
-        $totalSks = 0;
-        $totalBobotSks = 0;
+        $grouped = $nilaiList->groupBy('tahun_akademik_id');
 
-        $items = $nilaiList->map(function ($item) use (&$totalSks, &$totalBobotSks) {
-            $mk = $item->mataKuliahAngkatanKelas?->enrollmentMataKuliah?->mataKuliah;
-            $sks = $mk?->sks ?? 0;
-            $bobot = $item->bobot ?? 0;
+        $riwayatSemester = [];
+        $runningItems = [];
+        $semesterKe = 1;
 
-            $totalSks += $sks;
-            $totalBobotSks += ($sks * $bobot);
+        foreach ($grouped as $taId => $itemsInSemester) {
+            $ta = $itemsInSemester->first()?->tahunAkademik;
+            $namaPeriode = $ta ? "{$ta->tahun} - {$ta->semester}" : "Periode ID {$taId}";
 
-            return [
-                'id' => $item->id,
-                'tahun_akademik_id' => $item->tahun_akademik_id,
-                'tahun_akademik' => $item->tahunAkademik?->tahun,
-                'semester' => $item->semester,
-                'kode_mata_kuliah' => $mk?->kode_mata_kuliah,
-                'nama_mata_kuliah' => $mk?->nama_mata_kuliah,
-                'sks' => $sks,
-                'nilai_angka' => $item->nilai_angka,
-                'nilai_huruf' => $item->nilai_huruf,
-                'bobot' => $item->bobot,
-                'link_nilai' => $item->link_nilai,
-                'link_evidence' => $item->link_evidence,
+            $calcSemester = AkademikCalculatorService::hitungIP($itemsInSemester);
+
+            foreach ($itemsInSemester as $item) {
+                $runningItems[] = $item;
+            }
+
+            $calcKumulatif = AkademikCalculatorService::hitungIPK($runningItems, 'terbaik');
+
+            $riwayatSemester[] = [
+                'semester_ke' => $semesterKe++,
+                'tahun_akademik_id' => $taId,
+                'tahun' => $ta?->tahun,
+                'semester' => $ta?->semester,
+                'nama_periode' => $namaPeriode,
+                'sks_semester' => $calcSemester['total_sks'],
+                'kredit_semester' => $calcSemester['total_kredit'],
+                'ip_semester' => $calcSemester['ip'],
+                'sks_kumulatif' => $calcKumulatif['total_sks'],
+                'kredit_kumulatif' => $calcKumulatif['total_kredit'],
+                'ipk_kumulatif' => $calcKumulatif['ipk'],
             ];
-        })->values();
+        }
 
-        $ipk = $totalSks > 0 ? round($totalBobotSks / $totalSks, 2) : 0;
+        $overallIpk = AkademikCalculatorService::hitungIPK($nilaiList, 'terbaik');
 
         return ApiResponse::success([
             'mahasiswa' => [
                 'id' => $mahasiswa->id,
                 'nim' => $mahasiswa->nim,
                 'nama' => $mahasiswa->nama_mahasiswa,
+                'tahun_masuk' => $mahasiswa->tahun_masuk,
             ],
-            'total_sks' => $totalSks,
-            'ipk' => $ipk,
-            'daftar_nilai' => $items,
-        ], 'Transkrip nilai mahasiswa berhasil diambil');
+            'total_sks' => $overallIpk['total_sks'],
+            'total_kredit' => $overallIpk['total_kredit'],
+            'ipk' => $overallIpk['ipk'],
+            'predikat' => match (true) {
+                $overallIpk['ipk'] >= 3.51 => 'Dengan Pujian (Cum Laude)',
+                $overallIpk['ipk'] >= 3.01 => 'Sangat Memuaskan',
+                $overallIpk['ipk'] >= 2.76 => 'Memuaskan',
+                default => 'Cukup',
+            },
+            'perkembangan_semester' => $riwayatSemester,
+        ], 'Ringkasan akademik mahasiswa berhasil diambil');
     }
 }

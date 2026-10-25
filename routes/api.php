@@ -226,4 +226,5 @@ Route::middleware(['auth:api'])->group(function () {
     Route::patch('/nilai-mahasiswa/{id}/link-evidence', [NilaiMahasiswaController::class, 'updateLinkEvidence']);
     Route::get('/mahasiswa/{id}/khs', [NilaiMahasiswaController::class, 'khs']);
     Route::get('/mahasiswa/{id}/transkrip', [NilaiMahasiswaController::class, 'transkrip']);
+    Route::get('/mahasiswa/{id}/ringkasan-akademik', [NilaiMahasiswaController::class, 'ringkasanAkademik']);
 });
