@@ -146,12 +146,15 @@ class RoleAndPermissionSeeder extends Seeder
         $adminRole->syncPermissions(Permission::all());
 
         // 2. KAPRODI:
-        // K1: Merancang standar akademik (CRUD Kurikulum, CPL, Mata Kuliah, Pivot Matkul-CPL; Read-Only lainnya)
+        // K1: Merancang standar akademik & mengelola perkuliahan/nilai (CRUD Kurikulum, CPL, Mata Kuliah, Pivot Matkul-CPL, Matkul Angkatan Kelas, Enrollment Matkul, Nilai Mahasiswa; Read-Only lainnya)
         $kaprodiK1ModulesCrud = [
             'mata_kuliah',
             'kurikulum',
             'cpl',
             'mata_kuliah_cpl',
+            'mata_kuliah_angkatan_kelas',
+            'enrollment_mata_kuliah',
+            'nilai_mahasiswa',
         ];
 
         $kaprodiK1ModulesRead = [
@@ -165,14 +168,11 @@ class RoleAndPermissionSeeder extends Seeder
             'mahasiswa',
             'status_mahasiswa',
             'kegiatan_mahasiswa',
-            'nilai_mahasiswa',
             'prestasi_mahasiswa',
             'evidence_prestasi_mahasiswa',
             'jenis_prestasi',
             'angkatan_kelas',
             'enrollment_kelas',
-            'enrollment_mata_kuliah',
-            'mata_kuliah_angkatan_kelas',
             'dosen',
         ];
 
@@ -258,7 +258,10 @@ class RoleAndPermissionSeeder extends Seeder
             'dashboard.read',
         ];
 
-        $dosenPermissions = $cru('nilai_mahasiswa');
+        $dosenPermissions = array_merge(
+            $crud('nilai_mahasiswa'),
+            ['enrollment_mata_kuliah.update']
+        );
         foreach ($dosenK1ModulesRead as $m) {
             $dosenPermissions = array_merge($dosenPermissions, $readOnly($m));
         }

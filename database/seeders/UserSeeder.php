@@ -16,6 +16,44 @@ class UserSeeder extends Seeder
     {
         $password = Hash::make('password');
 
+        $pimpinanPermissions = [
+            // K1 Read-Only
+            'perguruan_tinggi.read',
+            'prodi.read',
+            'kelas.read',
+            'upps.read',
+            'anggota_upps.read',
+            'mata_kuliah.read',
+            'tahun_akademik.read',
+            'angkatan.read',
+            'kurikulum.read',
+            'cpl.read',
+            'mata_kuliah_cpl.read',
+            'mahasiswa.read',
+            'status_mahasiswa.read',
+            'kegiatan_mahasiswa.read',
+            'nilai_mahasiswa.read',
+            'prestasi_mahasiswa.read',
+            'evidence_prestasi_mahasiswa.read',
+            'jenis_prestasi.read',
+            'angkatan_kelas.read',
+            'enrollment_kelas.read',
+            'enrollment_mata_kuliah.read',
+            'mata_kuliah_angkatan_kelas.read',
+            // K2 Pimpinan (Tanpa evidence.validate)
+            'dosen.read',
+            'kriteria.read',
+            'kegiatan.read',
+            'luaran.read',
+            'kerjasama.read',
+            'evidence.read',
+            'assessment.read',
+            'assessment.run',
+            'dashboard.read',
+            'led.read',
+            'lkps.read',
+        ];
+
         // Akun Pengguna Sesuai Spesifikasi Integrasi SSO K1 ➔ K2
         $users = [
             // 1. Super Admin
@@ -127,37 +165,13 @@ class UserSeeder extends Seeder
                 'name' => 'Direktur Politeknik Negeri Semarang',
                 'email' => 'pimpinan@polines.ac.id',
                 'role' => UserRole::REVIEWER,
-                'direct_permissions' => [
-                    'dosen.read',
-                    'kriteria.read',
-                    'kegiatan.read',
-                    'luaran.read',
-                    'kerjasama.read',
-                    'evidence.read',
-                    'assessment.read',
-                    'assessment.run',
-                    'dashboard.read',
-                    'led.read',
-                    'lkps.read',
-                ],
+                'direct_permissions' => $pimpinanPermissions,
             ],
             [
                 'name' => 'Pimpinan Eksekutif SSO',
                 'email' => 'pimpinan@example.com',
                 'role' => UserRole::REVIEWER,
-                'direct_permissions' => [
-                    'dosen.read',
-                    'kriteria.read',
-                    'kegiatan.read',
-                    'luaran.read',
-                    'kerjasama.read',
-                    'evidence.read',
-                    'assessment.read',
-                    'assessment.run',
-                    'dashboard.read',
-                    'led.read',
-                    'lkps.read',
-                ],
+                'direct_permissions' => $pimpinanPermissions,
             ],
         ];
 
