@@ -21,38 +21,16 @@ class UppsSeeder extends Seeder
             return;
         }
 
-        $uppsList = [
+        Upps::updateOrCreate(
+            ['kode_upps' => 'UPPS01'],
             [
                 'id_pt' => $pt->id,
                 'kode_upps' => 'UPPS01',
-                'nama_upps' => 'Jurusan Teknik Elektro',
+                'nama_upps' => 'UPPS TRK',
                 'pimpinan_upps' => 'Dr. Amin Suharjono, S.T., M.T.',
                 'prodi_id' => $prodi->id,
                 'jenis' => 'Jurusan',
-            ],
-            [
-                'id_pt' => $pt->id,
-                'kode_upps' => 'UPPS02',
-                'nama_upps' => 'Jurusan Teknik Mesin',
-                'pimpinan_upps' => 'Hartono, S.T., M.T.',
-                'prodi_id' => $prodi->id,
-                'jenis' => 'Jurusan',
-            ],
-            [
-                'id_pt' => $pt->id,
-                'kode_upps' => 'UPPS03',
-                'nama_upps' => 'Jurusan Teknik Sipil',
-                'pimpinan_upps' => 'Dwi Yanuar, S.T., M.T.',
-                'prodi_id' => $prodi->id,
-                'jenis' => 'Jurusan',
-            ],
-        ];
-
-        foreach ($uppsList as $item) {
-            Upps::firstOrCreate(
-                ['kode_upps' => $item['kode_upps']],
-                $item
-            );
-        }
+            ]
+        );
     }
 }

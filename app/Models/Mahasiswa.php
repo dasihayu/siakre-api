@@ -21,6 +21,20 @@ class Mahasiswa extends Model
         'masa_studi_bulan',
     ];
 
+    protected $appends = [
+        'nim_display',
+    ];
+
+    public function getNimDisplayAttribute(): string
+    {
+        $raw = (string) $this->nim;
+        if (preg_match('/^(\d)(\d{2})(\d{2})(\d)(\d{2})$/', $raw, $m)) {
+            return "{$m[1]}.{$m[2]}.{$m[3]}.{$m[4]}.{$m[5]}";
+        }
+
+        return $raw;
+    }
+
     public function nilaiMahasiswa(): HasMany
     {
         return $this->hasMany(NilaiMahasiswa::class, 'mahasiswa_id');

@@ -14,8 +14,11 @@ class KegiatanMahasiswaSeeder extends Seeder
      */
     public function run(): void
     {
-        $ta2024 = TahunAkademik::where('tahun', 2024)->first() ?? TahunAkademik::first();
-        if (! $ta2024) {
+        $taDefault = TahunAkademik::where('tahun', '2025/2026')->where('semester', 'Ganjil')->first()
+            ?? TahunAkademik::where('is_active', true)->first()
+            ?? TahunAkademik::first();
+
+        if (! $taDefault) {
             return;
         }
 
@@ -26,8 +29,8 @@ class KegiatanMahasiswaSeeder extends Seeder
                 'jenis_kegiatan' => 'Organisasi',
                 'peran' => 'Ketua Divisi',
                 'tingkat' => 'Polines',
-                'tanggal_mulai' => '2024-02-01',
-                'tanggal_selesai' => '2024-12-20',
+                'tanggal_mulai' => '2025-09-01',
+                'tanggal_selesai' => '2026-06-20',
                 'penyelenggara' => 'HME Polines',
                 'status_validasi' => 'Disetujui',
             ],
@@ -37,8 +40,8 @@ class KegiatanMahasiswaSeeder extends Seeder
                 'jenis_kegiatan' => 'Lomba',
                 'peran' => 'Ketua Tim',
                 'tingkat' => 'Nasional',
-                'tanggal_mulai' => '2024-05-10',
-                'tanggal_selesai' => '2024-05-12',
+                'tanggal_mulai' => '2025-10-10',
+                'tanggal_selesai' => '2025-10-12',
                 'penyelenggara' => 'Kemendikbudristek',
                 'status_validasi' => 'Disetujui',
             ],
@@ -48,8 +51,8 @@ class KegiatanMahasiswaSeeder extends Seeder
                 'jenis_kegiatan' => 'Seminar',
                 'peran' => 'Peserta',
                 'tingkat' => 'Regional',
-                'tanggal_mulai' => '2024-03-15',
-                'tanggal_selesai' => '2024-03-16',
+                'tanggal_mulai' => '2025-11-15',
+                'tanggal_selesai' => '2025-11-16',
                 'penyelenggara' => 'GDG Semarang',
                 'status_validasi' => 'Disetujui',
             ],
@@ -59,8 +62,8 @@ class KegiatanMahasiswaSeeder extends Seeder
                 'jenis_kegiatan' => 'Pelatihan',
                 'peran' => 'Peserta',
                 'tingkat' => 'Nasional',
-                'tanggal_mulai' => '2024-07-01',
-                'tanggal_selesai' => '2024-07-05',
+                'tanggal_mulai' => '2026-02-01',
+                'tanggal_selesai' => '2026-02-05',
                 'penyelenggara' => 'BSSN',
                 'status_validasi' => 'Disetujui',
             ],
@@ -70,8 +73,8 @@ class KegiatanMahasiswaSeeder extends Seeder
                 'jenis_kegiatan' => 'UKM',
                 'peran' => 'Anggota Tim',
                 'tingkat' => 'Polines',
-                'tanggal_mulai' => '2024-01-10',
-                'tanggal_selesai' => '2024-11-30',
+                'tanggal_mulai' => '2025-09-10',
+                'tanggal_selesai' => '2026-05-30',
                 'penyelenggara' => 'UKM Robotika Polines',
                 'status_validasi' => 'Disetujui',
             ],
@@ -81,42 +84,31 @@ class KegiatanMahasiswaSeeder extends Seeder
                 'jenis_kegiatan' => 'Pengabdian',
                 'peran' => 'Koordinator Lapangan',
                 'tingkat' => 'Regional',
-                'tanggal_mulai' => '2024-08-01',
-                'tanggal_selesai' => '2024-08-20',
+                'tanggal_mulai' => '2026-03-01',
+                'tanggal_selesai' => '2026-03-20',
                 'penyelenggara' => 'P3M Polines',
                 'status_validasi' => 'Disetujui',
             ],
             [
-                'nim' => 43325007,
+                'nim' => 43324001,
                 'nama_kegiatan' => 'Program Magang Industri Otomasi IoT Terapan',
                 'jenis_kegiatan' => 'Magang',
                 'peran' => 'Peserta Magang',
                 'tingkat' => 'Nasional',
-                'tanggal_mulai' => '2024-09-01',
-                'tanggal_selesai' => '2025-01-31',
+                'tanggal_mulai' => '2025-09-01',
+                'tanggal_selesai' => '2026-01-31',
                 'penyelenggara' => 'PT Telkom Indonesia',
                 'status_validasi' => 'Disetujui',
             ],
             [
-                'nim' => 43325008,
-                'nama_kegiatan' => 'Turnamen E-Sport Championship Polines',
-                'jenis_kegiatan' => 'UKM',
-                'peran' => 'Ketua Tim',
-                'tingkat' => 'Polines',
-                'tanggal_mulai' => '2024-02-01',
-                'tanggal_selesai' => '2024-02-15',
-                'penyelenggara' => 'BEM Polines',
-                'status_validasi' => 'Disetujui',
-            ],
-            [
-                'nim' => 33424101,
-                'nama_kegiatan' => 'Turnamen Mobile Legends',
-                'jenis_kegiatan' => 'UKM',
-                'peran' => 'Ketua Tim',
-                'tingkat' => 'Polines',
-                'tanggal_mulai' => '2024-02-01',
-                'tanggal_selesai' => '2024-06-30',
-                'penyelenggara' => 'BEM Polines',
+                'nim' => 43323001,
+                'nama_kegiatan' => 'Riset Terapan Sistem Cerdas Berbasis Edge Computing',
+                'jenis_kegiatan' => 'Penelitian',
+                'peran' => 'Asisten Peneliti',
+                'tingkat' => 'Nasional',
+                'tanggal_mulai' => '2025-08-01',
+                'tanggal_selesai' => '2026-01-15',
+                'penyelenggara' => 'P3M Polines',
                 'status_validasi' => 'Disetujui',
             ],
         ];
@@ -127,14 +119,14 @@ class KegiatanMahasiswaSeeder extends Seeder
                 continue;
             }
 
-            KegiatanMahasiswa::firstOrCreate(
+            KegiatanMahasiswa::updateOrCreate(
                 [
                     'mahasiswa_id' => $mhs->id,
                     'nama_kegiatan' => $act['nama_kegiatan'],
                 ],
                 [
                     'mahasiswa_id' => $mhs->id,
-                    'tahun_akademik_id' => $ta2024->id,
+                    'tahun_akademik_id' => $taDefault->id,
                     'nama_kegiatan' => $act['nama_kegiatan'],
                     'jenis_kegiatan' => $act['jenis_kegiatan'],
                     'peran' => $act['peran'],

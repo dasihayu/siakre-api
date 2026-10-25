@@ -13,7 +13,7 @@ class CplSeeder extends Seeder
      */
     public function run(): void
     {
-        $kurikulum = Kurikulum::where('nama_kurikulum', 'Kurikulum Merdeka TRK 2024')->first() ?? Kurikulum::first();
+        $kurikulum = Kurikulum::where('nama_kurikulum', 'Kurikulum Sarjana Terapan Teknologi Rekayasa Komputer')->first() ?? Kurikulum::first();
 
         if (! $kurikulum) {
             return;
@@ -22,48 +22,48 @@ class CplSeeder extends Seeder
         $cpls = [
             [
                 'kode_cpl' => 'CPL-01',
-                'deskripsi_cpl' => 'Bertakwa kepada Tuhan YME dan mampu menunjukkan sikap religius serta etika moral profesi rekayasa.',
+                'deskripsi_cpl' => 'Bertakwa kepada Tuhan Yang Maha Esa, menjunjung tinggi nilai kemanusiaan, Pancasila, kewarganegaraan, serta etika profesi di bidang teknologi rekayasa komputer.',
                 'kategori' => 'Sikap',
             ],
             [
                 'kode_cpl' => 'CPL-02',
-                'deskripsi_cpl' => 'Menunjukkan sikap disiplin, berintegritas, dan bertanggung jawab atas pekerjaan di bidang teknologi rekayasa komputer.',
+                'deskripsi_cpl' => 'Menunjukkan sikap disiplin, tanggung jawab, kerja sama tim, dan semangat kewirausahaan teknologi (IT Preneur).',
                 'kategori' => 'Sikap',
             ],
             [
                 'kode_cpl' => 'CPL-03',
-                'deskripsi_cpl' => 'Menguasai konsep teoretis matematika terapan, sains komputasi, serta arsitektur dan organisasi sistem komputer.',
+                'deskripsi_cpl' => 'Menguasai konsep teoretis matematika terapan, algoritma, struktur data, serta arsitektur dan organisasi sistem komputer.',
                 'kategori' => 'Pengetahuan',
             ],
             [
                 'kode_cpl' => 'CPL-04',
-                'deskripsi_cpl' => 'Menguasai prinsip dasar rekayasa perangkat lunak, sistem cerdas, dan keamanan infrastruktur siber.',
+                'deskripsi_cpl' => 'Menguasai metodologi analisis dan perancangan perangkat lunak, sistem cerdas, manajemen proyek, dan sistem informasi enterprise (IT Analyst).',
                 'kategori' => 'Pengetahuan',
             ],
             [
                 'kode_cpl' => 'CPL-05',
-                'deskripsi_cpl' => 'Mampu menerapkan pemikiran logis, kritis, sistematis, dan inovatif dalam implementasi solusi komputasi terapan.',
+                'deskripsi_cpl' => 'Mampu menerapkan pemikiran logis, kritis, sistematis, dan inovatif dalam rekayasa terapan serta penulisan karya ilmiah.',
                 'kategori' => 'Keterampilan Umum',
             ],
             [
                 'kode_cpl' => 'CPL-06',
-                'deskripsi_cpl' => 'Mampu merancang, mengimplementasikan, dan menguji embedded system serta arsitektur Internet of Things (IoT).',
+                'deskripsi_cpl' => 'Mampu membangun dan mengevaluasi perangkat lunak multiplatform (Web, Mobile, Visual, Game, dan Multimedia) secara terintegrasi (Software Engineer).',
                 'kategori' => 'Keterampilan Khusus',
             ],
             [
                 'kode_cpl' => 'CPL-07',
-                'deskripsi_cpl' => 'Mampu merancang arsitektur dan membangun aplikasi perangkat lunak skala industri berbasis Web, Mobile, dan API.',
+                'deskripsi_cpl' => 'Mampu merancang dan mengimplementasikan konektivitas jaringan komputer, keamanan siber, komputasi awan, sistem tertanam, IoT, dan automasi industri (Network & Cloud Engineer).',
                 'kategori' => 'Keterampilan Khusus',
             ],
             [
                 'kode_cpl' => 'CPL-08',
-                'deskripsi_cpl' => 'Mampu mengonfigurasi, menganalisis performa, dan memitigasi celah keamanan jaringan komputer tingkat lanjut.',
+                'deskripsi_cpl' => 'Mampu mengelola dan menganalisis data skala besar, teks, dan citra menggunakan teknik pembelajaran mesin serta kecerdasan buatan (Data Analysts & Scientists).',
                 'kategori' => 'Keterampilan Khusus',
             ],
         ];
 
         foreach ($cpls as $item) {
-            Cpl::firstOrCreate(
+            Cpl::updateOrCreate(
                 ['kode_cpl' => $item['kode_cpl']],
                 array_merge($item, ['id_kurikulum' => $kurikulum->id])
             );

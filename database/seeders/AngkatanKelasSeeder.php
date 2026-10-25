@@ -12,46 +12,61 @@ use Illuminate\Database\Seeder;
 class AngkatanKelasSeeder extends Seeder
 {
     /**
+     * Mapping antara nama kelas dan tahun angkatan.
+     *
+     * @return array<string, int>
+     */
+    public static function getKelasAngkatanMap(): array
+    {
+        return [
+            'TI-1A' => 2026,
+            'TI-1B' => 2026,
+            'TI-1C' => 2026,
+            'TI-2A' => 2025,
+            'TI-2B' => 2025,
+            'TI-2C' => 2025,
+            'TI-3A' => 2024,
+            'TI-3B' => 2024,
+            'TI-3C' => 2024,
+            'TI-4A' => 2023,
+            'TI-4B' => 2023,
+            'TI-4C' => 2023,
+        ];
+    }
+
+    /**
      * Run the database seeds.
      */
     public function run(): void
     {
         $prodiTrk = Prodi::where('kode_prodi', 'PR01')->first() ?? Prodi::first();
-        $prodiTi = Prodi::where('kode_prodi', 'PR02')->first() ?? $prodiTrk;
-        $ta2024 = TahunAkademik::where('tahun', 2024)->first() ?? TahunAkademik::first();
+        $taActive = TahunAkademik::where('tahun', '2026/2027')->where('semester', 'Ganjil')->first()
+            ?? TahunAkademik::where('is_active', true)->first()
+            ?? TahunAkademik::first();
 
-        if (! $prodiTrk || ! $ta2024) {
+        if (! $prodiTrk || ! $taActive) {
             return;
         }
 
-        $combinations = [
-            ['kelas' => 'TRK-1A', 'angkatan' => 2024, 'prodi' => $prodiTrk->id],
-            ['kelas' => 'TRK-1B', 'angkatan' => 2024, 'prodi' => $prodiTrk->id],
-            ['kelas' => 'TRK-2A', 'angkatan' => 2023, 'prodi' => $prodiTrk->id],
-            ['kelas' => 'TRK-2B', 'angkatan' => 2023, 'prodi' => $prodiTrk->id],
-            ['kelas' => 'TRK-3A', 'angkatan' => 2022, 'prodi' => $prodiTrk->id],
-            ['kelas' => 'TRK-4A', 'angkatan' => 2021, 'prodi' => $prodiTrk->id],
-            ['kelas' => 'TI-1A', 'angkatan' => 2024, 'prodi' => $prodiTi->id],
-            ['kelas' => 'TI-2A', 'angkatan' => 2023, 'prodi' => $prodiTi->id],
-        ];
+        $kelasMap = Kelas::pluck('id', 'kelas');
+        $angkatanMap = Angkatan::pluck('id', 'angkatan');
 
-        foreach ($combinations as $combo) {
-            $kelas = Kelas::where('kelas', $combo['kelas'])->first();
-            $angkatan = Angkatan::where('angkatan', $combo['angkatan'])->first();
+        foreach (self::getKelasAngkatanMap() as $namaKelas => $tahunAngkatan) {
+            $kelasId = $kelasMap->get($namaKelas);
+            $angkatanId = $angkatanMap->get($tahunAngkatan);
 
-            if ($kelas && $angkatan) {
-                AngkatanKelas::firstOrCreate(
+            if ($kelasId && $angkatanId) {
+                AngkatanKelas::updateOrCreate(
                     [
-                        'kelas_id' => $kelas->id,
-                        'angkatan_id' => $angkatan->id,
-                        'prodi_id' => $combo['prodi'],
-                        'tahun_akademik_id' => $ta2024->id,
+                        'kelas_id' => $kelasId,
+                        'angkatan_id' => $angkatanId,
+                        'prodi_id' => $prodiTrk->id,
                     ],
                     [
-                        'kelas_id' => $kelas->id,
-                        'angkatan_id' => $angkatan->id,
-                        'prodi_id' => $combo['prodi'],
-                        'tahun_akademik_id' => $ta2024->id,
+                        'kelas_id' => $kelasId,
+                        'angkatan_id' => $angkatanId,
+                        'prodi_id' => $prodiTrk->id,
+                        'tahun_akademik_id' => $taActive->id,
                     ]
                 );
             }

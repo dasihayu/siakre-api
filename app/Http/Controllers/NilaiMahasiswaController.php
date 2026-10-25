@@ -45,6 +45,13 @@ class NilaiMahasiswaController extends Controller
             $query->where('tahun_akademik_id', $request->query('tahun_akademik_id'));
         }
 
+        if ($request->filled('mata_kuliah_id')) {
+            $mataKuliahId = $request->query('mata_kuliah_id');
+            $query->whereHas('mataKuliahAngkatanKelas.enrollmentMataKuliah', function ($q) use ($mataKuliahId) {
+                $q->where('mata_kuliah_id', $mataKuliahId);
+            });
+        }
+
         if ($request->has('semester')) {
             $semester = $request->query('semester');
             $semesterVal = match (strtolower((string) $semester)) {
@@ -333,7 +340,10 @@ class NilaiMahasiswaController extends Controller
                     continue;
                 }
 
-                $mahasiswa = Mahasiswa::where('nim', $nim)->first();
+                $cleanNim = preg_replace('/\D/', '', $nim);
+                $mahasiswa = Mahasiswa::where('nim', $nim)
+                    ->when($cleanNim !== '' && $cleanNim !== $nim, fn ($q) => $q->orWhere('nim', $cleanNim))
+                    ->first();
                 if (! $mahasiswa) {
                     $errors[] = "Baris {$rowNum}: Mahasiswa dengan NIM '{$nim}' tidak terdaftar di sistem.";
 
