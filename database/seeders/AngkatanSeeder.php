@@ -12,7 +12,7 @@ class AngkatanSeeder extends Seeder
      */
     public function run(): void
     {
-        $years = [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
+        $years = [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
 
         foreach ($years as $year) {
             Angkatan::updateOrCreate(

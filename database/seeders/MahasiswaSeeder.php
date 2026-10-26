@@ -60,11 +60,11 @@ class MahasiswaSeeder extends Seeder
 
         $jalurOptions = ['SNBP', 'SNBT', 'Mandiri', 'Reguler'];
 
-        // Angkatan 2019..2026:
+        // Angkatan 2018..2026:
         // - 2023..2026: Mahasiswa aktif pada TA 2026/2027 (Tingkat 4..Tingkat 1)
-        // - 2019..2022: Mahasiswa yang mengisi kelas pada TA 2022/2023 s/d 2025/2026 dan telah lulus
+        // - 2018..2022: Mahasiswa yang lulus pada 2022 s/d 2026 dengan variasi kelulusan & drop out
         // Kelas: 0 = A, 1 = B, 2 = C
-        // Absen: 01 s.d. 25
+        // Absen: 01 s.d. 25 (total 75 per angkatan)
         $angkatans = [
             2026 => 26,
             2025 => 25,
@@ -74,19 +74,58 @@ class MahasiswaSeeder extends Seeder
             2021 => 21,
             2020 => 20,
             2019 => 19,
+            2018 => 18,
+        ];
+
+        // Profil kelulusan per angkatan (on_time, late 54 bln, drop out)
+        // Menghasilkan persentase kelulusan tepat waktu akurat sesuai standar & tren Figma:
+        // 2018 (lulus 2022): 55/75 = 73%
+        // 2019 (lulus 2023): 66/75 = 88%
+        // 2020 (lulus 2024): 58/75 = 77%
+        // 2021 (lulus 2025): 65/75 = 87%
+        // 2022 (lulus 2026): 64/75 = 85%
+        $cohortProfiles = [
+            2018 => ['on_time' => 55, 'late' => 5, 'do' => 15],
+            2019 => ['on_time' => 66, 'late' => 4, 'do' => 5],
+            2020 => ['on_time' => 58, 'late' => 6, 'do' => 11],
+            2021 => ['on_time' => 65, 'late' => 5, 'do' => 5],
+            2022 => ['on_time' => 64, 'late' => 4, 'do' => 7],
+            2023 => ['on_time' => 0, 'late' => 0, 'do' => 3],
+            2024 => ['on_time' => 0, 'late' => 0, 'do' => 2],
+            2025 => ['on_time' => 0, 'late' => 0, 'do' => 1],
+            2026 => ['on_time' => 0, 'late' => 0, 'do' => 0],
         ];
 
         $records = [];
         $counter = 0;
 
         foreach ($angkatans as $tahunMasuk => $aa) {
-            $tanggalKelulusan = $tahunMasuk <= 2022
-                ? sprintf('%d-08-25', $tahunMasuk + 4)
-                : null;
+            $profile = $cohortProfiles[$tahunMasuk] ?? ['on_time' => 60, 'late' => 5, 'do' => 10];
 
             for ($b = 0; $b <= 2; $b++) {
                 for ($cc = 1; $cc <= 25; $cc++) {
+                    $studentIndex = ($b * 25) + ($cc - 1); // 0..74
                     $nim = (int) sprintf('433%02d%d%02d', $aa, $b, $cc);
+
+                    if ($tahunMasuk <= 2022) {
+                        if ($studentIndex < $profile['on_time']) {
+                            // Lulus tepat waktu (48 bulan)
+                            $tanggalKelulusan = sprintf('%d-08-25', $tahunMasuk + 4);
+                            $masaStudi = 48;
+                        } elseif ($studentIndex < ($profile['on_time'] + $profile['late'])) {
+                            // Lulus terlambat (54 bulan)
+                            $tanggalKelulusan = sprintf('%d-02-25', $tahunMasuk + 5);
+                            $masaStudi = 54;
+                        } else {
+                            // Drop out / tidak lulus
+                            $tanggalKelulusan = null;
+                            $masaStudi = 0;
+                        }
+                    } else {
+                        // Mahasiswa yang masih aktif menempuh perkuliahan
+                        $tanggalKelulusan = null;
+                        $masaStudi = 0;
+                    }
 
                     if (isset($presetStudents[$nim])) {
                         $nama = $presetStudents[$nim]['nama'];
@@ -105,7 +144,7 @@ class MahasiswaSeeder extends Seeder
                         'tahun_masuk' => $tahunMasuk,
                         'jenis_pendaftaran' => $jalur,
                         'tanggal_kelulusan' => $tanggalKelulusan,
-                        'masa_studi_bulan' => 48,
+                        'masa_studi_bulan' => $masaStudi,
                         'created_at' => $now,
                         'updated_at' => $now,
                     ];

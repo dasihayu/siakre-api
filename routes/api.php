@@ -109,6 +109,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/mata-kuliah/{mataKuliahId}/cpl/sync', [MataKuliahCplController::class, 'sync']);
 
     // --- CRUD Data Mahasiswa ---
+    Route::get('/mahasiswa/tren', [MahasiswaController::class, 'tren']);
     Route::get('/mahasiswa', [MahasiswaController::class, 'index']);
     Route::post('/mahasiswa', [MahasiswaController::class, 'store']);
     Route::get('/mahasiswa/{id}', [MahasiswaController::class, 'show']);
