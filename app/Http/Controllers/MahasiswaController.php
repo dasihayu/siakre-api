@@ -49,9 +49,13 @@ class MahasiswaController extends Controller
         ], 'Berhasil mengambil tren IPK dan kelulusan');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $data = Mahasiswa::all();
+        $request->validate([
+            'kategori' => ['nullable', 'string', 'in:baru,transfer,asing'],
+        ]);
+
+        $data = Mahasiswa::kategori($request->query('kategori'))->get();
 
         return ApiResponse::success($data, 'Berhasil mengambil data Mahasiswa');
     }
