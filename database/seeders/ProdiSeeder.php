@@ -18,6 +18,11 @@ class ProdiSeeder extends Seeder
                 'kode_prodi' => 'PR01',
                 'nama_prodi' => 'Teknologi Rekayasa Komputer',
                 'akreditasi' => 'Unggul',
+                'jenjang' => 'D4',
+                'sk_pendirian' => 'SK/POLINES/TRK/001',
+                'tanggal_sk_pendirian' => '2020-01-15',
+                'status_akreditasi' => 'Terakreditasi Unggul',
+                'masa_berlaku_akreditasi' => '2028-12-31',
             ]
         );
     }
