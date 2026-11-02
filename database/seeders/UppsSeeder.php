@@ -21,7 +21,7 @@ class UppsSeeder extends Seeder
             return;
         }
 
-        Upps::updateOrCreate(
+        $upps = Upps::updateOrCreate(
             ['kode_upps' => 'UPPS01'],
             [
                 'id_pt' => $pt->id,
@@ -32,5 +32,10 @@ class UppsSeeder extends Seeder
                 'jenis' => 'Jurusan',
             ]
         );
+
+        // Hubungkan prodi ke UPPS melalui id_upps
+        if ($prodi && ! $prodi->id_upps) {
+            $prodi->update(['id_upps' => $upps->id]);
+        }
     }
 }

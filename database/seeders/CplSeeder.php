@@ -64,7 +64,10 @@ class CplSeeder extends Seeder
 
         foreach ($cpls as $item) {
             Cpl::updateOrCreate(
-                ['kode_cpl' => $item['kode_cpl']],
+                [
+                    'id_kurikulum' => $kurikulum->id,
+                    'kode_cpl' => $item['kode_cpl'],
+                ],
                 array_merge($item, ['id_kurikulum' => $kurikulum->id])
             );
         }
