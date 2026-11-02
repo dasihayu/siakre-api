@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -33,6 +34,20 @@ class Mahasiswa extends Model
         }
 
         return $raw;
+    }
+
+    /**
+     * Scope a query to filter mahasiswa by kategori (jenis_pendaftaran).
+     *
+     * Nilai yang valid: baru, transfer, asing
+     */
+    public function scopeKategori(Builder $query, ?string $kategori): Builder
+    {
+        if ($kategori === null) {
+            return $query;
+        }
+
+        return $query->where('jenis_pendaftaran', $kategori);
     }
 
     public function nilaiMahasiswa(): HasMany

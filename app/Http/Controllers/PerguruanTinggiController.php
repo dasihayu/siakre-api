@@ -2,84 +2,75 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ApiResponse;
+use App\Http\Requests\PerguruanTinggi\StorePerguruanTinggiRequest;
+use App\Http\Requests\PerguruanTinggi\UpdatePerguruanTinggiRequest;
+use App\Http\Resources\PerguruanTinggiResource;
 use App\Models\PerguruanTinggi;
-use Illuminate\Http\Request;
-use App\Helpers\ApiResponse; 
+use App\Models\Upps;
 
 class PerguruanTinggiController extends Controller
 {
-    // Tampil semua data (Read)
+    /** Tampil semua data (Read) */
     public function index()
     {
-        $data = PerguruanTinggi::all();
+        $data = PerguruanTinggiResource::collection(PerguruanTinggi::all());
+
         return ApiResponse::success($data, 'Berhasil mengambil data');
     }
 
-    // Tambah data (Create)
-    public function store(Request $request)
+    /** Tambah data (Create) */
+    public function store(StorePerguruanTinggiRequest $request)
     {
-        $request->validate([
-            'kode_pt' => 'required|string',
-            'nama_pt' => 'required|string',
-        ]);
+        $pt = PerguruanTinggi::create($request->validated());
 
-        $pt = PerguruanTinggi::create($request->all());
-        return ApiResponse::success($pt, 'Data Perguruan Tinggi berhasil ditambahkan', 201);
+        return ApiResponse::success(new PerguruanTinggiResource($pt), 'Data Perguruan Tinggi berhasil ditambahkan', 201);
     }
 
-    // Tampil satu data spesifik (Read Detail)
+    /** Tampil satu data spesifik (Read Detail) */
     public function show(string $id)
     {
         $pt = PerguruanTinggi::find($id);
-        if (!$pt) {
+
+        if (! $pt) {
             return ApiResponse::error('Data tidak ditemukan', 404);
         }
-        
-        return ApiResponse::success($pt, 'Berhasil mengambil detail data');
+
+        return ApiResponse::success(new PerguruanTinggiResource($pt), 'Berhasil mengambil detail data');
     }
 
-    // Update data (Sesuai Flowchart: Edit PT)
-    public function update(Request $request, string $id)
+    /** Update data (Sesuai Flowchart: Edit PT) */
+    public function update(UpdatePerguruanTinggiRequest $request, string $id)
     {
         $pt = PerguruanTinggi::find($id);
-        if (!$pt) {
+
+        if (! $pt) {
             return ApiResponse::error('Data tidak ditemukan', 404);
         }
 
-        // Cek Kelengkapan Data (Sesuai flowchart)
-        $request->validate([
-            'kode_pt' => 'required|string',
-            'nama_pt' => 'required|string',
-        ]);
+        $pt->update($request->validated());
 
-        $pt->update($request->all());
-        
-        // Tampilkan Pesan Berhasil (Sesuai flowchart)
-        return ApiResponse::success($pt, 'Data berhasil diupdate');
+        return ApiResponse::success(new PerguruanTinggiResource($pt), 'Data berhasil diupdate');
     }
 
-    // Hapus data (Sesuai Flowchart: Hapus PT)
+    /** Hapus data (Sesuai Flowchart: Hapus PT) */
     public function destroy(string $id)
     {
         $pt = PerguruanTinggi::find($id);
-        if (!$pt) {
+
+        if (! $pt) {
             return ApiResponse::error('Data tidak ditemukan', 404);
         }
 
         // Cek Relasi ke Fakultas / UPPS (Sesuai flowchart)
-        // import model Upps untuk mengecek relasi
-        $adaDataTerikat = \App\Models\Upps::where('id_pt', $id)->exists();
+        $adaDataTerikat = Upps::where('id_pt', $id)->exists();
 
-        // Ada Data Terikat? Ya
         if ($adaDataTerikat) {
-            // Tampilkan Error 'Data PT Masih Digunakan'
-            return ApiResponse::error('Data PT Masih Digunakan', 400); 
+            return ApiResponse::error('Data PT Masih Digunakan', 400);
         }
 
-        // Ada Data Terikat? Tidak -> Hapus Data PT dari Database
         $pt->delete();
-        
-        // Tampilkan Pesan Berhasil
-        return ApiResponse::success(null, 'Data berhasil dihapus'); 
+
+        return ApiResponse::success(null, 'Data berhasil dihapus');
     }
 }
