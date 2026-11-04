@@ -5,14 +5,17 @@ use App\Http\Controllers\AngkatanController;
 use App\Http\Controllers\AngkatanKelasController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CplController;
+use App\Http\Controllers\DashboardPendidikanController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\EnrollmentKelasController;
 use App\Http\Controllers\EnrollmentMataKuliahController;
+use App\Http\Controllers\EvidenceIndikatorController;
 use App\Http\Controllers\EvidencePrestasiMahasiswaController;
 use App\Http\Controllers\JenisPrestasiController;
 use App\Http\Controllers\KegiatanMahasiswaController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\KurikulumController;
+use App\Http\Controllers\LulusanController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\MataKuliahAngkatanKelasController;
 use App\Http\Controllers\MataKuliahController;
@@ -214,6 +217,18 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/jenis-prestasi/{id}', [JenisPrestasiController::class, 'show']);
     Route::put('/jenis-prestasi/{id}', [JenisPrestasiController::class, 'update']);
     Route::delete('/jenis-prestasi/{id}', [JenisPrestasiController::class, 'destroy']);
+
+    // --- [API-D2] Data Lulusan ---
+    Route::get('/lulusan/ringkasan', [LulusanController::class, 'ringkasan']);
+    Route::get('/lulusan', [LulusanController::class, 'index']);
+
+    // --- [API-D5] Evidence ke Indikator LAM INFOKOM ---
+    Route::get('/evidence-indikator/{id_indikator}', [EvidenceIndikatorController::class, 'show']);
+    Route::post('/evidence-indikator', [EvidenceIndikatorController::class, 'store']);
+    Route::delete('/evidence-indikator/{id}', [EvidenceIndikatorController::class, 'destroy']);
+
+    // --- [API-A2] Dashboard KPI Pendidikan ---
+    Route::get('/dashboard/pendidikan', [DashboardPendidikanController::class, 'index']);
 
     // --- CRUD Data Nilai Mahasiswa ---
     Route::get('/nilai-mahasiswa', [NilaiMahasiswaController::class, 'index']);
