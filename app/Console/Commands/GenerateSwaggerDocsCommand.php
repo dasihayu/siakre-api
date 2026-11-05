@@ -895,10 +895,10 @@ PHP;
         $isNullable = str_contains($ruleStr, 'nullable');
         // Jika rule explicitly required atau jika bukan nullable dan field utama
         if (empty($ruleStr)) {
-            $isNullable = in_array($field, ['alamat', 'pimpinan', 'pimpinan_upps', 'visi', 'misi', 'sk_kurikulum', 'kategori', 'tanggal_kelulusan', 'tanggal_selesai', 'dosen_id', 'evidence', 'mata_kuliah_angkatan_kelas_id', 'avatar', 'google_id']);
+            $isNullable = in_array($field, ['alamat', 'pimpinan', 'pimpinan_upps', 'visi', 'misi', 'sk_kurikulum', 'kategori', 'tanggal_kelulusan', 'tanggal_selesai', 'dosen_id', 'evidence', 'mata_kuliah_angkatan_kelas_id', 'avatar', 'google_id', 'tahun_mulai', 'dokumen_url', 'profil_lulusan']);
         }
 
-        $isInteger = str_contains($ruleStr, 'integer') || str_contains($ruleStr, 'numeric') || str_ends_with($field, '_id') || str_starts_with($field, 'id_') || in_array($field, ['tahun', 'sks', 'angkatan', 'nim', 'masa_studi_bulan', 'berlaku_sampai']);
+        $isInteger = str_contains($ruleStr, 'integer') || str_contains($ruleStr, 'numeric') || str_ends_with($field, '_id') || str_starts_with($field, 'id_') || in_array($field, ['tahun', 'sks', 'angkatan', 'nim', 'masa_studi_bulan', 'berlaku_sampai', 'tahun_mulai']);
         $isDate = str_contains($ruleStr, 'date') || str_contains($field, 'tanggal');
 
         $type = $isInteger ? 'integer' : 'string';
@@ -1068,7 +1068,10 @@ PHP;
             'nama' => 'Nama lengkap pengurus atau anggota',
             'jabatan' => 'Nama jabatan struktural dalam organisasi',
             'nama_kurikulum' => 'Nama kurikulum akademik',
+            'tahun_mulai' => 'Tahun mulai berlakunya kurikulum',
             'berlaku_sampai' => 'Tahun masa berakhirnya kurikulum',
+            'dokumen_url' => 'URL link berkas dokumen kurikulum',
+            'profil_lulusan' => 'Deskripsi profil lulusan sesuai kurikulum',
             'sk_kurikulum' => 'Nomor Surat Keputusan (SK) pemberlakuan kurikulum',
             'id_kurikulum' => 'ID referensi Kurikulum',
             'kode_cpl' => 'Kode unik Capaian Pembelajaran Lulusan (CPL)',

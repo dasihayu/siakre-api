@@ -209,3 +209,160 @@ test('authenticated user can get mata kuliah per kurikulum', function () {
         ->getJson('/api/kurikulum/99999/mata-kuliah');
     $response404->assertStatus(404);
 });
+
+test('authenticated user can create kurikulum with new fields', function () {
+    $user = User::factory()->create();
+    $token = auth('api')->login($user);
+
+    $prodi = Prodi::create(['kode_prodi' => 'PR02', 'nama_prodi' => 'Teknik Komputer', 'akreditasi' => 'Unggul']);
+
+    $payload = [
+        'id_prodi' => $prodi->id,
+        'nama_kurikulum' => 'Kurikulum OBE 2026',
+        'tahun_mulai' => 2026,
+        'berlaku_sampai' => 2030,
+        'status' => 'Aktif',
+        'dokumen_url' => 'https://polines.ac.id/kurikulum-obe-2026.pdf',
+        'profil_lulusan' => 'IoT Specialist, System Integrator',
+        'sk_kurikulum' => 'SK/2026/009',
+    ];
+
+    $response = $this->withHeader('Authorization', "Bearer {$token}")
+        ->postJson('/api/kurikulum', $payload);
+
+    $response->assertStatus(201)
+        ->assertJsonPath('data.tahun_mulai', 2026)
+        ->assertJsonPath('data.status', 'Aktif')
+        ->assertJsonPath('data.dokumen_url', 'https://polines.ac.id/kurikulum-obe-2026.pdf')
+        ->assertJsonPath('data.profil_lulusan', 'IoT Specialist, System Integrator');
+
+    $this->assertDatabaseHas('kurikulum', [
+        'nama_kurikulum' => 'Kurikulum OBE 2026',
+        'tahun_mulai' => 2026,
+        'status' => 'Aktif',
+        'dokumen_url' => 'https://polines.ac.id/kurikulum-obe-2026.pdf',
+        'profil_lulusan' => 'IoT Specialist, System Integrator',
+    ]);
+});
+
+test('cannot create more than one active kurikulum for the same prodi', function () {
+    $user = User::factory()->create();
+    $token = auth('api')->login($user);
+
+    $prodi = Prodi::create(['kode_prodi' => 'PR03', 'nama_prodi' => 'Sistem Informasi', 'akreditasi' => 'Baik']);
+
+    // Kurikulum aktif pertama
+    Kurikulum::create([
+        'id_prodi' => $prodi->id,
+        'nama_kurikulum' => 'Kurikulum Aktif 1',
+        'tahun_mulai' => 2022,
+        'berlaku_sampai' => 2026,
+        'status' => 'Aktif',
+    ]);
+
+    // Percobaan membuat kurikulum aktif kedua untuk prodi yang sama
+    $response = $this->withHeader('Authorization', "Bearer {$token}")
+        ->postJson('/api/kurikulum', [
+            'id_prodi' => $prodi->id,
+            'nama_kurikulum' => 'Kurikulum Aktif 2',
+            'tahun_mulai' => 2024,
+            'berlaku_sampai' => 2028,
+            'status' => 'Aktif',
+        ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['status']);
+});
+
+test('can create archive kurikulum when active kurikulum already exists in prodi', function () {
+    $user = User::factory()->create();
+    $token = auth('api')->login($user);
+
+    $prodi = Prodi::create(['kode_prodi' => 'PR04', 'nama_prodi' => 'Teknik Mesin', 'akreditasi' => 'Baik']);
+
+    Kurikulum::create([
+        'id_prodi' => $prodi->id,
+        'nama_kurikulum' => 'Kurikulum Aktif Saat Ini',
+        'tahun_mulai' => 2022,
+        'berlaku_sampai' => 2026,
+        'status' => 'Aktif',
+    ]);
+
+    $response = $this->withHeader('Authorization', "Bearer {$token}")
+        ->postJson('/api/kurikulum', [
+            'id_prodi' => $prodi->id,
+            'nama_kurikulum' => 'Kurikulum Lama Yang Diarsipkan',
+            'tahun_mulai' => 2018,
+            'berlaku_sampai' => 2022,
+            'status' => 'Arsip',
+        ]);
+
+    $response->assertStatus(201)
+        ->assertJsonPath('data.status', 'Arsip');
+});
+
+test('cannot update an archived kurikulum to active if another active kurikulum exists in same prodi', function () {
+    $user = User::factory()->create();
+    $token = auth('api')->login($user);
+
+    $prodi = Prodi::create(['kode_prodi' => 'PR05', 'nama_prodi' => 'Teknik Sipil', 'akreditasi' => 'Baik']);
+
+    Kurikulum::create([
+        'id_prodi' => $prodi->id,
+        'nama_kurikulum' => 'Kurikulum Sedang Aktif',
+        'tahun_mulai' => 2024,
+        'berlaku_sampai' => 2028,
+        'status' => 'Aktif',
+    ]);
+
+    $kurikulumArsip = Kurikulum::create([
+        'id_prodi' => $prodi->id,
+        'nama_kurikulum' => 'Kurikulum Versi Lama',
+        'tahun_mulai' => 2020,
+        'berlaku_sampai' => 2024,
+        'status' => 'Arsip',
+    ]);
+
+    // Coba aktifkan kembali kurikulum lama
+    $response = $this->withHeader('Authorization', "Bearer {$token}")
+        ->putJson("/api/kurikulum/{$kurikulumArsip->id}", [
+            'id_prodi' => $prodi->id,
+            'nama_kurikulum' => 'Kurikulum Versi Lama Mau Diaktifkan',
+            'berlaku_sampai' => 2024,
+            'status' => 'Aktif',
+        ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['status']);
+});
+
+test('can update active kurikulum attributes without triggering unique active validation', function () {
+    $user = User::factory()->create();
+    $token = auth('api')->login($user);
+
+    $prodi = Prodi::create(['kode_prodi' => 'PR06', 'nama_prodi' => 'Akuntansi', 'akreditasi' => 'Unggul']);
+
+    $kurikulum = Kurikulum::create([
+        'id_prodi' => $prodi->id,
+        'nama_kurikulum' => 'Kurikulum Awal',
+        'tahun_mulai' => 2023,
+        'berlaku_sampai' => 2027,
+        'status' => 'Aktif',
+    ]);
+
+    $response = $this->withHeader('Authorization', "Bearer {$token}")
+        ->putJson("/api/kurikulum/{$kurikulum->id}", [
+            'id_prodi' => $prodi->id,
+            'nama_kurikulum' => 'Kurikulum Awal Diperbarui',
+            'tahun_mulai' => 2023,
+            'berlaku_sampai' => 2028,
+            'status' => 'Aktif',
+            'dokumen_url' => 'https://polines.ac.id/kurikulum-update.pdf',
+            'profil_lulusan' => 'Akuntan Publik, Auditor',
+        ]);
+
+    $response->assertStatus(200)
+        ->assertJsonPath('data.nama_kurikulum', 'Kurikulum Awal Diperbarui')
+        ->assertJsonPath('data.status', 'Aktif')
+        ->assertJsonPath('data.profil_lulusan', 'Akuntan Publik, Auditor');
+});

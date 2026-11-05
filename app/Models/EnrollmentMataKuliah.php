@@ -19,6 +19,18 @@ class EnrollmentMataKuliah extends Model
         'mata_kuliah_angkatan_kelas_id',
     ];
 
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'evidence' => 'array',
+        ];
+    }
+
     public function tahunAkademik()
     {
         return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
