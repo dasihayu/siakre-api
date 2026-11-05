@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Angkatan;
 use App\Helpers\ApiResponse;
+use App\Models\Angkatan;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -22,7 +22,7 @@ class AngkatanController extends Controller
 
             return ApiResponse::success($angkatan, 'Berhasil mendapatkan data angkatan');
         } catch (\Exception $e) {
-            return ApiResponse::error('Gagal memuat data angkatan: ' . $e->getMessage(), 500);
+            return ApiResponse::error('Gagal memuat data angkatan: '.$e->getMessage(), 500);
         }
     }
 
@@ -30,16 +30,17 @@ class AngkatanController extends Controller
     {
         try {
             $validated = $request->validate([
-            'angkatan' => 'required|integer|unique:angkatan,angkatan',
+                'angkatan' => 'required|integer|unique:angkatan,angkatan',
+                'jumlah_pendaftar' => 'nullable|integer|min:0',
             ]);
-            
+
             $angkatan = Angkatan::create($validated);
 
             return ApiResponse::success($angkatan, 'Angkatan berhasil ditambahkan', 201);
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             return ApiResponse::validationError($e->errors(), 'Validasi gagal');
         } catch (\Exception $e) {
-            return ApiResponse::error('Gagal menambahkan angkatan: ' . $e->getMessage(), 500);
+            return ApiResponse::error('Gagal menambahkan angkatan: '.$e->getMessage(), 500);
         }
     }
 
@@ -47,7 +48,7 @@ class AngkatanController extends Controller
     {
         $angkatan = Angkatan::find($id);
 
-        if (!$angkatan) {
+        if (! $angkatan) {
             return ApiResponse::error('Data angkatan tidak ditemukan', 404);
         }
 
@@ -58,13 +59,14 @@ class AngkatanController extends Controller
     {
         $angkatan = Angkatan::find($id);
 
-        if (!$angkatan) {
+        if (! $angkatan) {
             return ApiResponse::error('Data angkatan tidak ditemukan', 404);
         }
 
         try {
             $validated = $request->validate([
-                'angkatan' => 'required|integer|unique:angkatan,angkatan,' . $id,
+                'angkatan' => 'required|integer|unique:angkatan,angkatan,'.$id,
+                'jumlah_pendaftar' => 'sometimes|nullable|integer|min:0',
             ]);
 
             $angkatan->update($validated);
@@ -73,7 +75,7 @@ class AngkatanController extends Controller
         } catch (ValidationException $e) {
             return ApiResponse::validationError($e->errors(), 'Validasi gagal');
         } catch (\Exception $e) {
-            return ApiResponse::error('Gagal memperbarui angkatan: ' . $e->getMessage(), 500);
+            return ApiResponse::error('Gagal memperbarui angkatan: '.$e->getMessage(), 500);
         }
     }
 
@@ -81,15 +83,16 @@ class AngkatanController extends Controller
     {
         $angkatan = Angkatan::find($id);
 
-        if (!$angkatan) {
+        if (! $angkatan) {
             return ApiResponse::error('Data angkatan tidak ditemukan', 404);
         }
 
         try {
             $angkatan->delete();
+
             return ApiResponse::success(null, 'Angkatan berhasil dihapus');
         } catch (\Exception $e) {
-            return ApiResponse::error('Gagal menghapus angkatan: ' . $e->getMessage(), 500);
+            return ApiResponse::error('Gagal menghapus angkatan: '.$e->getMessage(), 500);
         }
     }
 }
