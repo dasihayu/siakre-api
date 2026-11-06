@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PrestasiMahasiswa extends Model
 {
@@ -17,20 +19,26 @@ class PrestasiMahasiswa extends Model
         'tahun',
     ];
 
-    // Relasi ke Mahasiswa
-    public function mahasiswa()
+    /**
+     * Relasi ke Mahasiswa
+     */
+    public function mahasiswa(): BelongsTo
     {
         return $this->belongsTo(Mahasiswa::class, 'id_mahasiswa');
     }
 
-    // Relasi ke Evidence Prestasi Mahasiswa
-    public function evidence()
+    /**
+     * Relasi ke Evidence Prestasi Mahasiswa
+     */
+    public function evidence(): HasMany
     {
         return $this->hasMany(EvidencePrestasiMahasiswa::class, 'id_prestasi_mahasiswa');
     }
 
-    // Relasi ke Jenis Prestasi
-    public function jenisPrestasi()
+    /**
+     * Relasi ke Jenis Prestasi
+     */
+    public function jenisPrestasi(): HasMany
     {
         return $this->hasMany(JenisPrestasi::class, 'id_prestasi_mahasiswa');
     }

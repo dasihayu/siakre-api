@@ -2,36 +2,61 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\JenisEvidencePrestasi;
 use App\Helpers\ApiResponse;
 use App\Models\EvidencePrestasiMahasiswa;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class EvidencePrestasiMahasiswaController extends Controller
 {
-    // Tampil semua data (Read)
-    public function index()
+    /**
+     * Tampil semua data evidence prestasi mahasiswa.
+     */
+    public function index(): JsonResponse
     {
         $data = EvidencePrestasiMahasiswa::with(['prestasiMahasiswa'])->get();
 
         return ApiResponse::success($data, 'Berhasil mengambil data Evidence Prestasi Mahasiswa');
     }
 
-    // Tambah data (Sesuai Flowchart: Tambah)
-    public function store(Request $request)
+    /**
+     * Tambah data evidence prestasi mahasiswa baru.
+     */
+    public function store(Request $request): JsonResponse
     {
-        $request->validate([
+        if ($request->has('evidence') && ! $request->has('url')) {
+            $request->merge(['url' => $request->input('evidence')]);
+        }
+
+        $validated = $request->validate([
             'id_prestasi_mahasiswa' => 'required|exists:prestasi_mahasiswa,id',
-            'evidence' => 'required|string',
+            'url' => 'required|url|max:2048',
+            'jenis_evidence' => ['nullable', 'string', Rule::in(JenisEvidencePrestasi::values())],
+            'judul' => 'nullable|string|max:255',
+        ], [
+            'id_prestasi_mahasiswa.required' => 'Prestasi mahasiswa wajib dipilih.',
+            'id_prestasi_mahasiswa.exists' => 'Data prestasi mahasiswa tidak valid.',
+            'url.required' => 'URL berkas bukti prestasi wajib diisi.',
+            'url.url' => 'Format URL berkas bukti prestasi tidak valid.',
+            'url.max' => 'URL berkas bukti prestasi maksimal 2048 karakter.',
+            'jenis_evidence.in' => 'Jenis evidence prestasi tidak valid.',
         ]);
 
-        $evidence = EvidencePrestasiMahasiswa::create($request->all());
+        if (empty($validated['jenis_evidence'])) {
+            $validated['jenis_evidence'] = JenisEvidencePrestasi::SERTIFIKAT->value;
+        }
 
-        // Tampilkan Pesan Berhasil
+        $evidence = EvidencePrestasiMahasiswa::create($validated);
+
         return ApiResponse::success($evidence, 'Data Evidence Prestasi Mahasiswa berhasil ditambahkan', 201);
     }
 
-    // Tampil satu data spesifik
-    public function show(string $id)
+    /**
+     * Tampil satu data spesifik evidence prestasi mahasiswa.
+     */
+    public function show(string $id): JsonResponse
     {
         $evidence = EvidencePrestasiMahasiswa::with(['prestasiMahasiswa'])->find($id);
 
@@ -42,8 +67,10 @@ class EvidencePrestasiMahasiswaController extends Controller
         return ApiResponse::success($evidence, 'Berhasil mengambil detail data Evidence Prestasi Mahasiswa');
     }
 
-    // Update data (Sesuai Flowchart: Edit)
-    public function update(Request $request, string $id)
+    /**
+     * Update data evidence prestasi mahasiswa.
+     */
+    public function update(Request $request, string $id): JsonResponse
     {
         $evidence = EvidencePrestasiMahasiswa::find($id);
 
@@ -51,19 +78,33 @@ class EvidencePrestasiMahasiswaController extends Controller
             return ApiResponse::error('Data tidak ditemukan', 404);
         }
 
-        $request->validate([
-            'id_prestasi_mahasiswa' => 'required|exists:prestasi_mahasiswa,id',
-            'evidence' => 'required|string',
+        if ($request->has('evidence') && ! $request->has('url')) {
+            $request->merge(['url' => $request->input('evidence')]);
+        }
+
+        $validated = $request->validate([
+            'id_prestasi_mahasiswa' => 'sometimes|required|exists:prestasi_mahasiswa,id',
+            'url' => 'sometimes|required|url|max:2048',
+            'jenis_evidence' => ['nullable', 'string', Rule::in(JenisEvidencePrestasi::values())],
+            'judul' => 'nullable|string|max:255',
+        ], [
+            'id_prestasi_mahasiswa.required' => 'Prestasi mahasiswa wajib dipilih.',
+            'id_prestasi_mahasiswa.exists' => 'Data prestasi mahasiswa tidak valid.',
+            'url.required' => 'URL berkas bukti prestasi wajib diisi.',
+            'url.url' => 'Format URL berkas bukti prestasi tidak valid.',
+            'url.max' => 'URL berkas bukti prestasi maksimal 2048 karakter.',
+            'jenis_evidence.in' => 'Jenis evidence prestasi tidak valid.',
         ]);
 
-        $evidence->update($request->all());
+        $evidence->update($validated);
 
-        // Tampilkan Pesan Berhasil
         return ApiResponse::success($evidence, 'Data Evidence Prestasi Mahasiswa berhasil diupdate');
     }
 
-    // Hapus data (Sesuai Flowchart: Hapus)
-    public function destroy(string $id)
+    /**
+     * Hapus data evidence prestasi mahasiswa.
+     */
+    public function destroy(string $id): JsonResponse
     {
         $evidence = EvidencePrestasiMahasiswa::find($id);
 
@@ -73,7 +114,6 @@ class EvidencePrestasiMahasiswaController extends Controller
 
         $evidence->delete();
 
-        // Tampilkan Pesan Berhasil
         return ApiResponse::success(null, 'Data berhasil dihapus');
     }
 }
