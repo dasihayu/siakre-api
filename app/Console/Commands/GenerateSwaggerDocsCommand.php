@@ -895,7 +895,7 @@ PHP;
         $isNullable = str_contains($ruleStr, 'nullable');
         // Jika rule explicitly required atau jika bukan nullable dan field utama
         if (empty($ruleStr)) {
-            $isNullable = in_array($field, ['alamat', 'pimpinan', 'pimpinan_upps', 'visi', 'misi', 'sk_kurikulum', 'kategori', 'tanggal_kelulusan', 'tanggal_selesai', 'dosen_id', 'evidence', 'mata_kuliah_angkatan_kelas_id', 'avatar', 'google_id', 'tahun_mulai', 'dokumen_url', 'profil_lulusan']);
+            $isNullable = in_array($field, ['alamat', 'pimpinan', 'pimpinan_upps', 'visi', 'misi', 'sk_kurikulum', 'kategori', 'tanggal_kelulusan', 'tanggal_selesai', 'dosen_id', 'evidence', 'mata_kuliah_angkatan_kelas_id', 'avatar', 'google_id', 'tahun_mulai', 'dokumen_url', 'profil_lulusan', 'judul']);
         }
 
         $isInteger = str_contains($ruleStr, 'integer') || str_contains($ruleStr, 'numeric') || str_ends_with($field, '_id') || str_starts_with($field, 'id_') || in_array($field, ['tahun', 'sks', 'angkatan', 'nim', 'masa_studi_bulan', 'berlaku_sampai', 'tahun_mulai']);
@@ -1029,7 +1029,10 @@ PHP;
             'status_validasi' => 'Disetujui',
             'status' => 'Aktif',
             'nama_aktivitas' => 'Juara 1 Hackathon Nasional IoT & Smart City',
-            'evidence' => 'sertifikat_juara_1_hackathon_iot_2024.pdf',
+            'evidence' => 'https://storage.polines.ac.id/prestasi/sertifikat_hackathon.pdf',
+            'url' => 'https://storage.polines.ac.id/prestasi/sertifikat_hackathon.pdf',
+            'jenis_evidence' => 'Sertifikat',
+            'judul' => 'Sertifikat Juara 1 Hackathon IoT',
             'email' => 'andi@polines.ac.id',
             'password' => 'password123',
             'role' => 'KAPRODI',
@@ -1116,6 +1119,9 @@ PHP;
             'enrollment_mata_kuliah_id' => 'ID referensi Penawaran Enrollment Mata Kuliah',
             'nama_aktivitas' => 'Nama prestasi kejuaraan atau kompetisi',
             'evidence' => 'Nama file atau link berkas bukti sertifikat pendukung',
+            'url' => 'Tautan URL berkas bukti prestasi (maksimal 2048 karakter)',
+            'jenis_evidence' => 'Jenis bukti prestasi (Sertifikat, Piagam, Surat Tugas, Foto Kegiatan, Publikasi, Link Lomba, Lainnya)',
+            'judul' => 'Judul atau keterangan berkas bukti prestasi',
             'email' => 'Alamat email pengguna',
             'password' => 'Kata sandi akun',
             'role' => 'Hak akses peran pengguna dalam sistem',
