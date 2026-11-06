@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\StatusKurikulum;
 use App\Helpers\ApiResponse;
+use App\Http\Requests\Kurikulum\StoreKurikulumRequest;
+use App\Http\Requests\Kurikulum\UpdateKurikulumRequest;
 use App\Models\Kurikulum;
 use App\Models\MataKuliah;
 use Illuminate\Database\QueryException;
@@ -11,25 +14,32 @@ use Illuminate\Http\Request;
 class KurikulumController extends Controller
 {
     // Tampil semua data
-    public function index()
+    public function index(Request $request)
     {
-        // Pakai with('prodi') biar nama prodinya ikut tampil, bukan cuma ID-nya doang
-        $data = Kurikulum::with('prodi')->get();
+        $query = Kurikulum::with('prodi');
+
+        if ($request->filled('id_prodi')) {
+            $query->where('id_prodi', $request->query('id_prodi'));
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->query('status'));
+        }
+
+        $data = $query->get();
 
         return ApiResponse::success($data, 'Berhasil mengambil data Kurikulum');
     }
 
     // Tambah data (Sesuai Flowchart: Input Nama Kurikulum & Tahun -> Simpan)
-    public function store(Request $request)
+    public function store(StoreKurikulumRequest $request)
     {
-        $request->validate([
-            'id_prodi' => 'required|exists:prodi,id',
-            'nama_kurikulum' => 'required|string',
-            'berlaku_sampai' => 'required|integer',
-            'sk_kurikulum' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
+        if (! isset($validated['status'])) {
+            $validated['status'] = StatusKurikulum::AKTIF->value;
+        }
 
-        $kurikulum = Kurikulum::create($request->all());
+        $kurikulum = Kurikulum::create($validated);
 
         return ApiResponse::success($kurikulum, 'Data Kurikulum berhasil ditambahkan', 201);
     }
@@ -47,7 +57,7 @@ class KurikulumController extends Controller
     }
 
     // Update data (Sesuai Flowchart: Ubah Data / SK Kurikulum -> Update)
-    public function update(Request $request, string $id)
+    public function update(UpdateKurikulumRequest $request, string $id)
     {
         $kurikulum = Kurikulum::find($id);
 
@@ -55,14 +65,7 @@ class KurikulumController extends Controller
             return ApiResponse::error('Data tidak ditemukan', 404);
         }
 
-        $request->validate([
-            'id_prodi' => 'required|exists:prodi,id',
-            'nama_kurikulum' => 'required|string',
-            'berlaku_sampai' => 'required|integer',
-            'sk_kurikulum' => 'nullable|string',
-        ]);
-
-        $kurikulum->update($request->all());
+        $kurikulum->update($request->validated());
 
         return ApiResponse::success($kurikulum, 'Data Kurikulum berhasil diupdate');
     }

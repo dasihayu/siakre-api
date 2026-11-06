@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
+use App\Http\Requests\EnrollmentMataKuliah\StoreEnrollmentMataKuliahRequest;
+use App\Http\Requests\EnrollmentMataKuliah\UpdateEnrollmentMataKuliahRequest;
 use App\Models\EnrollmentMataKuliah;
 use App\Models\TahunAkademik;
 use Illuminate\Http\Request;
@@ -11,7 +13,7 @@ class EnrollmentMataKuliahController extends Controller
 {
     public function index(Request $request)
     {
-        $query = EnrollmentMataKuliah::with(['tahunAkademik', 'mataKuliah']);
+        $query = EnrollmentMataKuliah::with(['tahunAkademik', 'mataKuliah', 'dosen']);
 
         if ($request->filled('mata_kuliah_id')) {
             $query->where('mata_kuliah_id', $request->query('mata_kuliah_id'));
@@ -19,6 +21,10 @@ class EnrollmentMataKuliahController extends Controller
 
         if ($request->filled('tahun_akademik_id')) {
             $query->where('tahun_akademik_id', $request->query('tahun_akademik_id'));
+        }
+
+        if ($request->filled('dosen_id')) {
+            $query->where('dosen_id', $request->query('dosen_id'));
         }
 
         $data = $query->get();
@@ -59,44 +65,28 @@ class EnrollmentMataKuliahController extends Controller
         return $latestTaId ? (int) $latestTaId : null;
     }
 
-    public function store(Request $request)
+    public function store(StoreEnrollmentMataKuliahRequest $request)
     {
-        $request->validate([
-            'tahun_akademik_id' => 'required|exists:tahun_akademik,id',
-            'mata_kuliah_id' => 'required|exists:mata_kuliah,id',
-            'dosen_id' => 'nullable|integer',
-            'evidence' => 'nullable|integer',
-            'mata_kuliah_angkatan_kelas_id' => 'nullable|integer',
-        ]);
-
-        $data = EnrollmentMataKuliah::create($request->all());
+        $data = EnrollmentMataKuliah::create($request->validated());
 
         return ApiResponse::success($data, 'Berhasil menambahkan data', 201);
     }
 
     public function show(string $id)
     {
-        $data = EnrollmentMataKuliah::with(['tahunAkademik', 'mataKuliah'])->find($id);
+        $data = EnrollmentMataKuliah::with(['tahunAkademik', 'mataKuliah', 'dosen'])->find($id);
 
         return $data ? ApiResponse::success($data, 'Berhasil mengambil detail data') : ApiResponse::error('Data tidak ditemukan', 404);
     }
 
-    public function update(Request $request, string $id)
+    public function update(UpdateEnrollmentMataKuliahRequest $request, string $id)
     {
         $data = EnrollmentMataKuliah::find($id);
         if (! $data) {
             return ApiResponse::error('Data tidak ditemukan', 404);
         }
 
-        $request->validate([
-            'tahun_akademik_id' => 'required|exists:tahun_akademik,id',
-            'mata_kuliah_id' => 'required|exists:mata_kuliah,id',
-            'dosen_id' => 'nullable|integer',
-            'evidence' => 'nullable|integer',
-            'mata_kuliah_angkatan_kelas_id' => 'nullable|integer',
-        ]);
-
-        $data->update($request->all());
+        $data->update($request->validated());
 
         return ApiResponse::success($data, 'Berhasil mengupdate data');
     }
