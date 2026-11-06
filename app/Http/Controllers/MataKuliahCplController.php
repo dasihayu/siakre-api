@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ApiResponse;
 use App\Models\MataKuliah;
 use Illuminate\Http\Request;
-use App\Helpers\ApiResponse;
 
 class MataKuliahCplController extends Controller
 {
@@ -13,7 +13,7 @@ class MataKuliahCplController extends Controller
     {
         $matkul = MataKuliah::with('cpl')->find($mataKuliahId);
 
-        if (!$matkul) {
+        if (! $matkul) {
             return ApiResponse::error('Data Mata Kuliah tidak ditemukan', 404);
         }
 
@@ -25,17 +25,34 @@ class MataKuliahCplController extends Controller
     {
         $matkul = MataKuliah::find($mataKuliahId);
 
-        if (!$matkul) {
+        if (! $matkul) {
             return ApiResponse::error('Data Mata Kuliah tidak ditemukan', 404);
         }
 
-        $request->validate([
-            'cpl_ids'   => 'required|array',
-            'cpl_ids.*' => 'exists:cpl,id', // Pastikan setiap ID CPL benar-benar ada di database
+        $validated = $request->validate([
+            'cpl_ids' => 'required_without:mappings|array',
+            'cpl_ids.*' => 'required|integer|distinct|exists:cpl,id',
+            'mappings' => 'required_without:cpl_ids|array',
+            'mappings.*.id_cpl' => 'required|integer|distinct|exists:cpl,id',
+            'mappings.*.bobot' => 'required|numeric|gt:0|lte:100',
         ]);
 
-        // Fungsi sync Laravel otomatis menambah data baru yang dicentang dan menghapus centang yang dilepas
-        $matkul->cpl()->sync($request->cpl_ids);
+        if (isset($validated['mappings'])) {
+            $syncData = collect($validated['mappings'])
+                ->mapWithKeys(fn (array $mapping): array => [
+                    $mapping['id_cpl'] => ['bobot' => $mapping['bobot']],
+                ])
+                ->all();
+        } else {
+            $existingMappings = $matkul->cpl()->get()->keyBy('id');
+            $syncData = collect($validated['cpl_ids'])
+                ->mapWithKeys(fn (int $cplId): array => [
+                    $cplId => ['bobot' => $existingMappings->get($cplId)?->pivot->bobot ?? 100],
+                ])
+                ->all();
+        }
+
+        $matkul->cpl()->sync($syncData);
 
         return ApiResponse::success($matkul->load('cpl'), 'Mapping CPL Mata Kuliah berhasil disimpan');
     }

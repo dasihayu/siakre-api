@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\Prodi;
 use App\Models\Kurikulum;
 use App\Models\MataKuliah;
+use App\Models\Prodi;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -18,12 +18,12 @@ test('authenticated user can list mata kuliah', function () {
 
     $prodi = Prodi::create(['kode_prodi' => 'PR01', 'nama_prodi' => 'Informatika', 'akreditasi' => 'Unggul']);
     $kurikulum = Kurikulum::create(['id_prodi' => $prodi->id, 'nama_kurikulum' => 'K24', 'berlaku_sampai' => 2028, 'sk_kurikulum' => 'SK01']);
-    
+
     MataKuliah::create([
-        'id_kurikulum'     => $kurikulum->id,
+        'id_kurikulum' => $kurikulum->id,
         'kode_mata_kuliah' => 'IF101',
         'nama_mata_kuliah' => 'Pemrograman Web',
-        'sks'              => 3,
+        'sks' => 3,
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
@@ -46,10 +46,14 @@ test('authenticated user can create mata kuliah', function () {
     $kurikulum = Kurikulum::create(['id_prodi' => $prodi->id, 'nama_kurikulum' => 'K24', 'berlaku_sampai' => 2028, 'sk_kurikulum' => 'SK01']);
 
     $payload = [
-        'id_kurikulum'     => $kurikulum->id,
+        'id_kurikulum' => $kurikulum->id,
         'kode_mata_kuliah' => 'IF102',
         'nama_mata_kuliah' => 'Basis Data',
-        'sks'              => 4,
+        'sks' => 4,
+        'semester' => 2,
+        'jenis' => 'Wajib',
+        'sks_teori' => 3,
+        'sks_praktik' => 1,
     ];
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
@@ -63,6 +67,10 @@ test('authenticated user can create mata kuliah', function () {
 
     $this->assertDatabaseHas('mata_kuliah', [
         'kode_mata_kuliah' => 'IF102',
+        'semester' => 2,
+        'jenis' => 'Wajib',
+        'sks_teori' => 3,
+        'sks_praktik' => 1,
     ]);
 });
 
@@ -72,19 +80,19 @@ test('system blocks creation of duplicate kode mata kuliah', function () {
 
     $prodi = Prodi::create(['kode_prodi' => 'PR01', 'nama_prodi' => 'Informatika', 'akreditasi' => 'Unggul']);
     $kurikulum = Kurikulum::create(['id_prodi' => $prodi->id, 'nama_kurikulum' => 'K24', 'berlaku_sampai' => 2028, 'sk_kurikulum' => 'SK01']);
-    
+
     MataKuliah::create([
-        'id_kurikulum'     => $kurikulum->id,
+        'id_kurikulum' => $kurikulum->id,
         'kode_mata_kuliah' => 'IF-SAMA',
         'nama_mata_kuliah' => 'Matkul Awal',
-        'sks'              => 3,
+        'sks' => 3,
     ]);
 
     $payload = [
-        'id_kurikulum'     => $kurikulum->id,
+        'id_kurikulum' => $kurikulum->id,
         'kode_mata_kuliah' => 'IF-SAMA',
         'nama_mata_kuliah' => 'Matkul Duplikat',
-        'sks'              => 3,
+        'sks' => 3,
     ];
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
@@ -100,12 +108,12 @@ test('authenticated user can view detail of mata kuliah', function () {
 
     $prodi = Prodi::create(['kode_prodi' => 'PR01', 'nama_prodi' => 'Informatika', 'akreditasi' => 'Unggul']);
     $kurikulum = Kurikulum::create(['id_prodi' => $prodi->id, 'nama_kurikulum' => 'K24', 'berlaku_sampai' => 2028, 'sk_kurikulum' => 'SK01']);
-    
+
     $matkul = MataKuliah::create([
-        'id_kurikulum'     => $kurikulum->id,
+        'id_kurikulum' => $kurikulum->id,
         'kode_mata_kuliah' => 'IF103',
         'nama_mata_kuliah' => 'Jaringan Komputer',
-        'sks'              => 3,
+        'sks' => 3,
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
@@ -127,20 +135,24 @@ test('authenticated user can update mata kuliah', function () {
 
     $prodi = Prodi::create(['kode_prodi' => 'PR01', 'nama_prodi' => 'Informatika', 'akreditasi' => 'Unggul']);
     $kurikulum = Kurikulum::create(['id_prodi' => $prodi->id, 'nama_kurikulum' => 'K24', 'berlaku_sampai' => 2028, 'sk_kurikulum' => 'SK01']);
-    
+
     $matkul = MataKuliah::create([
-        'id_kurikulum'     => $kurikulum->id,
+        'id_kurikulum' => $kurikulum->id,
         'kode_mata_kuliah' => 'IF104',
         'nama_mata_kuliah' => 'Nama Lama',
-        'sks'              => 2,
+        'sks' => 2,
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
         ->putJson("/api/mata-kuliah/{$matkul->id}", [
-            'id_kurikulum'     => $kurikulum->id,
+            'id_kurikulum' => $kurikulum->id,
             'kode_mata_kuliah' => 'IF104-BARU',
             'nama_mata_kuliah' => 'Nama Baru',
-            'sks'              => 3,
+            'sks' => 3,
+            'semester' => 5,
+            'jenis' => 'Pilihan',
+            'sks_teori' => 1,
+            'sks_praktik' => 2,
         ]);
 
     $response->assertStatus(200)
@@ -153,6 +165,10 @@ test('authenticated user can update mata kuliah', function () {
         'id' => $matkul->id,
         'kode_mata_kuliah' => 'IF104-BARU',
         'nama_mata_kuliah' => 'Nama Baru',
+        'semester' => 5,
+        'jenis' => 'Pilihan',
+        'sks_teori' => 1,
+        'sks_praktik' => 2,
     ]);
 });
 
@@ -162,12 +178,12 @@ test('authenticated user can delete mata kuliah', function () {
 
     $prodi = Prodi::create(['kode_prodi' => 'PR01', 'nama_prodi' => 'Informatika', 'akreditasi' => 'Unggul']);
     $kurikulum = Kurikulum::create(['id_prodi' => $prodi->id, 'nama_kurikulum' => 'K24', 'berlaku_sampai' => 2028, 'sk_kurikulum' => 'SK01']);
-    
+
     $matkul = MataKuliah::create([
-        'id_kurikulum'     => $kurikulum->id,
+        'id_kurikulum' => $kurikulum->id,
         'kode_mata_kuliah' => 'IF999',
         'nama_mata_kuliah' => 'Matkul Hapus',
-        'sks'              => 2,
+        'sks' => 2,
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")

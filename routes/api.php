@@ -3,6 +3,7 @@
 use App\Http\Controllers\AnggotaUppsController;
 use App\Http\Controllers\AngkatanController;
 use App\Http\Controllers\AngkatanKelasController;
+use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CplController;
 use App\Http\Controllers\DashboardPendidikanController;
@@ -26,6 +27,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PrestasiMahasiswaController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\RpsController;
 use App\Http\Controllers\StatusMahasiswaController;
 use App\Http\Controllers\TahunAkademikController;
 use App\Http\Controllers\UppsController;
@@ -106,6 +108,19 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/mata-kuliah/{id}', [MataKuliahController::class, 'show']);
     Route::put('/mata-kuliah/{id}', [MataKuliahController::class, 'update']);
     Route::delete('/mata-kuliah/{id}', [MataKuliahController::class, 'destroy']);
+    Route::get('/mata-kuliah/{id}/rps', [RpsController::class, 'indexByMataKuliah']);
+    Route::post('/mata-kuliah/{id}/rps', [RpsController::class, 'storeByMataKuliah']);
+
+    // --- CRUD RPS ---
+    Route::get('/rps', [RpsController::class, 'index']);
+    Route::post('/rps', [RpsController::class, 'store']);
+    Route::get('/rps/{id}', [RpsController::class, 'show']);
+    Route::put('/rps/{id}', [RpsController::class, 'update']);
+    Route::delete('/rps/{id}', [RpsController::class, 'destroy']);
+
+    // --- Assessment CPL dan Pendidikan ---
+    Route::get('/assessment/cpl', [AssessmentController::class, 'cpl']);
+    Route::get('/assessment/pendidikan/gap', [AssessmentController::class, 'pendidikanGap']);
 
     // --- Mapping Mata Kuliah ke CPL ---
     Route::get('/mata-kuliah/{mataKuliahId}/cpl', [MataKuliahCplController::class, 'index']);
