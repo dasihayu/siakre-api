@@ -3,16 +3,20 @@
 use App\Http\Controllers\AnggotaUppsController;
 use App\Http\Controllers\AngkatanController;
 use App\Http\Controllers\AngkatanKelasController;
+use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CplController;
+use App\Http\Controllers\DashboardPendidikanController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\EnrollmentKelasController;
 use App\Http\Controllers\EnrollmentMataKuliahController;
+use App\Http\Controllers\EvidenceIndikatorController;
 use App\Http\Controllers\EvidencePrestasiMahasiswaController;
 use App\Http\Controllers\JenisPrestasiController;
 use App\Http\Controllers\KegiatanMahasiswaController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\KurikulumController;
+use App\Http\Controllers\LulusanController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\MataKuliahAngkatanKelasController;
 use App\Http\Controllers\MataKuliahController;
@@ -23,6 +27,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PrestasiMahasiswaController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\RpsController;
 use App\Http\Controllers\StatusMahasiswaController;
 use App\Http\Controllers\TahunAkademikController;
 use App\Http\Controllers\UppsController;
@@ -103,6 +108,19 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/mata-kuliah/{id}', [MataKuliahController::class, 'show']);
     Route::put('/mata-kuliah/{id}', [MataKuliahController::class, 'update']);
     Route::delete('/mata-kuliah/{id}', [MataKuliahController::class, 'destroy']);
+    Route::get('/mata-kuliah/{id}/rps', [RpsController::class, 'indexByMataKuliah']);
+    Route::post('/mata-kuliah/{id}/rps', [RpsController::class, 'storeByMataKuliah']);
+
+    // --- CRUD RPS ---
+    Route::get('/rps', [RpsController::class, 'index']);
+    Route::post('/rps', [RpsController::class, 'store']);
+    Route::get('/rps/{id}', [RpsController::class, 'show']);
+    Route::put('/rps/{id}', [RpsController::class, 'update']);
+    Route::delete('/rps/{id}', [RpsController::class, 'destroy']);
+
+    // --- Assessment CPL dan Pendidikan ---
+    Route::get('/assessment/cpl', [AssessmentController::class, 'cpl']);
+    Route::get('/assessment/pendidikan/gap', [AssessmentController::class, 'pendidikanGap']);
 
     // --- Mapping Mata Kuliah ke CPL ---
     Route::get('/mata-kuliah/{mataKuliahId}/cpl', [MataKuliahCplController::class, 'index']);
@@ -214,6 +232,18 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/jenis-prestasi/{id}', [JenisPrestasiController::class, 'show']);
     Route::put('/jenis-prestasi/{id}', [JenisPrestasiController::class, 'update']);
     Route::delete('/jenis-prestasi/{id}', [JenisPrestasiController::class, 'destroy']);
+
+    // --- [API-D2] Data Lulusan ---
+    Route::get('/lulusan/ringkasan', [LulusanController::class, 'ringkasan']);
+    Route::get('/lulusan', [LulusanController::class, 'index']);
+
+    // --- [API-D5] Evidence ke Indikator LAM INFOKOM ---
+    Route::get('/evidence-indikator/{id_indikator}', [EvidenceIndikatorController::class, 'show']);
+    Route::post('/evidence-indikator', [EvidenceIndikatorController::class, 'store']);
+    Route::delete('/evidence-indikator/{id}', [EvidenceIndikatorController::class, 'destroy']);
+
+    // --- [API-A2] Dashboard KPI Pendidikan ---
+    Route::get('/dashboard/pendidikan', [DashboardPendidikanController::class, 'index']);
 
     // --- CRUD Data Nilai Mahasiswa ---
     Route::get('/nilai-mahasiswa', [NilaiMahasiswaController::class, 'index']);

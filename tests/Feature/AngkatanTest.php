@@ -21,11 +21,11 @@ test('authenticated user can list and create angkatan', function () {
             'success',
             'code',
             'message',
-            'data'
+            'data',
         ]);
 
     // Test POST create angkatan
-    $payload = ['angkatan' => 2026];
+    $payload = ['angkatan' => 2026, 'jumlah_pendaftar' => 100];
 
     $responsePost = $this->withHeader('Authorization', "Bearer {$token}")
         ->postJson('/api/angkatan', $payload);
@@ -39,6 +39,7 @@ test('authenticated user can list and create angkatan', function () {
     // Assert database has the newly created angkatan
     $this->assertDatabaseHas('angkatan', [
         'angkatan' => 2026,
+        'jumlah_pendaftar' => 100,
     ]);
 });
 test('authenticated user can update and delete angkatan', function () {

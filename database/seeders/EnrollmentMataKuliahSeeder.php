@@ -86,7 +86,24 @@ class EnrollmentMataKuliahSeeder extends Seeder
                         'tahun_akademik_id' => $ta->id,
                         'mata_kuliah_id' => $mk->id,
                         'dosen_id' => $dosen?->id,
-                        'evidence' => 1,
+                        'evidence' => [
+                            [
+                                'jenis_dokumen' => 'RPS',
+                                'url' => 'https://siakre.polines.ac.id/dokumen/rps-'.$mk->kode_mata_kuliah.'.pdf',
+                            ],
+                            [
+                                'jenis_dokumen' => 'Kontrak Kuliah',
+                                'url' => 'https://siakre.polines.ac.id/dokumen/kontrak-'.$mk->kode_mata_kuliah.'.pdf',
+                            ],
+                            [
+                                'jenis_dokumen' => 'Presensi',
+                                'url' => 'https://siakre.polines.ac.id/dokumen/presensi-'.$mk->kode_mata_kuliah.'.pdf',
+                            ],
+                            [
+                                'jenis_dokumen' => 'Soal Ujian',
+                                'url' => 'https://siakre.polines.ac.id/dokumen/soal-ujian-'.$mk->kode_mata_kuliah.'.pdf',
+                            ],
+                        ],
                         'mata_kuliah_angkatan_kelas_id' => null,
                     ]
                 );

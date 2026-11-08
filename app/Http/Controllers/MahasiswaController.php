@@ -4,54 +4,117 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
 use App\Models\Mahasiswa;
+use App\Services\AkademikCalculatorService;
+use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 class MahasiswaController extends Controller
 {
-    public function tren()
+    /**
+     * GET /api/mahasiswa/tren
+     *
+     * Tren riil berbasis data nyata dari TS sampai TS-n:
+     * - jumlah_mahasiswa_baru   : jumlah mahasiswa yang masuk per tahun
+     * - rata_ipk_lulusan        : rata-rata IPK lulusan per kohort angkatan
+     * - rata_masa_studi_bulan   : rata-rata masa studi (bulan) lulusan per kohort
+     * - persen_lulus_tepat_waktu: % lulus tepat waktu per kohort (D3≤36bln, D4/S1≤48bln)
+     *
+     * Query params:
+     *   n (int, default 5) : jumlah tahun ke belakang dari tahun berjalan
+     */
+    public function tren(Request $request)
     {
-        $years = ['2022', '2023', '2024', '2025', '2026'];
-        $kelulusan = [];
-        $ipkList = [];
+        $n = max(1, (int) $request->query('n', 5));
+        $tsBulan = (int) date('Y');
+        $years = range($tsBulan - $n + 1, $tsBulan);
 
-        $ipkBenchmark = [
-            '2022' => 3.30,
-            '2023' => 3.40,
-            '2024' => 3.52,
-            '2025' => 3.52,
-            '2026' => 3.52,
-        ];
+        $jumlahMahasiswaBaru = [];
+        $rataIpkLulusan = [];
+        $rataMasaStudiBulan = [];
+        $persenLulusTepat = [];
 
         foreach ($years as $year) {
-            $intYear = (int) $year;
-            $cohortYear = $intYear - 4;
-            $cohort = Mahasiswa::where('tahun_masuk', $cohortYear)->get();
-            $totalCohort = $cohort->count();
+            // ── Mahasiswa baru per tahun masuk ──────────────────────────────
+            $mahasiswaBaru = Mahasiswa::where('tahun_masuk', $year)->count();
+            $jumlahMahasiswaBaru[] = $mahasiswaBaru;
 
-            if ($totalCohort > 0) {
-                $onTimeCount = $cohort->filter(function ($m) {
-                    return ! empty($m->tanggal_kelulusan) && (int) ($m->masa_studi_bulan ?? 0) <= 48;
-                })->count();
-                $pct = (int) round(($onTimeCount / $totalCohort) * 100);
+            // ── Lulusan dari kohort angkatan $year ───────────────────────────
+            // Lulusan adalah mahasiswa kohort $year yang sudah memiliki tanggal_kelulusan
+            $lulusanKohort = Mahasiswa::where('tahun_masuk', $year)
+                ->whereNotNull('tanggal_kelulusan')
+                ->with([
+                    'nilaiMahasiswa.mataKuliahAngkatanKelas.enrollmentMataKuliah.mataKuliah',
+                    'nilaiMahasiswa.tahunAkademik',
+                ])
+                ->get();
+
+            $totalLulusan = $lulusanKohort->count();
+
+            if ($totalLulusan === 0) {
+                $rataIpkLulusan[] = null;
+                $rataMasaStudiBulan[] = null;
+                $persenLulusTepat[] = null;
             } else {
-                $pct = 80;
-            }
+                // Hitung IPK tiap lulusan lalu rata-rata
+                $sumIpk = 0.0;
+                $sumMasaStudi = 0;
+                $tepatCount = 0;
 
-            $kelulusan[] = $pct;
-            $ipkList[] = $ipkBenchmark[$year] ?? 3.50;
+                foreach ($lulusanKohort as $mhs) {
+                    // IPK riil
+                    $ipkResult = AkademikCalculatorService::hitungIPK($mhs->nilaiMahasiswa);
+                    $sumIpk += $ipkResult['ipk'];
+
+                    // Masa studi aktual
+                    $masaStudiBulan = $this->hitungMasaStudiBulan($mhs);
+                    $sumMasaStudi += $masaStudiBulan;
+
+                    // Batas tepat waktu (default D4/S1 = 48, D3 = 36)
+                    // Karena bisa multi-prodi, kita pakai default 48 untuk kohort global
+                    // Controller Dashboard mengambil per-prodi; di sini kita gunakan kolom masa_studi_bulan
+                    if ($masaStudiBulan <= 48) {
+                        $tepatCount++;
+                    }
+                }
+
+                $rataIpkLulusan[] = round($sumIpk / $totalLulusan, 2);
+                $rataMasaStudiBulan[] = round($sumMasaStudi / $totalLulusan, 1);
+                $persenLulusTepat[] = round(($tepatCount / $totalLulusan) * 100, 1);
+            }
         }
 
         return ApiResponse::success([
-            'years' => $years,
-            'ipk' => $ipkList,
-            'kelulusan' => $kelulusan,
-        ], 'Berhasil mengambil tren IPK dan kelulusan');
+            'years' => array_values($years),
+            'jumlah_mahasiswa_baru' => $jumlahMahasiswaBaru,
+            'rata_ipk_lulusan' => $rataIpkLulusan,
+            'rata_masa_studi_bulan' => $rataMasaStudiBulan,
+            'persen_lulus_tepat_waktu' => $persenLulusTepat,
+        ], 'Berhasil mengambil tren riil mahasiswa');
     }
 
-    public function index()
+    /**
+     * Hitung masa studi aktual dalam bulan dari data mahasiswa.
+     */
+    private function hitungMasaStudiBulan(Mahasiswa $mhs): int
     {
-        $data = Mahasiswa::all();
+        if ($mhs->tahun_masuk && $mhs->tanggal_kelulusan) {
+            $mulai = Carbon::create($mhs->tahun_masuk, 8, 1);
+            $lulus = Carbon::parse($mhs->tanggal_kelulusan);
+
+            return (int) $mulai->diffInMonths($lulus);
+        }
+
+        return (int) ($mhs->masa_studi_bulan ?? 48);
+    }
+
+    public function index(Request $request)
+    {
+        $request->validate([
+            'kategori' => ['nullable', 'string', 'in:baru,transfer,asing'],
+        ]);
+
+        $data = Mahasiswa::kategori($request->query('kategori'))->get();
 
         return ApiResponse::success($data, 'Berhasil mengambil data Mahasiswa');
     }
