@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class JenisPrestasi extends Model
 {
@@ -12,13 +13,22 @@ class JenisPrestasi extends Model
     protected $table = 'jenis_prestasi';
 
     protected $fillable = [
-        'id_prestasi_mahasiswa',
-        'jenis',
+        'kode',
+        'nama',
+        'kategori',
+        'tingkat',
+        'is_active',
     ];
 
-    // Relasi ke Prestasi Mahasiswa
-    public function prestasiMahasiswa()
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
+    /**
+     * Relasi ke Prestasi Mahasiswa (1 Jenis Prestasi bisa dimiliki banyak Prestasi Mahasiswa)
+     */
+    public function prestasiMahasiswa(): HasMany
     {
-        return $this->belongsTo(PrestasiMahasiswa::class, 'id_prestasi_mahasiswa');
+        return $this->hasMany(PrestasiMahasiswa::class, 'id_jenis_prestasi');
     }
 }
