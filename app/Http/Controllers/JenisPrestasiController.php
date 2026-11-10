@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class JenisPrestasiController extends Controller
 {
-    // Tampil semua data (Read)
+// Tampil semua data (Read)
     public function index()
     {
         $data = JenisPrestasi::with(['prestasiMahasiswa'])->get();
@@ -19,18 +19,21 @@ class JenisPrestasiController extends Controller
     // Tambah data (Sesuai Flowchart: Tambah)
     public function store(Request $request)
     {
-        $request->validate([
-            'id_prestasi_mahasiswa' => 'required|exists:prestasi_mahasiswa,id',
-            'jenis' => 'required|string',
+        $validated = $request->validate([
+            'kode' => 'required|string|unique:jenis_prestasi,kode',
+            'nama' => 'required|string|max:255',
+            'kategori' => 'required|in:Akademik,Non-Akademik',
+            'tingkat' => 'required|in:Internasional,Nasional,Regional,Lokal',
+            'is_active' => 'boolean',
         ]);
 
-        $jenis = JenisPrestasi::create($request->all());
+        $jenis = JenisPrestasi::create($validated);
 
         // Tampilkan Pesan Berhasil
         return ApiResponse::success($jenis, 'Data Jenis Prestasi berhasil ditambahkan', 201);
     }
 
-    // Tampil satu data spesifik
+// Tampil satu data spesifik
     public function show(string $id)
     {
         $jenis = JenisPrestasi::with(['prestasiMahasiswa'])->find($id);
@@ -51,12 +54,15 @@ class JenisPrestasiController extends Controller
             return ApiResponse::error('Data tidak ditemukan', 404);
         }
 
-        $request->validate([
-            'id_prestasi_mahasiswa' => 'required|exists:prestasi_mahasiswa,id',
-            'jenis' => 'required|string',
+        $validated = $request->validate([
+            'kode' => 'required|string|unique:jenis_prestasi,kode,' . $id,
+            'nama' => 'required|string|max:255',
+            'kategori' => 'required|in:Akademik,Non-Akademik',
+            'tingkat' => 'required|in:Internasional,Nasional,Regional,Lokal',
+            'is_active' => 'boolean',
         ]);
 
-        $jenis->update($request->all());
+        $jenis->update($validated);
 
         // Tampilkan Pesan Berhasil
         return ApiResponse::success($jenis, 'Data Jenis Prestasi berhasil diupdate');

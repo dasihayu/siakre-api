@@ -1,8 +1,6 @@
 <?php
 
 use App\Models\JenisPrestasi;
-use App\Models\Mahasiswa;
-use App\Models\PrestasiMahasiswa;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -16,23 +14,12 @@ test('authenticated user can list jenis prestasi', function () {
     $user = User::factory()->create();
     $token = auth('api')->login($user);
 
-    $mahasiswa = Mahasiswa::create([
-        'nim' => 33424101,
-        'nama_mahasiswa' => 'Andrian Amirudin',
-        'tahun_masuk' => 2024,
-        'jenis_pendaftaran' => 'Reguler',
-        'masa_studi_bulan' => 48,
-    ]);
-
-    $prestasi = PrestasiMahasiswa::create([
-        'id_mahasiswa' => $mahasiswa->id,
-        'nama_aktivitas' => 'Juara 1 OSN',
-        'tahun' => 2024,
-    ]);
-
     JenisPrestasi::create([
-        'id_prestasi_mahasiswa' => $prestasi->id,
-        'jenis' => 'Akademik',
+        'kode' => 'JP01',
+        'nama' => 'Juara 1 Lomba Pemrograman',
+        'kategori' => 'Akademik',
+        'tingkat' => 'Nasional',
+        'is_active' => true,
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
@@ -51,23 +38,12 @@ test('authenticated user can create jenis prestasi', function () {
     $user = User::factory()->create();
     $token = auth('api')->login($user);
 
-    $mahasiswa = Mahasiswa::create([
-        'nim' => 33424101,
-        'nama_mahasiswa' => 'Andrian Amirudin',
-        'tahun_masuk' => 2024,
-        'jenis_pendaftaran' => 'Reguler',
-        'masa_studi_bulan' => 48,
-    ]);
-
-    $prestasi = PrestasiMahasiswa::create([
-        'id_mahasiswa' => $mahasiswa->id,
-        'nama_aktivitas' => 'Juara 1 OSN',
-        'tahun' => 2024,
-    ]);
-
     $payload = [
-        'id_prestasi_mahasiswa' => $prestasi->id,
-        'jenis' => 'Akademik',
+        'kode' => 'JP02',
+        'nama' => 'Juara 2 Hackathon',
+        'kategori' => 'Akademik',
+        'tingkat' => 'Internasional',
+        'is_active' => true,
     ];
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
@@ -78,12 +54,13 @@ test('authenticated user can create jenis prestasi', function () {
             'success' => true,
             'message' => 'Data Jenis Prestasi berhasil ditambahkan',
             'data' => [
-                'jenis' => 'Akademik',
+                'kode' => 'JP02',
+                'nama' => 'Juara 2 Hackathon',
             ],
         ]);
 
     $this->assertDatabaseHas('jenis_prestasi', [
-        'jenis' => 'Akademik',
+        'kode' => 'JP02',
     ]);
 });
 
@@ -91,23 +68,12 @@ test('authenticated user can view detail of jenis prestasi', function () {
     $user = User::factory()->create();
     $token = auth('api')->login($user);
 
-    $mahasiswa = Mahasiswa::create([
-        'nim' => 33424101,
-        'nama_mahasiswa' => 'Andrian Amirudin',
-        'tahun_masuk' => 2024,
-        'jenis_pendaftaran' => 'Reguler',
-        'masa_studi_bulan' => 48,
-    ]);
-
-    $prestasi = PrestasiMahasiswa::create([
-        'id_mahasiswa' => $mahasiswa->id,
-        'nama_aktivitas' => 'Juara 1 OSN',
-        'tahun' => 2024,
-    ]);
-
     $jenis = JenisPrestasi::create([
-        'id_prestasi_mahasiswa' => $prestasi->id,
-        'jenis' => 'Akademik',
+        'kode' => 'JP03',
+        'nama' => 'Juara 3 Badminton',
+        'kategori' => 'Non-Akademik',
+        'tingkat' => 'Regional',
+        'is_active' => true,
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
@@ -118,7 +84,7 @@ test('authenticated user can view detail of jenis prestasi', function () {
             'success' => true,
             'data' => [
                 'id' => $jenis->id,
-                'jenis' => 'Akademik',
+                'kode' => 'JP03',
             ],
         ]);
 });
@@ -127,29 +93,21 @@ test('authenticated user can update jenis prestasi', function () {
     $user = User::factory()->create();
     $token = auth('api')->login($user);
 
-    $mahasiswa = Mahasiswa::create([
-        'nim' => 33424101,
-        'nama_mahasiswa' => 'Andrian Amirudin',
-        'tahun_masuk' => 2024,
-        'jenis_pendaftaran' => 'Reguler',
-        'masa_studi_bulan' => 48,
-    ]);
-
-    $prestasi = PrestasiMahasiswa::create([
-        'id_mahasiswa' => $mahasiswa->id,
-        'nama_aktivitas' => 'Juara 1 OSN',
-        'tahun' => 2024,
-    ]);
-
     $jenis = JenisPrestasi::create([
-        'id_prestasi_mahasiswa' => $prestasi->id,
-        'jenis' => 'Jenis Lama',
+        'kode' => 'JP04',
+        'nama' => 'Nama Lama',
+        'kategori' => 'Akademik',
+        'tingkat' => 'Lokal',
+        'is_active' => true,
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
         ->putJson("/api/jenis-prestasi/{$jenis->id}", [
-            'id_prestasi_mahasiswa' => $prestasi->id,
-            'jenis' => 'Non-Akademik',
+            'kode' => 'JP04-UPD',
+            'nama' => 'Nama Baru',
+            'kategori' => 'Akademik',
+            'tingkat' => 'Nasional',
+            'is_active' => true,
         ]);
 
     $response->assertStatus(200)
@@ -160,7 +118,8 @@ test('authenticated user can update jenis prestasi', function () {
 
     $this->assertDatabaseHas('jenis_prestasi', [
         'id' => $jenis->id,
-        'jenis' => 'Non-Akademik',
+        'kode' => 'JP04-UPD',
+        'nama' => 'Nama Baru',
     ]);
 });
 
@@ -168,23 +127,12 @@ test('authenticated user can delete jenis prestasi', function () {
     $user = User::factory()->create();
     $token = auth('api')->login($user);
 
-    $mahasiswa = Mahasiswa::create([
-        'nim' => 33424101,
-        'nama_mahasiswa' => 'Andrian Amirudin',
-        'tahun_masuk' => 2024,
-        'jenis_pendaftaran' => 'Reguler',
-        'masa_studi_bulan' => 48,
-    ]);
-
-    $prestasi = PrestasiMahasiswa::create([
-        'id_mahasiswa' => $mahasiswa->id,
-        'nama_aktivitas' => 'Juara 1 OSN',
-        'tahun' => 2024,
-    ]);
-
     $jenis = JenisPrestasi::create([
-        'id_prestasi_mahasiswa' => $prestasi->id,
-        'jenis' => 'Jenis Hapus',
+        'kode' => 'JP05',
+        'nama' => 'Akan Dihapus',
+        'kategori' => 'Akademik',
+        'tingkat' => 'Lokal',
+        'is_active' => true,
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")

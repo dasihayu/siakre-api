@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\JenisPrestasi;
-use App\Models\PrestasiMahasiswa;
 use Illuminate\Database\Seeder;
 
 class JenisPrestasiSeeder extends Seeder
@@ -13,24 +12,34 @@ class JenisPrestasiSeeder extends Seeder
      */
     public function run(): void
     {
-        $allPrestasi = PrestasiMahasiswa::all();
+        $data = [
+            [
+                'kode' => 'JP01',
+                'nama' => 'Juara 1 Lomba Pemrograman Nasional',
+                'kategori' => 'Akademik',
+                'tingkat' => 'Nasional',
+                'is_active' => true,
+            ],
+            [
+                'kode' => 'JP02',
+                'nama' => 'Juara 2 Hackathon Internasional',
+                'kategori' => 'Akademik',
+                'tingkat' => 'Internasional',
+                'is_active' => true,
+            ],
+            [
+                'kode' => 'JP03',
+                'nama' => 'Juara 1 Kejuaraan Karate Regional',
+                'kategori' => 'Non-Akademik',
+                'tingkat' => 'Regional',
+                'is_active' => true,
+            ],
+        ];
 
-        foreach ($allPrestasi as $prestasi) {
-            $isNonAkademik = str_contains(strtolower($prestasi->nama_aktivitas), 'english')
-                || str_contains(strtolower($prestasi->nama_aktivitas), 'olahraga')
-                || str_contains(strtolower($prestasi->nama_aktivitas), 'seni');
-
-            $jenis = $isNonAkademik ? 'Non-Akademik' : 'Akademik';
-
-            JenisPrestasi::firstOrCreate(
-                [
-                    'id_prestasi_mahasiswa' => $prestasi->id,
-                    'jenis' => $jenis,
-                ],
-                [
-                    'id_prestasi_mahasiswa' => $prestasi->id,
-                    'jenis' => $jenis,
-                ]
+        foreach ($data as $item) {
+            JenisPrestasi::updateOrCreate(
+                ['kode' => $item['kode']],
+                $item
             );
         }
     }
