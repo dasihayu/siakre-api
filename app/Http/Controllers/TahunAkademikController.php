@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\DB;
 
 class TahunAkademikController extends Controller
 {
@@ -33,16 +34,18 @@ class TahunAkademikController extends Controller
             }
 
             $defaultProdi = Prodi::first();
+            // Ambil tahun akademik yang aktif untuk acuan label TS
+            $activeTa = TahunAkademik::where('is_active', true)->first();
 
             if ($request->has('per_page')) {
                 /** @var LengthAwarePaginator $paginator */
                 $paginator = $query->paginate($request->get('per_page', 10));
-                $paginator->getCollection()->transform(fn (TahunAkademik $ta) => $this->formatTahunAkademik($ta, $defaultProdi));
+                $paginator->getCollection()->transform(fn (TahunAkademik $ta) => $this->formatTahunAkademik($ta, $defaultProdi, $activeTa));
 
                 return ApiResponse::success($paginator, 'Berhasil mendapatkan data tahun akademik');
             }
 
-            $tahunAkademik = $query->get()->map(fn (TahunAkademik $ta) => $this->formatTahunAkademik($ta, $defaultProdi));
+            $tahunAkademik = $query->get()->map(fn (TahunAkademik $ta) => $this->formatTahunAkademik($ta, $defaultProdi, $activeTa));
 
             return ApiResponse::success($tahunAkademik, 'Berhasil mendapatkan data tahun akademik');
         } catch (\Exception $e) {
@@ -50,12 +53,26 @@ class TahunAkademikController extends Controller
         }
     }
 
-    protected function formatTahunAkademik(TahunAkademik $ta, ?Prodi $defaultProdi = null): array
+    protected function formatTahunAkademik(TahunAkademik $ta, ?Prodi $defaultProdi = null, ?TahunAkademik $activeTa = null): array
     {
         $prodiModel = $ta->relationLoaded('angkatanKelas')
             ? $ta->angkatanKelas->first()?->prodi
             : null;
         $prodiModel = $prodiModel ?? $defaultProdi;
+
+        // Logika Generator Label TS (TS, TS-1, TS-2, dst.) relatif terhadap is_active = true
+        $labelTs = 'TS';
+        if ($activeTa) {
+            $activeStart = intval(substr($activeTa->tahun, 0, 4));
+            $currentStart = intval(substr($ta->tahun, 0, 4));
+            $diff = $activeStart - $currentStart;
+            
+            if ($diff > 0) {
+                $labelTs = 'TS-' . $diff;
+            } elseif ($diff < 0) {
+                $labelTs = 'TS+' . abs($diff);
+            }
+        }
 
         return [
             'id' => $ta->id,
@@ -63,6 +80,7 @@ class TahunAkademikController extends Controller
             'semester' => $ta->semester,
             'nama_tahun_akademik' => $ta->nama_tahun_akademik,
             'is_active' => (bool) $ta->is_active,
+            'label_ts' => $labelTs, // Ditambahkan sesuai instruksi lembar tugas M4
             'jumlah_kelas' => (int) ($ta->jumlah_kelas ?? $ta->angkatanKelas()->count()),
             'prodi' => $prodiModel ? [
                 'id' => $prodiModel->id,
@@ -89,16 +107,27 @@ class TahunAkademikController extends Controller
                         return $query->where('semester', $semester);
                     }),
                 ],
-                'semester' => 'required|in:Ganjil,Genap',
+                'semester' => 'required|in:Ganjil,Genap,Pendek',
                 'is_active' => 'boolean',
             ]);
 
+            DB::beginTransaction();
+
+            // Enforce validasi agar hanya ada tepat satu tahun akademik berstatus aktif
+            if (isset($validated['is_active']) && $validated['is_active']) {
+                TahunAkademik::where('is_active', true)->update(['is_active' => false]);
+            }
+
             $tahunAkademik = TahunAkademik::create($validated);
+
+            DB::commit();
 
             return ApiResponse::success($tahunAkademik, 'Tahun akademik berhasil ditambahkan', 201);
         } catch (ValidationException $e) {
+            DB::rollBack();
             return ApiResponse::validationError($e->errors(), 'Validasi gagal');
         } catch (\Exception $e) {
+            DB::rollBack();
             return ApiResponse::error('Gagal menambahkan tahun akademik: '.$e->getMessage(), 500);
         }
     }
@@ -113,8 +142,10 @@ class TahunAkademikController extends Controller
             return ApiResponse::error('Data tahun akademik tidak ditemukan', 404);
         }
 
+        $activeTa = TahunAkademik::where('is_active', true)->first();
+
         return ApiResponse::success(
-            $this->formatTahunAkademik($tahunAkademik, Prodi::first()),
+            $this->formatTahunAkademik($tahunAkademik, Prodi::first(), $activeTa),
             'Detail tahun akademik berhasil ditemukan'
         );
     }
@@ -192,16 +223,27 @@ class TahunAkademikController extends Controller
                         return $query->where('semester', $semester);
                     })->ignore($id),
                 ],
-                'semester' => 'required|in:Ganjil,Genap',
+                'semester' => 'required|in:Ganjil,Genap,Pendek',
                 'is_active' => 'boolean',
             ]);
 
+            DB::beginTransaction();
+
+            // Enforce validasi single active saat update
+            if (isset($validated['is_active']) && $validated['is_active']) {
+                TahunAkademik::where('id', '!=', $id)->update(['is_active' => false]);
+            }
+
             $tahunAkademik->update($validated);
+
+            DB::commit();
 
             return ApiResponse::success($tahunAkademik, 'Tahun akademik berhasil diperbarui');
         } catch (ValidationException $e) {
+            DB::rollBack();
             return ApiResponse::validationError($e->errors(), 'Validasi gagal');
         } catch (\Exception $e) {
+            DB::rollBack();
             return ApiResponse::error('Gagal memperbarui tahun akademik: '.$e->getMessage(), 500);
         }
     }
