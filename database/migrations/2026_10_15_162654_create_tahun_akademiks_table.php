@@ -10,9 +10,10 @@ return new class extends Migration
     {
         Schema::create('tahun_akademik', function (Blueprint $table) {
             $table->id();
-            $table->string('tahun', 20);
-            $table->string('semester', 20)->default('Ganjil');
-            $table->boolean('is_active')->default(true);
+            $table->string('tahun', 20); // Contoh: "2026/2027"
+            // Diubah menggunakan enum agar sesuai dengan pilihan tugas: Ganjil, Genap, Pendek
+            $table->enum('semester', ['Ganjil', 'Genap', 'Pendek'])->default('Ganjil'); 
+            $table->boolean('is_active')->default(false); // Default false agar tidak bentrok saat input baru
             $table->timestamps();
 
             $table->unique(['tahun', 'semester'], 'tahun_akademik_tahun_semester_unique');
@@ -21,7 +22,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        // Menggunakan nama tabel asli tanpa 's'
         Schema::dropIfExists('tahun_akademik');
     }
 };
