@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\PerguruanTinggi;
-use App\Models\Prodi;
 use App\Models\Upps;
 use Illuminate\Database\Seeder;
 
@@ -15,9 +14,7 @@ class UppsSeeder extends Seeder
     public function run(): void
     {
         $pt = PerguruanTinggi::where('kode_pt', 'PT001')->first() ?? PerguruanTinggi::first();
-        $prodi = Prodi::where('kode_prodi', 'PR01')->first() ?? Prodi::first();
-
-        if (! $pt || ! $prodi) {
+        if (! $pt) {
             return;
         }
 
@@ -28,7 +25,6 @@ class UppsSeeder extends Seeder
                 'kode_upps' => 'UPPS01',
                 'nama_upps' => 'UPPS TRK',
                 'pimpinan_upps' => 'Dr. Amin Suharjono, S.T., M.T.',
-                'prodi_id' => $prodi->id,
                 'jenis' => 'Jurusan',
             ]
         );

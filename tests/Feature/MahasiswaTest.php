@@ -15,11 +15,11 @@ test('authenticated user can list mahasiswa', function () {
     $token = auth('api')->login($user);
 
     Mahasiswa::create([
-        'nim'               => 33424101,
-        'nama_mahasiswa'    => 'Andrian Amirudin',
-        'tahun_masuk'       => 2024,
+        'nim' => 33424101,
+        'nama_mahasiswa' => 'Andrian Amirudin',
+        'tahun_masuk' => 2024,
         'jenis_pendaftaran' => 'Reguler',
-        'masa_studi_bulan'  => 48,
+        'masa_studi_bulan' => 48,
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
@@ -39,12 +39,12 @@ test('authenticated user can create mahasiswa', function () {
     $token = auth('api')->login($user);
 
     $payload = [
-        'nim'               => 33424102,
-        'nama_mahasiswa'    => 'Budi Santoso',
-        'tahun_masuk'       => 2024,
+        'nim' => 33424102,
+        'nama_mahasiswa' => 'Budi Santoso',
+        'tahun_masuk' => 2024,
         'jenis_pendaftaran' => 'Reguler',
         'tanggal_kelulusan' => '2028-09-13',
-        'masa_studi_bulan'  => 48,
+        'masa_studi_bulan' => 12,
     ];
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
@@ -58,7 +58,52 @@ test('authenticated user can create mahasiswa', function () {
 
     $this->assertDatabaseHas('data_mahasiswa', [
         'nim' => 33424102,
+        'masa_studi_bulan' => 56,
     ]);
+});
+
+test('mahasiswa masa studi is recalculated from entry year and graduation date', function () {
+    $user = User::factory()->create();
+    $token = auth('api')->login($user);
+
+    $mhs = Mahasiswa::create([
+        'nim' => 33424103,
+        'nama_mahasiswa' => 'Mahasiswa Lulus',
+        'tahun_masuk' => 2024,
+        'jenis_pendaftaran' => 'Reguler',
+    ]);
+
+    $this->withHeader('Authorization', '******')
+        ->putJson("/api/mahasiswa/{$mhs->id}", [
+            'nim' => 33424103,
+            'nama_mahasiswa' => 'Mahasiswa Lulus',
+            'tahun_masuk' => 2024,
+            'jenis_pendaftaran' => 'Reguler',
+            'tanggal_kelulusan' => '2028-10-10',
+            'masa_studi_bulan' => 1,
+        ])
+        ->assertOk();
+
+    $this->assertDatabaseHas('data_mahasiswa', [
+        'id' => $mhs->id,
+        'masa_studi_bulan' => 57,
+    ]);
+});
+
+test('mahasiswa accepts the new profile fields and requires country for foreign students', function () {
+    $user = User::factory()->create();
+    $token = auth('api')->login($user);
+
+    $this->withHeader('Authorization', '******')
+        ->postJson('/api/mahasiswa', [
+            'nim' => 33424321,
+            'nama_mahasiswa' => 'Mahasiswa Asing',
+            'tahun_masuk' => 2024,
+            'jenis_pendaftaran' => 'Reguler',
+            'kewarganegaraan' => 'WNA',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['negara']);
 });
 
 test('system blocks creation of duplicate nim mahasiswa', function () {
@@ -66,19 +111,19 @@ test('system blocks creation of duplicate nim mahasiswa', function () {
     $token = auth('api')->login($user);
 
     Mahasiswa::create([
-        'nim'               => 33424199,
-        'nama_mahasiswa'    => 'Mahasiswa Lama',
-        'tahun_masuk'       => 2024,
+        'nim' => 33424199,
+        'nama_mahasiswa' => 'Mahasiswa Lama',
+        'tahun_masuk' => 2024,
         'jenis_pendaftaran' => 'Reguler',
-        'masa_studi_bulan'  => 48,
+        'masa_studi_bulan' => 48,
     ]);
 
     $payload = [
-        'nim'               => 33424199,
-        'nama_mahasiswa'    => 'Mahasiswa Baru',
-        'tahun_masuk'       => 2024,
+        'nim' => 33424199,
+        'nama_mahasiswa' => 'Mahasiswa Baru',
+        'tahun_masuk' => 2024,
         'jenis_pendaftaran' => 'Reguler',
-        'masa_studi_bulan'  => 48,
+        'masa_studi_bulan' => 48,
     ];
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
@@ -93,11 +138,11 @@ test('authenticated user can view detail of mahasiswa', function () {
     $token = auth('api')->login($user);
 
     $mhs = Mahasiswa::create([
-        'nim'               => 33424104,
-        'nama_mahasiswa'    => 'Siti Aminah',
-        'tahun_masuk'       => 2023,
+        'nim' => 33424104,
+        'nama_mahasiswa' => 'Siti Aminah',
+        'tahun_masuk' => 2023,
         'jenis_pendaftaran' => 'Transfer',
-        'masa_studi_bulan'  => 48,
+        'masa_studi_bulan' => 48,
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
@@ -118,21 +163,21 @@ test('authenticated user can update mahasiswa', function () {
     $token = auth('api')->login($user);
 
     $mhs = Mahasiswa::create([
-        'nim'               => 33424105,
-        'nama_mahasiswa'    => 'Nama Lama',
-        'tahun_masuk'       => 2024,
+        'nim' => 33424105,
+        'nama_mahasiswa' => 'Nama Lama',
+        'tahun_masuk' => 2024,
         'jenis_pendaftaran' => 'Reguler',
-        'masa_studi_bulan'  => 48,
+        'masa_studi_bulan' => 48,
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
         ->putJson("/api/mahasiswa/{$mhs->id}", [
-            'nim'               => 33424105,
-            'nama_mahasiswa'    => 'Nama Baru Update',
-            'tahun_masuk'       => 2024,
+            'nim' => 33424105,
+            'nama_mahasiswa' => 'Nama Baru Update',
+            'tahun_masuk' => 2024,
             'jenis_pendaftaran' => 'Reguler',
             'tanggal_kelulusan' => '2028-10-10',
-            'masa_studi_bulan'  => 50,
+            'masa_studi_bulan' => 50,
         ]);
 
     $response->assertStatus(200)
@@ -153,11 +198,11 @@ test('authenticated user can delete mahasiswa', function () {
     $token = auth('api')->login($user);
 
     $mhs = Mahasiswa::create([
-        'nim'               => 33424188,
-        'nama_mahasiswa'    => 'Akan Dihapus',
-        'tahun_masuk'       => 2024,
+        'nim' => 33424188,
+        'nama_mahasiswa' => 'Akan Dihapus',
+        'tahun_masuk' => 2024,
         'jenis_pendaftaran' => 'Reguler',
-        'masa_studi_bulan'  => 48,
+        'masa_studi_bulan' => 48,
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")

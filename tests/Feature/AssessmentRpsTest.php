@@ -123,7 +123,7 @@ test('CPL assessment and education gap use weighted grades and available cohort 
         'nama_mahasiswa' => 'Mahasiswa Uji',
         'tahun_masuk' => 2024,
         'jenis_pendaftaran' => 'SNBT',
-        'tanggal_kelulusan' => '2028-07-01',
+        'tanggal_kelulusan' => '2028-01-01',
         'masa_studi_bulan' => 48,
     ]);
     $academicYear = TahunAkademik::create([

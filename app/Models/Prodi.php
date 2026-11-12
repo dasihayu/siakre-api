@@ -14,11 +14,12 @@ class Prodi extends Model
     protected $fillable = [
         'kode_prodi',
         'nama_prodi',
-        'akreditasi'
+        'akreditasi',
+        'id_upps',
     ];
 
     public function upps()
     {
-        return $this->hasMany(Upps::class, 'prodi_id');
+        return $this->belongsTo(Upps::class, 'id_upps');
     }
 }

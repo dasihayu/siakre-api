@@ -10,14 +10,13 @@ class Upps extends Model
     use HasFactory;
 
     protected $table = 'upps';
-    
+
     protected $fillable = [
-        'id_pt', 
-        'kode_upps', 
-        'nama_upps', 
-        'pimpinan_upps', 
-        'prodi_id', 
-        'jenis'
+        'id_pt',
+        'kode_upps',
+        'nama_upps',
+        'pimpinan_upps',
+        'jenis',
     ];
 
     // Relasi ke Perguruan Tinggi
@@ -27,8 +26,8 @@ class Upps extends Model
     }
 
     // Relasi ke Prodi
-    public function prodi()
+    public function prodis()
     {
-        return $this->belongsTo(Prodi::class, 'prodi_id');
+        return $this->hasMany(Prodi::class, 'id_upps');
     }
 }

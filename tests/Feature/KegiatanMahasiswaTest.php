@@ -71,11 +71,11 @@ test('authenticated user can create kegiatan mahasiswa', function () {
         'nama_kegiatan' => 'Seminar IT',
         'jenis_kegiatan' => 'Seminar',
         'peran' => 'Panitia',
-        'tingkat' => 'Fakultas',
+        'tingkat' => 'Lokal',
         'tanggal_mulai' => '2025-08-01',
         'tanggal_selesai' => '2025-08-02',
         'penyelenggara' => 'Himpunan Mahasiswa',
-        'status_validasi' => 'Disetujui',
+        'status_validasi' => 'Valid',
     ];
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
@@ -90,7 +90,35 @@ test('authenticated user can create kegiatan mahasiswa', function () {
     $this->assertDatabaseHas('kegiatan_mahasiswa', [
         'nama_kegiatan' => 'Seminar IT',
         'peran' => 'Panitia',
+        'status_validasi' => 'Valid',
     ]);
+});
+
+test('kegiatan mahasiswa rejects unsupported status and level values', function () {
+    $user = User::factory()->create();
+    $token = auth('api')->login($user);
+    $mhs = Mahasiswa::create([
+        'nim' => 33424991,
+        'nama_mahasiswa' => 'Mahasiswa',
+        'tahun_masuk' => 2024,
+        'jenis_pendaftaran' => 'Reguler',
+    ]);
+    $ta = TahunAkademik::create(['tahun' => '2024']);
+
+    $this->withHeader('Authorization', '******')
+        ->postJson('/api/kegiatan-mahasiswa', [
+            'mahasiswa_id' => $mhs->id,
+            'tahun_akademik_id' => $ta->id,
+            'nama_kegiatan' => 'Kegiatan',
+            'jenis_kegiatan' => 'Lomba',
+            'peran' => 'Peserta',
+            'tingkat' => 'Fakultas',
+            'tanggal_mulai' => '2025-08-01',
+            'penyelenggara' => 'Kampus',
+            'status_validasi' => 'Disetujui',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['tingkat', 'status_validasi']);
 });
 
 test('authenticated user can view detail, update, and delete kegiatan mahasiswa', function () {
@@ -138,13 +166,13 @@ test('authenticated user can view detail, update, and delete kegiatan mahasiswa'
             'tingkat' => 'Lokal',
             'tanggal_mulai' => '2025-10-01',
             'penyelenggara' => 'Kampus',
-            'status_validasi' => 'Disetujui',
+            'status_validasi' => 'Valid',
         ])
         ->assertStatus(200);
 
     $this->assertDatabaseHas('kegiatan_mahasiswa', [
         'nama_kegiatan' => 'Lomba A Update',
-        'status_validasi' => 'Disetujui',
+        'status_validasi' => 'Valid',
     ]);
 
     // Delete

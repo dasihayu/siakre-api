@@ -10,34 +10,35 @@ class KegiatanMahasiswaController extends Controller
 {
     public function index()
     {
-        $data = KegiatanMahasiswa::with(['mahasiswa', 'tahunAkademik'])->get();
+        $data = KegiatanMahasiswa::with(['mahasiswa', 'tahunAkademik', 'evidences'])->get();
 
         return ApiResponse::success($data, 'Berhasil mengambil data kegiatan mahasiswa');
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'mahasiswa_id' => 'required|exists:data_mahasiswa,id',
             'tahun_akademik_id' => 'required|exists:tahun_akademik,id',
             'nama_kegiatan' => 'required|string',
             'jenis_kegiatan' => 'required|string',
             'peran' => 'required|string',
-            'tingkat' => 'required|string',
+            'tingkat' => 'required|in:Internasional,Nasional,Provinsi,Lokal',
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
             'penyelenggara' => 'required|string',
-            'status_validasi' => 'required|string',
+            'status_validasi' => 'required|in:Pending,Valid,Ditolak',
         ]);
 
-        $kegiatan = KegiatanMahasiswa::create($request->all());
+        $kegiatan = KegiatanMahasiswa::create($validated);
+        $kegiatan->load('evidences');
 
         return ApiResponse::success($kegiatan, 'Data kegiatan mahasiswa berhasil ditambahkan', 201);
     }
 
     public function show(string $id)
     {
-        $kegiatan = KegiatanMahasiswa::with(['mahasiswa', 'tahunAkademik'])->find($id);
+        $kegiatan = KegiatanMahasiswa::with(['mahasiswa', 'tahunAkademik', 'evidences'])->find($id);
 
         if (! $kegiatan) {
             return ApiResponse::error('Data kegiatan tidak ditemukan', 404);
@@ -54,20 +55,21 @@ class KegiatanMahasiswaController extends Controller
             return ApiResponse::error('Data kegiatan tidak ditemukan', 404);
         }
 
-        $request->validate([
+        $validated = $request->validate([
             'mahasiswa_id' => 'required|exists:data_mahasiswa,id',
             'tahun_akademik_id' => 'required|exists:tahun_akademik,id',
             'nama_kegiatan' => 'required|string',
             'jenis_kegiatan' => 'required|string',
             'peran' => 'required|string',
-            'tingkat' => 'required|string',
+            'tingkat' => 'required|in:Internasional,Nasional,Provinsi,Lokal',
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
             'penyelenggara' => 'required|string',
-            'status_validasi' => 'required|string',
+            'status_validasi' => 'required|in:Pending,Valid,Ditolak',
         ]);
 
-        $kegiatan->update($request->all());
+        $kegiatan->update($validated);
+        $kegiatan->load('evidences');
 
         return ApiResponse::success($kegiatan, 'Data kegiatan mahasiswa berhasil diupdate');
     }

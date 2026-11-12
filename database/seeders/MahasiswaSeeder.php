@@ -111,20 +111,16 @@ class MahasiswaSeeder extends Seeder
                         if ($studentIndex < $profile['on_time']) {
                             // Lulus tepat waktu (48 bulan)
                             $tanggalKelulusan = sprintf('%d-08-25', $tahunMasuk + 4);
-                            $masaStudi = 48;
                         } elseif ($studentIndex < ($profile['on_time'] + $profile['late'])) {
                             // Lulus terlambat (54 bulan)
                             $tanggalKelulusan = sprintf('%d-02-25', $tahunMasuk + 5);
-                            $masaStudi = 54;
                         } else {
                             // Drop out / tidak lulus
                             $tanggalKelulusan = null;
-                            $masaStudi = 0;
                         }
                     } else {
                         // Mahasiswa yang masih aktif menempuh perkuliahan
                         $tanggalKelulusan = null;
-                        $masaStudi = 0;
                     }
 
                     if (isset($presetStudents[$nim])) {
@@ -144,7 +140,10 @@ class MahasiswaSeeder extends Seeder
                         'tahun_masuk' => $tahunMasuk,
                         'jenis_pendaftaran' => $jalur,
                         'tanggal_kelulusan' => $tanggalKelulusan,
-                        'masa_studi_bulan' => $masaStudi,
+                        'masa_studi_bulan' => $tanggalKelulusan === null
+                            ? null
+                            : (((((int) substr($tanggalKelulusan, 0, 4)) - $tahunMasuk) * 12)
+                                + (int) substr($tanggalKelulusan, 5, 2) - 1),
                         'created_at' => $now,
                         'updated_at' => $now,
                     ];

@@ -33,4 +33,9 @@ class KegiatanMahasiswa extends Model
     {
         return $this->belongsTo(TahunAkademik::class, 'tahun_akademik_id');
     }
+
+    public function evidences()
+    {
+        return $this->hasMany(EvidenceKegiatanMahasiswa::class, 'id_kegiatan');
+    }
 }

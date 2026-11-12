@@ -58,18 +58,22 @@ class MahasiswaController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nim' => 'required|integer|unique:data_mahasiswa,nim',
             'nama_mahasiswa' => 'required|string',
             'tahun_masuk' => 'required|integer',
             'jenis_pendaftaran' => 'required|string',
             'tanggal_kelulusan' => 'nullable|date',
-            'masa_studi_bulan' => 'required|integer',
+            'id_prodi' => 'nullable|exists:prodi,id',
+            'kewarganegaraan' => 'nullable|in:WNI,WNA',
+            'negara' => 'required_if:kewarganegaraan,WNA|nullable|string|max:255',
+            'asal_sekolah_pt' => 'nullable|string|max:255',
+            'id_status_terkini' => 'nullable|exists:status_mahasiswa,id',
         ], [
             'nim.unique' => 'NIM Mahasiswa Sudah Ada',
         ]);
 
-        $mhs = Mahasiswa::create($request->all());
+        $mhs = Mahasiswa::create($validated);
 
         return ApiResponse::success($mhs, 'Data Mahasiswa berhasil ditambahkan', 201);
     }
@@ -93,18 +97,22 @@ class MahasiswaController extends Controller
             return ApiResponse::error('Data mahasiswa tidak ditemukan', 404);
         }
 
-        $request->validate([
+        $validated = $request->validate([
             'nim' => 'required|integer|unique:data_mahasiswa,nim,'.$id,
             'nama_mahasiswa' => 'required|string',
             'tahun_masuk' => 'required|integer',
             'jenis_pendaftaran' => 'required|string',
             'tanggal_kelulusan' => 'nullable|date',
-            'masa_studi_bulan' => 'required|integer',
+            'id_prodi' => 'nullable|exists:prodi,id',
+            'kewarganegaraan' => 'nullable|in:WNI,WNA',
+            'negara' => 'required_if:kewarganegaraan,WNA|nullable|string|max:255',
+            'asal_sekolah_pt' => 'nullable|string|max:255',
+            'id_status_terkini' => 'nullable|exists:status_mahasiswa,id',
         ], [
             'nim.unique' => 'NIM Mahasiswa Sudah Ada',
         ]);
 
-        $mhs->update($request->all());
+        $mhs->update($validated);
 
         return ApiResponse::success($mhs, 'Data Mahasiswa berhasil diupdate');
     }

@@ -1,10 +1,9 @@
 <?php
 
+use App\Models\AnggotaUpps;
 use App\Models\PerguruanTinggi;
 use App\Models\Upps;
-use App\Models\AnggotaUpps;
 use App\Models\User;
-use App\Models\Prodi;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -23,24 +22,21 @@ test('authenticated user can list anggota upps', function () {
         'alamat' => 'Jl. Prof. Sudarto',
         'pimpinan' => 'Dyonisius Beti',
     ]);
-    
-    $prodi = Prodi::create([
-        'kode_prodi' => 'TI01',
-        'nama_prodi' => 'Teknik Informatika',
-    ]);
 
     $upps = Upps::create([
-        'id_pt'     => $pt->id,
-        'prodi_id'  => $prodi->id,
-        'kode_upps' => 'UPPS01', 
+        'id_pt' => $pt->id,
+        'kode_upps' => 'UPPS01',
         'nama_upps' => 'Fakultas Teknik',
-        'jenis'     => 'Fakultas', // Mandatory dari migration upps
+        'jenis' => 'Fakultas', // Mandatory dari migration upps
     ]);
-    
+
     AnggotaUpps::create([
         'id_upps' => $upps->id,
-        'nama'    => 'Dr. Siti Rahma, M.T.',
+        'nama' => 'Dr. Siti Rahma, M.T.',
         'jabatan' => 'Wakil Dekan I',
+        'urutan_tampil' => 1,
+        'periode_mulai' => '2025-01-01',
+        'periode_selesai' => '2028-12-31',
     ]);
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
@@ -65,22 +61,16 @@ test('authenticated user can create anggota upps', function () {
         'pimpinan' => 'Dyonisius Beti',
     ]);
 
-    $prodi = Prodi::create([
-        'kode_prodi' => 'TI02',
-        'nama_prodi' => 'Teknik Informatika',
-    ]);
-
     $upps = Upps::create([
-        'id_pt'     => $pt->id,
-        'prodi_id'  => $prodi->id,
+        'id_pt' => $pt->id,
         'kode_upps' => 'UPPS02',
         'nama_upps' => 'Fakultas Ilmu Komputer',
-        'jenis'     => 'Fakultas', // Mandatory dari migration upps
-    ]); 
+        'jenis' => 'Fakultas', // Mandatory dari migration upps
+    ]);
 
     $payload = [
         'id_upps' => $upps->id,
-        'nama'    => 'Prof. Dr. Budi',
+        'nama' => 'Prof. Dr. Budi',
         'jabatan' => 'Dekan',
     ];
 
@@ -109,49 +99,56 @@ test('authenticated user can view detail, update, and delete anggota upps', func
         'pimpinan' => 'Dyonisius Beti',
     ]);
 
-    $prodi = Prodi::create([
-        'kode_prodi' => 'TI03',
-        'nama_prodi' => 'Teknik Informatika',
-    ]);
-
     $upps = Upps::create([
-        'id_pt'     => $pt->id,
-        'prodi_id'  => $prodi->id,
+        'id_pt' => $pt->id,
         'kode_upps' => 'UPPS03',
         'nama_upps' => 'Fakultas Kedokteran',
-        'jenis'     => 'Fakultas', // Mandatory dari migration upps
-    ]); 
+        'jenis' => 'Fakultas', // Mandatory dari migration upps
+    ]);
 
     $anggota = AnggotaUpps::create([
         'id_upps' => $upps->id,
-        'nama'    => 'Dr. Andi',
+        'nama' => 'Dr. Andi',
         'jabatan' => 'Kaprodi',
+    ]);
+    $wakil = AnggotaUpps::create([
+        'id_upps' => $upps->id,
+        'nama' => 'Dr. Budi',
+        'jabatan' => 'Wakil Dekan',
+        'parent_id' => $anggota->id,
+        'urutan_tampil' => 1,
+        'periode_mulai' => '2025-01-01',
+        'periode_selesai' => '2028-12-31',
     ]);
 
     // View Detail
     $this->withHeader('Authorization', "Bearer {$token}")
-         ->getJson("/api/anggota-upps/{$anggota->id}")
-         ->assertStatus(200)
-         ->assertJsonPath('data.nama', 'Dr. Andi');
+        ->getJson("/api/anggota-upps/{$anggota->id}")
+        ->assertStatus(200)
+        ->assertJsonPath('data.nama', 'Dr. Andi');
 
     // Update
     $this->withHeader('Authorization', "Bearer {$token}")
-         ->putJson("/api/anggota-upps/{$anggota->id}", [
-             'id_upps' => $upps->id,
-             'nama'    => 'Dr. Andi, Sp.A',
-             'jabatan' => 'Wakil Dekan II',
-         ])
-         ->assertStatus(200);
+        ->putJson("/api/anggota-upps/{$anggota->id}", [
+            'id_upps' => $upps->id,
+            'nama' => 'Dr. Andi, Sp.A',
+            'jabatan' => 'Wakil Dekan II',
+            'urutan_tampil' => 2,
+        ])
+        ->assertStatus(200);
 
     $this->assertDatabaseHas('anggota_upps', [
         'nama' => 'Dr. Andi, Sp.A',
-        'jabatan' => 'Wakil Dekan II'
+        'jabatan' => 'Wakil Dekan II',
+        'urutan_tampil' => 2,
     ]);
+
+    expect($wakil->fresh()->parent_id)->toBe($anggota->id);
 
     // Delete
     $this->withHeader('Authorization', "Bearer {$token}")
-         ->deleteJson("/api/anggota-upps/{$anggota->id}")
-         ->assertStatus(200);
+        ->deleteJson("/api/anggota-upps/{$anggota->id}")
+        ->assertStatus(200);
 
     $this->assertDatabaseMissing('anggota_upps', [
         'id' => $anggota->id,
