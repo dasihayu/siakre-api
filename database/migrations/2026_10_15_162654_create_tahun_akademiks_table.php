@@ -11,8 +11,8 @@ return new class extends Migration
         Schema::create('tahun_akademik', function (Blueprint $table) {
             $table->id();
             $table->string('tahun', 20); // Contoh: "2026/2027"
-            // Diubah menggunakan enum agar sesuai dengan pilihan tugas: Ganjil, Genap, Pendek
-            $table->enum('semester', ['Ganjil', 'Genap', 'Pendek'])->default('Ganjil'); 
+            // Diubah menggunakan enum agar sesuai dengan pilihan tugas: Ganjil, Genap
+            $table->enum('semester', ['Ganjil', 'Genap'])->default('Ganjil'); 
             $table->boolean('is_active')->default(false); // Default false agar tidak bentrok saat input baru
             $table->timestamps();
 
