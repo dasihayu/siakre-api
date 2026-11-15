@@ -15,6 +15,7 @@ class PrestasiMahasiswa extends Model
 
     protected $fillable = [
         'id_mahasiswa',
+        'id_jenis_prestasi',
         'nama_aktivitas',
         'tahun',
     ];
@@ -28,18 +29,18 @@ class PrestasiMahasiswa extends Model
     }
 
     /**
+     * Relasi ke Jenis Prestasi (Prestasi Mahasiswa merujuk ke Master Jenis Prestasi)
+     */
+    public function jenisPrestasi(): BelongsTo
+    {
+        return $this->belongsTo(JenisPrestasi::class, 'id_jenis_prestasi');
+    }
+
+    /**
      * Relasi ke Evidence Prestasi Mahasiswa
      */
     public function evidence(): HasMany
     {
         return $this->hasMany(EvidencePrestasiMahasiswa::class, 'id_prestasi_mahasiswa');
-    }
-
-    /**
-     * Relasi ke Jenis Prestasi
-     */
-    public function jenisPrestasi(): HasMany
-    {
-        return $this->hasMany(JenisPrestasi::class, 'id_prestasi_mahasiswa');
     }
 }
