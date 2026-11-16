@@ -12,27 +12,27 @@ class ApiResponse
      * Format respons autentikasi (Login Berhasil - 200 OK)
      */
     public static function auth($user, $token, array $permissions = [], string $message = 'Login successful')
-{
-    return response()->json([
-        'success' => true,
-        'code' => 200,
-        'message' => $message,
-        'data' => [
-            'user' => [
-                'id' => $user->id,
-                'nama' => $user->name,
-                'email' => $user->email,
-                'role' => $user->role,
+    {
+        return response()->json([
+            'success' => true,
+            'code' => 200,
+            'message' => $message,
+            'data' => [
+                'user' => [
+                    'id' => $user->id,
+                    'nama' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                ],
+                'authorization' => [
+                    'access_token' => $token,
+                    'token_type' => 'Bearer',
+                    'expires_in' => 3600,
+                    'permissions' => $permissions,
+                ],
             ],
-            'authorization' => [
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-                'expires_in' => 3600,
-                'permissions' => $permissions,
-            ],
-        ],
-    ], 200);
-}
+        ], 200);
+    }
 
     /**
      * Format respons sukses data tunggal atau daftar (200 OK / 201 Created)

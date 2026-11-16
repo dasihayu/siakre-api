@@ -14,7 +14,7 @@ class AnggotaUpps extends Model
     protected $fillable = [
         'id_upps',
         'nama',
-        'jabatan'
+        'jabatan',
     ];
 
     // Relasi balik ke UPPS

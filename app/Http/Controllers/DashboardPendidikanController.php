@@ -5,12 +5,11 @@ namespace App\Http\Controllers;
 use App\Helpers\ApiResponse;
 use App\Models\KegiatanMahasiswa;
 use App\Models\Mahasiswa;
-use App\Models\NilaiMahasiswa;
 use App\Models\Prodi;
 use App\Models\StatusMahasiswa;
-use App\Services\AkademikCalculatorService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DashboardPendidikanController extends Controller
 {
@@ -145,27 +144,25 @@ class DashboardPendidikanController extends Controller
      */
     private function hitungIpkRataRata(?string $prodiId): ?float
     {
-        $nilaiQuery = NilaiMahasiswa::with([
-            'mataKuliahAngkatanKelas.enrollmentMataKuliah.mataKuliah:id,sks',
-            'mataKuliahAngkatanKelas.angkatanKelas:id,prodi_id',
-        ]);
+        $query = DB::table('nilai_mahasiswa')
+            ->join('mata_kuliah_angkatan_kelas', 'nilai_mahasiswa.mata_kuliah_angkatan_kelas_id', '=', 'mata_kuliah_angkatan_kelas.id')
+            ->join('enrollment_mata_kuliah', 'mata_kuliah_angkatan_kelas.enrollment_mata_kuliah_id', '=', 'enrollment_mata_kuliah.id')
+            ->join('mata_kuliah', 'enrollment_mata_kuliah.mata_kuliah_id', '=', 'mata_kuliah.id');
 
         if ($prodiId) {
-            $nilaiQuery->whereHas('mataKuliahAngkatanKelas.angkatanKelas', function ($q) use ($prodiId) {
-                $q->where('prodi_id', $prodiId);
-            });
+            $query->join('angkatan_kelas', 'mata_kuliah_angkatan_kelas.angkatan_kelas_id', '=', 'angkatan_kelas.id')
+                ->where('angkatan_kelas.prodi_id', $prodiId);
         }
 
-        $semuaNilai = $nilaiQuery->get();
+        $row = $query->selectRaw('SUM(mata_kuliah.sks * nilai_mahasiswa.bobot) as total_kredit, SUM(mata_kuliah.sks) as total_sks')
+            ->whereNotNull('nilai_mahasiswa.bobot')
+            ->first();
 
-        if ($semuaNilai->isEmpty()) {
+        if (! $row || empty($row->total_sks) || (int) $row->total_sks === 0) {
             return null;
         }
 
-        // Gunakan AkademikCalculatorService dengan rule 'terbaik' di level global
-        $result = AkademikCalculatorService::hitungIPK($semuaNilai);
-
-        return $result['total_sks'] > 0 ? $result['ipk'] : null;
+        return round((float) $row->total_kredit / (float) $row->total_sks, 2);
     }
 
     /**

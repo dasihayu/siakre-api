@@ -31,6 +31,7 @@ class NilaiMahasiswaSeeder extends Seeder
             2021 => 8,
             2020 => 8,
             2019 => 8,
+            2018 => 8,
         ];
     }
 
@@ -78,9 +79,20 @@ class NilaiMahasiswaSeeder extends Seeder
             foreach ($studentEnrollments as $enrollment) {
                 $studentId = $enrollment->id_mahasiswa;
 
-                // Menghasilkan nilai angka realistis yang deterministik-variatif antara 68.00 - 94.50
-                $seed = crc32("{$course->id}_{$studentId}_{$mk->kode_mata_kuliah}");
-                $nilaiAngka = round(68 + (($seed % 2650) / 100), 2);
+                // Menghasilkan nilai angka realistis dengan distribusi performa mahasiswa
+                $biasSeed = crc32("student_bias_{$studentId}") % 100;
+                if ($biasSeed < 25) {
+                    $base = 82.0; // Cum laude (~25%)
+                } elseif ($biasSeed < 80) {
+                    $base = 74.5; // Sangat Memuaskan (~55%)
+                } elseif ($biasSeed < 95) {
+                    $base = 67.0; // Memuaskan (~15%)
+                } else {
+                    $base = 58.0; // Cukup (~5%)
+                }
+
+                $courseVarSeed = ((crc32("{$studentId}_{$course->id}_{$mk->kode_mata_kuliah}") % 1500) / 100) - 7.5;
+                $nilaiAngka = round(max(45, min(97, $base + $courseVarSeed)), 2);
                 $calc = NilaiMahasiswa::hitungNilaiHurufDanBobot($nilaiAngka);
 
                 $records[] = [

@@ -96,6 +96,33 @@ class MahasiswaSeeder extends Seeder
             2026 => ['on_time' => 0, 'late' => 0, 'do' => 0],
         ];
 
+        $companies = [
+            'PT Telekomunikasi Indonesia (Telkom)',
+            'PT Bank Central Asia Tbk (BCA)',
+            'PT Bank Mandiri (Persero) Tbk',
+            'PT Bank Rakyat Indonesia (Persero) Tbk',
+            'Tokopedia',
+            'GoTo (Gojek)',
+            'Shopee Indonesia',
+            'PT Astra International Tbk',
+            'Traveloka',
+            'Blibli (PT Global Digital Niaga)',
+            'PT Pegadaian',
+            'PT Pertamina (Persero)',
+            'PT PLN (Persero)',
+            'Bukalapak',
+            'Accenture Indonesia',
+            'PT Indosat Ooredoo Hutchison',
+            'PT XL Axiata Tbk',
+            'DANA Indonesia',
+            'Tiket.com',
+            'PT Paragon Technology and Innovation',
+            'PT Kalbe Farma Tbk',
+            'PT Unilever Indonesia Tbk',
+            'PT Bank Negara Indonesia (Persero) Tbk',
+            'PT Mitrais',
+        ];
+
         $records = [];
         $counter = 0;
 
@@ -106,6 +133,9 @@ class MahasiswaSeeder extends Seeder
                 for ($cc = 1; $cc <= 25; $cc++) {
                     $studentIndex = ($b * 25) + ($cc - 1); // 0..74
                     $nim = (int) sprintf('433%02d%d%02d', $aa, $b, $cc);
+
+                    $masaTunggu = null;
+                    $tempatKerja = null;
 
                     if ($tahunMasuk <= 2022) {
                         if ($studentIndex < $profile['on_time']) {
@@ -120,6 +150,26 @@ class MahasiswaSeeder extends Seeder
                             // Drop out / tidak lulus
                             $tanggalKelulusan = null;
                             $masaStudi = 0;
+                        }
+
+                        if ($tanggalKelulusan !== null) {
+                            $masaTungguSeed = crc32("masa_tunggu_{$nim}") % 100;
+                            if ($masaTungguSeed < 20) {
+                                $masaTunggu = 1; // 1 bulan
+                            } elseif ($masaTungguSeed < 55) {
+                                $masaTunggu = 2; // 2 bulan
+                            } elseif ($masaTungguSeed < 80) {
+                                $masaTunggu = 3; // 3 bulan
+                            } elseif ($masaTungguSeed < 92) {
+                                $masaTunggu = 4; // 4 bulan
+                            } elseif ($masaTungguSeed < 97) {
+                                $masaTunggu = 5; // 5 bulan
+                            } else {
+                                $masaTunggu = 6; // 6 bulan
+                            }
+
+                            $compIdx = crc32("company_{$nim}") % count($companies);
+                            $tempatKerja = $companies[$compIdx];
                         }
                     } else {
                         // Mahasiswa yang masih aktif menempuh perkuliahan
@@ -145,6 +195,8 @@ class MahasiswaSeeder extends Seeder
                         'jenis_pendaftaran' => $jalur,
                         'tanggal_kelulusan' => $tanggalKelulusan,
                         'masa_studi_bulan' => $masaStudi,
+                        'masa_tunggu_bulan' => $masaTunggu,
+                        'tempat_kerja' => $tempatKerja,
                         'created_at' => $now,
                         'updated_at' => $now,
                     ];
@@ -158,7 +210,7 @@ class MahasiswaSeeder extends Seeder
             Mahasiswa::upsert(
                 $chunk,
                 ['nim'],
-                ['nama_mahasiswa', 'tahun_masuk', 'jenis_pendaftaran', 'tanggal_kelulusan', 'masa_studi_bulan', 'updated_at']
+                ['nama_mahasiswa', 'tahun_masuk', 'jenis_pendaftaran', 'tanggal_kelulusan', 'masa_studi_bulan', 'masa_tunggu_bulan', 'tempat_kerja', 'updated_at']
             );
         }
     }

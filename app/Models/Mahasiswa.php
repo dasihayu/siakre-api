@@ -20,6 +20,16 @@ class Mahasiswa extends Model
         'jenis_pendaftaran',
         'tanggal_kelulusan',
         'masa_studi_bulan',
+        'masa_tunggu_bulan',
+        'tempat_kerja',
+    ];
+
+    protected $casts = [
+        'nim' => 'integer',
+        'tahun_masuk' => 'integer',
+        'masa_studi_bulan' => 'integer',
+        'masa_tunggu_bulan' => 'integer',
+        'tanggal_kelulusan' => 'date',
     ];
 
     protected $appends = [

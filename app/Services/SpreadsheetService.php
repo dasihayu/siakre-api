@@ -11,7 +11,6 @@ class SpreadsheetService
     /**
      * Membaca file spreadsheet (.xlsx atau .csv) dan mengembalikan array of associative rows.
      *
-     * @param  UploadedFile|string  $file
      * @return array<int, array<string, mixed>>
      *
      * @throws Exception
@@ -39,7 +38,7 @@ class SpreadsheetService
      */
     protected function parseXlsx(string $filePath): array
     {
-        $zip = new ZipArchive();
+        $zip = new ZipArchive;
         if ($zip->open($filePath) !== true) {
             throw new Exception('Gagal membuka file Excel (.xlsx). Pastikan file tidak rusak.');
         }
@@ -79,7 +78,7 @@ class SpreadsheetService
                     foreach ($relsXml->Relationship as $rel) {
                         $target = (string) $rel['Target'];
                         if (str_contains($target, 'worksheets/')) {
-                            $sheetPath = 'xl/' . ltrim($target, '/');
+                            $sheetPath = 'xl/'.ltrim($target, '/');
                             $sheetXmlContent = $zip->getFromName($sheetPath);
                             if ($sheetXmlContent !== false) {
                                 break;
@@ -284,7 +283,7 @@ class SpreadsheetService
         $colIndex++;
         while ($colIndex > 0) {
             $rem = ($colIndex - 1) % 26;
-            $letter = chr(65 + $rem) . $letter;
+            $letter = chr(65 + $rem).$letter;
             $colIndex = (int) (($colIndex - $rem - 1) / 26);
         }
 
@@ -323,8 +322,8 @@ class SpreadsheetService
      */
     public function createXlsx(array $headers, array $rows, string $sheetName = 'Nilai'): string
     {
-        $tempFile = tempnam(sys_get_temp_dir(), 'xlsx_tmpl_') . '.xlsx';
-        $zip = new ZipArchive();
+        $tempFile = tempnam(sys_get_temp_dir(), 'xlsx_tmpl_').'.xlsx';
+        $zip = new ZipArchive;
         $zip->open($tempFile, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
         $sharedStrings = [];
@@ -346,7 +345,7 @@ class SpreadsheetService
         // Baris Header (Baris 1)
         $sheetDataXml .= '<row r="1">';
         foreach ($headers as $colIdx => $header) {
-            $ref = $this->indexToColLetter($colIdx) . '1';
+            $ref = $this->indexToColLetter($colIdx).'1';
             $sIdx = $addString((string) $header);
             $sheetDataXml .= "<c r=\"{$ref}\" t=\"s\"><v>{$sIdx}</v></c>";
         }
@@ -357,7 +356,7 @@ class SpreadsheetService
         foreach ($rows as $row) {
             $sheetDataXml .= "<row r=\"{$rowNum}\">";
             foreach ($row as $colIdx => $val) {
-                $ref = $this->indexToColLetter($colIdx) . $rowNum;
+                $ref = $this->indexToColLetter($colIdx).$rowNum;
                 if (is_numeric($val) && ! is_string($val)) {
                     $sheetDataXml .= "<c r=\"{$ref}\"><v>{$val}</v></c>";
                 } else {
@@ -370,42 +369,42 @@ class SpreadsheetService
         }
         $sheetDataXml .= '</sheetData>';
 
-        $sstXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' . "\n";
-        $sstXml .= '<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="' . count($sharedStrings) . '" uniqueCount="' . count($sharedStrings) . '">';
+        $sstXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\n";
+        $sstXml .= '<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="'.count($sharedStrings).'" uniqueCount="'.count($sharedStrings).'">';
         foreach ($sharedStrings as $str) {
-            $sstXml .= '<si><t>' . htmlspecialchars($str, ENT_XML1, 'UTF-8') . '</t></si>';
+            $sstXml .= '<si><t>'.htmlspecialchars($str, ENT_XML1, 'UTF-8').'</t></si>';
         }
         $sstXml .= '</sst>';
 
         $safeSheetName = htmlspecialchars($sheetName, ENT_XML1, 'UTF-8');
-        $worksheetXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' . "\n";
+        $worksheetXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\n";
         $worksheetXml .= "<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\">\n{$sheetDataXml}\n</worksheet>";
 
-        $contentTypes = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' . "\n";
-        $contentTypes .= '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' . "\n";
-        $contentTypes .= '  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' . "\n";
-        $contentTypes .= '  <Default Extension="xml" ContentType="application/xml"/>' . "\n";
-        $contentTypes .= '  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' . "\n";
-        $contentTypes .= '  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' . "\n";
-        $contentTypes .= '  <Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/>' . "\n";
+        $contentTypes = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\n";
+        $contentTypes .= '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'."\n";
+        $contentTypes .= '  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'."\n";
+        $contentTypes .= '  <Default Extension="xml" ContentType="application/xml"/>'."\n";
+        $contentTypes .= '  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'."\n";
+        $contentTypes .= '  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'."\n";
+        $contentTypes .= '  <Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/>'."\n";
         $contentTypes .= '</Types>';
 
-        $rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' . "\n";
-        $rels .= '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' . "\n";
-        $rels .= '  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>' . "\n";
+        $rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\n";
+        $rels .= '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'."\n";
+        $rels .= '  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>'."\n";
         $rels .= '</Relationships>';
 
-        $wbRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' . "\n";
-        $wbRels .= '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' . "\n";
-        $wbRels .= '  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>' . "\n";
-        $wbRels .= '  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/>' . "\n";
+        $wbRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\n";
+        $wbRels .= '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'."\n";
+        $wbRels .= '  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>'."\n";
+        $wbRels .= '  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/>'."\n";
         $wbRels .= '</Relationships>';
 
-        $workbook = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' . "\n";
-        $workbook .= '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' . "\n";
-        $workbook .= '  <sheets>' . "\n";
+        $workbook = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\n";
+        $workbook .= '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'."\n";
+        $workbook .= '  <sheets>'."\n";
         $workbook .= "    <sheet name=\"{$safeSheetName}\" sheetId=\"1\" r:id=\"rId1\"/>\n";
-        $workbook .= '  </sheets>' . "\n";
+        $workbook .= '  </sheets>'."\n";
         $workbook .= '</workbook>';
 
         $zip->addFromString('[Content_Types].xml', $contentTypes);
