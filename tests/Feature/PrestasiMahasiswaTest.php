@@ -2,6 +2,7 @@
 
 use App\Enums\JenisEvidencePrestasi;
 use App\Models\EvidencePrestasiMahasiswa;
+use App\Models\JenisPrestasi;
 use App\Models\Mahasiswa;
 use App\Models\PrestasiMahasiswa;
 use App\Models\User;
@@ -25,8 +26,17 @@ test('authenticated user can list prestasi mahasiswa with evidence relations', f
         'masa_studi_bulan' => 48,
     ]);
 
+    $jenisPrestasi = JenisPrestasi::create([
+        'kode' => 'JP01',
+        'nama' => 'Juara Nasional',
+        'kategori' => 'Akademik',
+        'tingkat' => 'Nasional',
+        'is_active' => true,
+    ]);
+
     $prestasi = PrestasiMahasiswa::create([
         'id_mahasiswa' => $mahasiswa->id,
+        'id_jenis_prestasi' => $jenisPrestasi->id,
         'nama_aktivitas' => 'Juara 1 OSN',
         'tahun' => 2024,
     ]);
@@ -64,8 +74,17 @@ test('authenticated user can create prestasi mahasiswa with batch evidence', fun
         'masa_studi_bulan' => 48,
     ]);
 
+    $jenisPrestasi = JenisPrestasi::create([
+        'kode' => 'JP01',
+        'nama' => 'Juara Nasional',
+        'kategori' => 'Akademik',
+        'tingkat' => 'Nasional',
+        'is_active' => true,
+    ]);
+
     $payload = [
         'id_mahasiswa' => $mahasiswa->id,
+        'id_jenis_prestasi' => $jenisPrestasi->id,
         'nama_aktivitas' => 'Juara 1 OSN',
         'tahun' => 2024,
         'evidence' => [
@@ -126,8 +145,17 @@ test('authenticated user can create prestasi mahasiswa with simple string urls i
         'masa_studi_bulan' => 48,
     ]);
 
+    $jenisPrestasi = JenisPrestasi::create([
+        'kode' => 'JP01',
+        'nama' => 'Juara Nasional',
+        'kategori' => 'Akademik',
+        'tingkat' => 'Nasional',
+        'is_active' => true,
+    ]);
+
     $payload = [
         'id_mahasiswa' => $mahasiswa->id,
+        'id_jenis_prestasi' => $jenisPrestasi->id,
         'nama_aktivitas' => 'Finalis Lomba Coding',
         'tahun' => 2025,
         'evidence' => [
@@ -158,8 +186,17 @@ test('fails to create prestasi mahasiswa with invalid url in evidence', function
         'masa_studi_bulan' => 48,
     ]);
 
+    $jenisPrestasi = JenisPrestasi::create([
+        'kode' => 'JP01',
+        'nama' => 'Juara Nasional',
+        'kategori' => 'Akademik',
+        'tingkat' => 'Nasional',
+        'is_active' => true,
+    ]);
+
     $payload = [
         'id_mahasiswa' => $mahasiswa->id,
+        'id_jenis_prestasi' => $jenisPrestasi->id,
         'nama_aktivitas' => 'Juara 1 OSN',
         'tahun' => 2024,
         'evidence' => [
@@ -186,8 +223,17 @@ test('fails to create prestasi mahasiswa with invalid jenis_evidence in evidence
         'masa_studi_bulan' => 48,
     ]);
 
+    $jenisPrestasi = JenisPrestasi::create([
+        'kode' => 'JP01',
+        'nama' => 'Juara Nasional',
+        'kategori' => 'Akademik',
+        'tingkat' => 'Nasional',
+        'is_active' => true,
+    ]);
+
     $payload = [
         'id_mahasiswa' => $mahasiswa->id,
+        'id_jenis_prestasi' => $jenisPrestasi->id,
         'nama_aktivitas' => 'Juara 1 OSN',
         'tahun' => 2024,
         'evidence' => [
@@ -217,8 +263,17 @@ test('authenticated user can view detail of prestasi mahasiswa', function () {
         'masa_studi_bulan' => 48,
     ]);
 
+    $jenisPrestasi = JenisPrestasi::create([
+        'kode' => 'JP01',
+        'nama' => 'Juara Nasional',
+        'kategori' => 'Akademik',
+        'tingkat' => 'Nasional',
+        'is_active' => true,
+    ]);
+
     $prestasi = PrestasiMahasiswa::create([
         'id_mahasiswa' => $mahasiswa->id,
+        'id_jenis_prestasi' => $jenisPrestasi->id,
         'nama_aktivitas' => 'Juara 1 OSN',
         'tahun' => 2024,
     ]);
@@ -258,8 +313,17 @@ test('authenticated user can update prestasi mahasiswa and sync batch evidence',
         'masa_studi_bulan' => 48,
     ]);
 
+    $jenisPrestasi = JenisPrestasi::create([
+        'kode' => 'JP01',
+        'nama' => 'Juara Nasional',
+        'kategori' => 'Akademik',
+        'tingkat' => 'Nasional',
+        'is_active' => true,
+    ]);
+
     $prestasi = PrestasiMahasiswa::create([
         'id_mahasiswa' => $mahasiswa->id,
+        'id_jenis_prestasi' => $jenisPrestasi->id,
         'nama_aktivitas' => 'Juara Lama',
         'tahun' => 2023,
     ]);
@@ -281,6 +345,7 @@ test('authenticated user can update prestasi mahasiswa and sync batch evidence',
     $response = $this->withHeader('Authorization', "Bearer {$token}")
         ->putJson("/api/prestasi-mahasiswa/{$prestasi->id}", [
             'id_mahasiswa' => $mahasiswa->id,
+            'id_jenis_prestasi' => $jenisPrestasi->id,
             'nama_aktivitas' => 'Juara Baru',
             'tahun' => 2024,
             'evidence' => [
@@ -341,8 +406,17 @@ test('updating prestasi mahasiswa without evidence key leaves existing evidence 
         'masa_studi_bulan' => 48,
     ]);
 
+    $jenisPrestasi = JenisPrestasi::create([
+        'kode' => 'JP01',
+        'nama' => 'Juara Nasional',
+        'kategori' => 'Akademik',
+        'tingkat' => 'Nasional',
+        'is_active' => true,
+    ]);
+
     $prestasi = PrestasiMahasiswa::create([
         'id_mahasiswa' => $mahasiswa->id,
+        'id_jenis_prestasi' => $jenisPrestasi->id,
         'nama_aktivitas' => 'Juara Lama',
         'tahun' => 2023,
     ]);
@@ -357,6 +431,7 @@ test('updating prestasi mahasiswa without evidence key leaves existing evidence 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
         ->putJson("/api/prestasi-mahasiswa/{$prestasi->id}", [
             'id_mahasiswa' => $mahasiswa->id,
+            'id_jenis_prestasi' => $jenisPrestasi->id,
             'nama_aktivitas' => 'Juara Terupdate',
             'tahun' => 2024,
         ]);
@@ -381,8 +456,17 @@ test('authenticated user can delete prestasi mahasiswa and its child evidence', 
         'masa_studi_bulan' => 48,
     ]);
 
+    $jenisPrestasi = JenisPrestasi::create([
+        'kode' => 'JP01',
+        'nama' => 'Juara Nasional',
+        'kategori' => 'Akademik',
+        'tingkat' => 'Nasional',
+        'is_active' => true,
+    ]);
+
     $prestasi = PrestasiMahasiswa::create([
         'id_mahasiswa' => $mahasiswa->id,
+        'id_jenis_prestasi' => $jenisPrestasi->id,
         'nama_aktivitas' => 'Prestasi Hapus',
         'tahun' => 2024,
     ]);
