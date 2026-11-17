@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('mata_kuliah_angkatan_kelas', function (Blueprint $table) {
-            $table->id(); 
-            $table->foreignId('enrollment_mata_kuliah_id')->constrained('enrollment_mata_kuliah')->onDelete('cascade'); 
-            $table->foreignId('angkatan_kelas_id')->constrained('angkatan_kelas')->onDelete('cascade'); 
+            $table->id();
+            $table->foreignId('enrollment_mata_kuliah_id')->constrained('enrollment_mata_kuliah')->onDelete('cascade');
+            $table->foreignId('angkatan_kelas_id')->constrained('angkatan_kelas')->onDelete('cascade');
             $table->timestamps();
         });
     }

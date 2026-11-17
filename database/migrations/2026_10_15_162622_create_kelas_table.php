@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('kelas', 50);
             $table->timestamps();
-            });
+        });
     }
 
     public function down(): void

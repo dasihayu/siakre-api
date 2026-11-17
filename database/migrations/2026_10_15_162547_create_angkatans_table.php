@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->integer('angkatan')->unique();
             $table->timestamps();
-});
+        });
     }
 
     public function down(): void

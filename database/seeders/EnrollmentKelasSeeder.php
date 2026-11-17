@@ -6,6 +6,7 @@ use App\Models\AngkatanKelas;
 use App\Models\EnrollmentKelas;
 use App\Models\Mahasiswa;
 use App\Models\Prodi;
+use App\Models\StatusMahasiswa;
 use Illuminate\Database\Seeder;
 
 class EnrollmentKelasSeeder extends Seeder
@@ -48,6 +49,7 @@ class EnrollmentKelasSeeder extends Seeder
             return "{$tahunAngkatan}|{$huruf}";
         });
 
+        StatusMahasiswa::query()->delete();
         EnrollmentKelas::query()->delete();
 
         $now = now();

@@ -13,6 +13,14 @@ class TahunAkademikSeeder extends Seeder
     public function run(): void
     {
         $data = [
+            ['tahun' => '2018/2019', 'semester' => 'Ganjil', 'is_active' => false],
+            ['tahun' => '2018/2019', 'semester' => 'Genap', 'is_active' => false],
+            ['tahun' => '2019/2020', 'semester' => 'Ganjil', 'is_active' => false],
+            ['tahun' => '2019/2020', 'semester' => 'Genap', 'is_active' => false],
+            ['tahun' => '2020/2021', 'semester' => 'Ganjil', 'is_active' => false],
+            ['tahun' => '2020/2021', 'semester' => 'Genap', 'is_active' => false],
+            ['tahun' => '2021/2022', 'semester' => 'Ganjil', 'is_active' => false],
+            ['tahun' => '2021/2022', 'semester' => 'Genap', 'is_active' => false],
             ['tahun' => '2022/2023', 'semester' => 'Ganjil', 'is_active' => false],
             ['tahun' => '2022/2023', 'semester' => 'Genap', 'is_active' => false],
             ['tahun' => '2023/2024', 'semester' => 'Ganjil', 'is_active' => false],

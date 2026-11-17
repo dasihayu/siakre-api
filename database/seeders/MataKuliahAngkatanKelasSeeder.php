@@ -23,6 +23,11 @@ class MataKuliahAngkatanKelasSeeder extends Seeder
             2025 => 3, // Kelas TI-2A..2C: sudah ada nilai Sem 1-2, sedang menempuh Sem 3
             2024 => 5, // Kelas TI-3A..3C: sudah ada nilai Sem 1-4, sedang menempuh Sem 5
             2023 => 7, // Kelas TI-4A..4C: sudah ada nilai Sem 1-6, sedang menempuh Sem 7
+            2022 => 8, // Lulusan: seluruh semester 1 s/d 8
+            2021 => 8, // Lulusan: seluruh semester 1 s/d 8
+            2020 => 8, // Lulusan: seluruh semester 1 s/d 8
+            2019 => 8, // Lulusan: seluruh semester 1 s/d 8
+            2018 => 8, // Lulusan: seluruh semester 1 s/d 8
         ];
     }
 
@@ -60,9 +65,32 @@ class MataKuliahAngkatanKelasSeeder extends Seeder
         $allTa = TahunAkademik::all();
         $taMap = $allTa->keyBy(fn (TahunAkademik $ta) => "{$ta->tahun}|{$ta->semester}");
         $enrollmentMap = $allEnrollments->keyBy(fn (EnrollmentMataKuliah $e) => "{$e->mata_kuliah_id}|{$e->tahun_akademik_id}");
-        $akByAngkatan = $activeAngkatanKelas->groupBy(fn (AngkatanKelas $ak) => (int) ($ak->angkatan?->angkatan));
 
+        $allAngkatanKelas = AngkatanKelas::with(['angkatan', 'kelas'])->get();
         $maxSemByAngkatan = self::getMaxEnrolledSemesterByAngkatan();
+
+        $akByAngkatanMap = [];
+        foreach ($maxSemByAngkatan as $angkatan => $maxSem) {
+            $activeClasses = $allAngkatanKelas->filter(function (AngkatanKelas $ak) use ($angkatan, $taActive) {
+                return (int) ($ak->angkatan?->angkatan ?? 0) === $angkatan
+                    && (int) $ak->tahun_akademik_id === (int) $taActive->id;
+            });
+
+            if ($activeClasses->isNotEmpty()) {
+                $akByAngkatanMap[$angkatan] = $activeClasses;
+            } else {
+                $cohortClasses = $allAngkatanKelas->filter(function (AngkatanKelas $ak) use ($angkatan) {
+                    return (int) ($ak->angkatan?->angkatan ?? 0) === $angkatan;
+                });
+
+                if ($cohortClasses->isNotEmpty()) {
+                    $latestTaId = $cohortClasses->max('tahun_akademik_id');
+                    $akByAngkatanMap[$angkatan] = $cohortClasses->where('tahun_akademik_id', $latestTaId);
+                }
+            }
+        }
+        $akByAngkatan = collect($akByAngkatanMap);
+
         $allMatkul = $allEnrollments->pluck('mataKuliah')->filter()->unique('id');
 
         MataKuliahAngkatanKelas::query()->delete();

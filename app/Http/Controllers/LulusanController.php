@@ -96,14 +96,24 @@ class LulusanController extends Controller
 
         $rataIpk = $total > 0 ? round($formatted->avg('ipk_riil'), 2) : null;
         $rataMasaStudi = $total > 0 ? round($formatted->avg('masa_studi_bulan'), 1) : null;
+        $rataMasaTunggu = $total > 0 ? round($formatted->whereNotNull('masa_tunggu_bulan')->avg('masa_tunggu_bulan'), 1) : null;
         $pctTepat = $total > 0 ? round(($tepat / $total) * 100, 1) : null;
+
+        $distribusiIpk = [
+            '< 2.75' => $formatted->filter(fn ($d) => $d['ipk_riil'] < 2.75)->count(),
+            '2.75 - 3.00' => $formatted->filter(fn ($d) => $d['ipk_riil'] >= 2.75 && $d['ipk_riil'] <= 3.00)->count(),
+            '3.01 - 3.50' => $formatted->filter(fn ($d) => $d['ipk_riil'] > 3.00 && $d['ipk_riil'] <= 3.50)->count(),
+            '> 3.50' => $formatted->filter(fn ($d) => $d['ipk_riil'] > 3.50)->count(),
+        ];
 
         return ApiResponse::success([
             'total_lulusan' => $total,
             'rata_rata_masa_studi_bulan' => $rataMasaStudi,
+            'rata_rata_masa_tunggu_bulan' => $rataMasaTunggu,
             'rata_rata_ipk' => $rataIpk,
             'persen_lulus_tepat_waktu' => $pctTepat,
             'jumlah_lulus_tepat_waktu' => $tepat,
+            'distribusi_ipk' => $distribusiIpk,
         ], 'Berhasil mengambil ringkasan data lulusan');
     }
 
@@ -143,6 +153,8 @@ class LulusanController extends Controller
             'jenjang_prodi' => $jenjang,
             'batas_masa_studi_bulan' => $batasTepat,
             'masa_studi_bulan' => $masaStudiBulan,
+            'masa_tunggu_bulan' => $mhs->masa_tunggu_bulan,
+            'tempat_kerja' => $mhs->tempat_kerja,
             'ipk_riil' => $ipkResult['ipk'],
             'total_sks' => $ipkResult['total_sks'],
             'lulus_tepat_waktu' => $masaStudiBulan <= $batasTepat,
