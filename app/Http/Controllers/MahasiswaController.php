@@ -39,15 +39,23 @@ class MahasiswaController extends Controller
             $mahasiswaBaru = Mahasiswa::where('tahun_masuk', $year)->count();
             $jumlahMahasiswaBaru[] = $mahasiswaBaru;
 
-            // ── Lulusan dari kohort angkatan $year ───────────────────────────
-            // Lulusan adalah mahasiswa kohort $year yang sudah memiliki tanggal_kelulusan
-            $lulusanKohort = Mahasiswa::where('tahun_masuk', $year)
-                ->whereNotNull('tanggal_kelulusan')
+            // ── Lulusan pada tahun $year (atau kohort tahun_masuk = $year) ──
+            $lulusanKohort = Mahasiswa::whereYear('tanggal_kelulusan', $year)
                 ->with([
                     'nilaiMahasiswa.mataKuliahAngkatanKelas.enrollmentMataKuliah.mataKuliah',
                     'nilaiMahasiswa.tahunAkademik',
                 ])
                 ->get();
+
+            if ($lulusanKohort->isEmpty()) {
+                $lulusanKohort = Mahasiswa::where('tahun_masuk', $year)
+                    ->whereNotNull('tanggal_kelulusan')
+                    ->with([
+                        'nilaiMahasiswa.mataKuliahAngkatanKelas.enrollmentMataKuliah.mataKuliah',
+                        'nilaiMahasiswa.tahunAkademik',
+                    ])
+                    ->get();
+            }
 
             $totalLulusan = $lulusanKohort->count();
 
@@ -128,6 +136,8 @@ class MahasiswaController extends Controller
             'jenis_pendaftaran' => 'required|string',
             'tanggal_kelulusan' => 'nullable|date',
             'masa_studi_bulan' => 'required|integer',
+            'masa_tunggu_bulan' => 'nullable|integer|min:0|max:120',
+            'tempat_kerja' => 'nullable|string|max:255',
         ], [
             'nim.unique' => 'NIM Mahasiswa Sudah Ada',
         ]);
@@ -163,6 +173,8 @@ class MahasiswaController extends Controller
             'jenis_pendaftaran' => 'required|string',
             'tanggal_kelulusan' => 'nullable|date',
             'masa_studi_bulan' => 'required|integer',
+            'masa_tunggu_bulan' => 'nullable|integer|min:0|max:120',
+            'tempat_kerja' => 'nullable|string|max:255',
         ], [
             'nim.unique' => 'NIM Mahasiswa Sudah Ada',
         ]);
